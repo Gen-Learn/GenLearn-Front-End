@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://0xabdallah-nabil.github.io/GenLearn/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
