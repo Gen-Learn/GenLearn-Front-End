@@ -1,0 +1,114 @@
+{
+  "Courses": [
+    {
+      "id": 1,
+      "img": "./Cardimg.png",
+      "title": "Web Development Fundamentals",
+      "Auther": "John Doe",
+      "description": "Learn the core concepts of modern web development.",
+      "status": "In Progress",
+      "progress": 45,
+      "numberofchapters": 12,
+      "fields": ["Web", "Basics"]
+    },
+    {
+      "id": 2,
+      "img": "./Cardimg.png",
+      "title": "React for Beginners",
+      "Auther": "Sarah Smith",
+      "description": "Build dynamic user interfaces using React.",
+      "status": "Completed",
+      "progress": 100,
+      "numberofchapters": 18,
+      "fields": ["React", "Frontend"]
+    },
+    {
+      "id": 3,
+      "img": "./Cardimg.png",
+      "title": "JavaScript Mastery",
+      "Auther": "Ahmed Ali",
+      "description": "Deep dive into JavaScript from basics to advanced.",
+      "status": "In Progress",
+      "progress": 62,
+      "numberofchapters": 20,
+      "fields": ["JavaScript", "Programming"]
+    },
+    {
+      "id": 4,
+      "img": "./Cardimg.png",
+      "title": "UI/UX Design Essentials",
+      "Auther": "Emily Brown",
+      "description": "Design beautiful and user-friendly interfaces.",
+      "status": "Not Started",
+      "progress": 0,
+      "numberofchapters": 10,
+      "fields": ["UI", "UX"]
+    },
+    {
+      "id": 5,
+      "img": "./Cardimg.png",
+      "title": "Node.js & Express",
+      "Auther": "Michael Lee",
+      "description": "Create fast and scalable backend applications.",
+      "status": "In Progress",
+      "progress": 30,
+      "numberofchapters": 15,
+      "fields": ["Backend", "Node.js"]
+    },
+    {
+      "id": 6,
+      "img": "./Cardimg.png",
+      "title": "Database Design",
+      "Auther": "Fatma Hassan",
+      "description": "Understand relational and NoSQL databases.",
+      "status": "Completed",
+      "progress": 100,
+      "numberofchapters": 14,
+      "fields": ["Database", "SQL"]
+    },
+    {
+      "id": 7,
+      "img": "./Cardimg.png",
+      "title": "AI Basics",
+      "Auther": "Omar Khaled",
+      "description": "Introduction to artificial intelligence concepts.",
+      "status": "In Progress",
+      "progress": 55,
+      "numberofchapters": 16,
+      "fields": ["AI", "ML"]
+    },
+    {
+      "id": 8,
+      "img": "./Cardimg.png",
+      "title": "Python Programming",
+      "Auther": "Laura White",
+      "description": "Learn Python for web, data, and automation.",
+      "status": "Not Started",
+      "progress": 0,
+      "numberofchapters": 22,
+      "fields": ["Python", "Programming"]
+    },
+    {
+      "id": 9,
+      "img": "./Cardimg.png",
+      "title": "Frontend Performance",
+      "Auther": "David Miller",
+      "description": "Optimize websites for speed and performance.",
+      "status": "In Progress",
+      "progress": 70,
+      "numberofchapters": 11,
+      "fields": ["Frontend", "Optimization"]
+    },
+    {
+      "id": 10,
+      "img": "./Cardimg.png",
+      "title": "Full-Stack Development",
+      "Auther": "Nora Adel",
+      "description": "Become a complete full-stack developer.",
+      "status": "Completed",
+      "progress": 100,
+      "numberofchapters": 25,
+      "fields": ["Full-Stack", "Web"]
+    }
+  ]
+}

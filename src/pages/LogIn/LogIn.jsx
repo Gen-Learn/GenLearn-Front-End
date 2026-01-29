@@ -11,7 +11,7 @@ function SignUp() {
       <div className="flex justify-evenly items-center py-10">
         <div className="lg:w-2/5 flex flex-col  p-8">
           {/* title */}
-          <h1 className="text-4xl font-bold  text-center mb-4">
+          <h1 className="sm:text-[35px] text-[30px] font-bold  text-center mb-4">
             Welcome Back!
           </h1>
           {/* description */}
@@ -35,12 +35,14 @@ function SignUp() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input type="checkbox" />
-              <p className="ml-2.5 text-[#a082c4]">Remember me</p>
+              <p className="ml-2.5 text-[#a082c4] text-[15px] sm:text-[16px]">
+                Remember me
+              </p>
             </div>
             <div>
               <Link
                 to="/forgotPassword"
-                className="ml-32 text-[#a082c4] hover:underline underline-offset-2"
+                className=" text-[#a082c4] hover:underline underline-offset-2 text-[15px] sm:text-[16px]"
               >
                 Forgot Password?
               </Link>
@@ -57,16 +59,16 @@ function SignUp() {
           </div>
           {/* google & facebook */}
           <div className="flex justify-center gap-4 my-4">
-            <button className="p-0.5 rounded-sm bg-linear-to-r from-[#22B5E5] to-[#E522B5]">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100">
-                <FcGoogle className="text-blue-700" />
+            <button className="p-0.5  bg-linear-to-r rounded-sm from-[#22B5E5] to-[#E522B5]">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100 h-full">
+                <FcGoogle />
                 <span className="text-[15px] text-[#505b61]">
                   Sign in with Google
                 </span>
               </div>
             </button>
             <button className="p-0.5  bg-linear-to-r rounded-sm from-[#22B5E5] to-[#E522B5]">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100 h-full">
                 <FaFacebook className="text-blue-700" />
                 <span className="text-[15px] text-[#505b61]">
                   Sign in with Facebook

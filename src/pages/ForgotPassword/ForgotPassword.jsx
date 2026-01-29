@@ -13,12 +13,14 @@ function ForgotPassword() {
         </div>
         <div className="lg:w-5/12 flex flex-col  p-8">
           {/* title */}
-          <h1 className="text-[35px] font-bold mb-4  ">Forgot Your Password?</h1>
+          <h1 className="sm:text-[30px] text-[22px] font-bold mb-4  ">
+            Forgot Your Password?
+          </h1>
           {/* description */}
-          <h2 className="text-3xl font-bold text-[#8864b5]">
+          <h2 className="sm:text-2xl text-[18px] font-bold text-[#8864b5]">
             Enter your Email
           </h2>
-          <p className="text-[16px]  text-[#505b61] mb-3">
+          <p className="sm:text-[18px] text-[16px]  text-[#505b61] mb-3">
             Enter your email to get the code.
           </p>
           {/* form */}

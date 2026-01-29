@@ -12,11 +12,11 @@ function SignUp() {
         </div>
         <div className="lg:w-2/5 flex flex-col  p-8">
           {/* title */}
-          <h1 className="text-4xl font-bold  text-center ">
+          <h1 className="sm:text-4xl text-3xl font-bold  text-center mb-4">
             Start Your Journey
           </h1>
           {/* description */}
-          <p className="text-2xl text-center  m-auto text-[#505b61]">
+          <p className="sm:text-[20px] text-[16px] text-center  m-auto text-[#505b61] mb-7">
             Turn every book into an interactive experience
           </p>
           {/* form */}
@@ -45,11 +45,16 @@ function SignUp() {
           {/* checkbox */}
           <div className="flex items-center">
             <input type="checkbox" />
-            <p className="ml-2.5">
+            <p className="ml-2.5 text-[14px] sm:text-[16px]">
               I agree to the
-              <span className="text-blue-500">Terms </span>
+              <span className="text-blue-500 text-[14px] sm:text-[16px]">
+                Terms{" "}
+              </span>
               and
-              <span className="text-blue-500"> Privacy Policy</span>
+              <span className="text-blue-500 text-[14px] sm:text-[16px]">
+                {" "}
+                Privacy Policy
+              </span>
             </p>
           </div>
 

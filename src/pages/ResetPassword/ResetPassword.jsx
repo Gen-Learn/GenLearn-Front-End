@@ -13,12 +13,14 @@ function ResetPassword() {
         </div>
         <div className="lg:w-5/12 flex flex-col  p-8">
           {/* title */}
-          <h1 className="text-[35px] font-bold mb-4  ">Reset Your Password?</h1>
+          <h1 className="sm:text-[30px] text-[24px] font-bold mb-4  ">
+            Reset Your Password?
+          </h1>
           {/* description */}
-          <h2 className="text-3xl font-bold text-[#8864b5]">
+          <h2 className="sm:text-2xl text-[18px] font-bold text-[#8864b5]">
             Enter new password
           </h2>
-          <p className="text-[16px]  text-[#505b61] mb-3">
+          <p className="sm:text-[18px] text-[12px]  text-[#505b61] mb-3">
             Turn every book into an interactive experience
           </p>
           {/* form */}
