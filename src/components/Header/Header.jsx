@@ -3,6 +3,7 @@ import BeforeAuth from "./BeforeAuth";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
 import { useState } from "react";
+import { Link } from "react-router";
 import BurgerMenuIcon from "./BurgerMenuIcon";
 import useMediaQuery from "../../hooks/useMediaQuery";
 function Header() {
@@ -11,9 +12,9 @@ function Header() {
   return (
     <header className="w-full m-auto flex-col flex justify-center items-center  my-5">
       <div className="w-[80%] flex justify-between items-center bg-[#f6f5fa] shadow-md rounded-2xl border border-[#b9bac9] px-4 py-2">
-        <div>
+        <Link to="/">
           <img src={logo} alt="Logo" />
-        </div>
+        </Link>
         <DesktopNav />
         {isMobile && (
           <BurgerMenuIcon

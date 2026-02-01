@@ -1,0 +1,794 @@
+{
+  "chaptersByCourse": {
+    "1": [
+      {
+        "id": 1,
+        "title": "Introduction to Web Development",
+        "sections": [
+          {
+            "id": 1,
+            "title": "What is Web Development?",
+            "duration": "12:30",
+            "videoUrl": "https://videos.example.com/web-dev/what-is-web-dev",
+            "script": "Explore the world of web development, understanding the difference between frontend and backend, and how they work together.",
+            "material": "https://materials.example.com/web-dev/intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Setting Up Your Development Environment",
+            "duration": "18:45",
+            "videoUrl": "https://videos.example.com/web-dev/setup-environment",
+            "script": "Learn how to install and configure essential tools like VS Code, Node.js, and Git for web development.",
+            "material": "https://materials.example.com/web-dev/setup-guide.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "HTML Basics",
+        "sections": [
+          {
+            "id": 3,
+            "title": "HTML Document Structure",
+            "duration": "14:20",
+            "videoUrl": "https://videos.example.com/web-dev/html-structure",
+            "script": "Understand the anatomy of an HTML document including doctype, head, and body elements.",
+            "material": "https://materials.example.com/web-dev/html-structure.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Working with Text and Links",
+            "duration": "16:50",
+            "videoUrl": "https://videos.example.com/web-dev/text-links",
+            "script": "Master headings, paragraphs, formatting tags, and creating hyperlinks in HTML.",
+            "material": "https://materials.example.com/web-dev/text-links.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "CSS Fundamentals",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Introduction to CSS",
+            "duration": "13:15",
+            "videoUrl": "https://videos.example.com/web-dev/intro-css",
+            "script": "Discover how CSS styles HTML elements and learn about selectors, properties, and values.",
+            "material": "https://materials.example.com/web-dev/css-intro.pdf"
+          },
+          {
+            "id": 6,
+            "title": "The Box Model",
+            "duration": "19:30",
+            "videoUrl": "https://videos.example.com/web-dev/box-model",
+            "script": "Deep dive into margin, border, padding, and content - the foundation of CSS layout.",
+            "material": "https://materials.example.com/web-dev/box-model.pdf"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Responsive Design",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Media Queries",
+            "duration": "17:40",
+            "videoUrl": "https://videos.example.com/web-dev/media-queries",
+            "script": "Learn how to create responsive layouts that adapt to different screen sizes using media queries.",
+            "material": "https://materials.example.com/web-dev/responsive.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Flexbox Layout",
+            "duration": "21:10",
+            "videoUrl": "https://videos.example.com/web-dev/flexbox",
+            "script": "Master the flexbox layout system for creating flexible and responsive page structures.",
+            "material": "https://materials.example.com/web-dev/flexbox-guide.pdf"
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "id": 1,
+        "title": "React Introduction",
+        "sections": [
+          {
+            "id": 1,
+            "title": "What is React?",
+            "duration": "11:25",
+            "videoUrl": "https://videos.example.com/react/what-is-react",
+            "script": "Understand React's component-based architecture and why it's a popular choice for building UIs.",
+            "material": "https://materials.example.com/react/intro-slides.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Your First React App",
+            "duration": "15:50",
+            "videoUrl": "https://videos.example.com/react/first-app",
+            "script": "Build your first React application and understand the basic project structure and workflow.",
+            "material": "https://materials.example.com/react/first-app-guide.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Components and Props",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Creating Components",
+            "duration": "18:30",
+            "videoUrl": "https://videos.example.com/react/components",
+            "script": "Learn how to create functional and class components in React.",
+            "material": "https://materials.example.com/react/components.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Passing Props",
+            "duration": "16:45",
+            "videoUrl": "https://videos.example.com/react/props",
+            "script": "Understand how to pass data between components using props for reusable interfaces.",
+            "material": "https://materials.example.com/react/props-guide.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "State Management",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Understanding State",
+            "duration": "20:15",
+            "videoUrl": "https://videos.example.com/react/state-basics",
+            "script": "Explore React state and how it differs from props, enabling interactive components.",
+            "material": "https://materials.example.com/react/state.pdf"
+          },
+          {
+            "id": 6,
+            "title": "useState Hook",
+            "duration": "17:35",
+            "videoUrl": "https://videos.example.com/react/usestate-hook",
+            "script": "Master the useState hook for managing component state in functional components.",
+            "material": "https://materials.example.com/react/hooks-useState.pdf"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Handling Events",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Event Handling Basics",
+            "duration": "14:50",
+            "videoUrl": "https://videos.example.com/react/events",
+            "script": "Learn how to handle user interactions like clicks, input changes, and form submissions.",
+            "material": "https://materials.example.com/react/events.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Forms in React",
+            "duration": "19:20",
+            "videoUrl": "https://videos.example.com/react/forms",
+            "script": "Build controlled components and manage form data effectively in React applications.",
+            "material": "https://materials.example.com/react/forms-guide.pdf"
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "id": 1,
+        "title": "JavaScript Foundations",
+        "sections": [
+          {
+            "id": 1,
+            "title": "Variables and Data Types",
+            "duration": "13:40",
+            "videoUrl": "https://videos.example.com/js/variables",
+            "script": "Learn about var, let, const and different data types in JavaScript.",
+            "material": "https://materials.example.com/js/variables.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Functions",
+            "duration": "17:25",
+            "videoUrl": "https://videos.example.com/js/functions",
+            "script": "Master function declarations, expressions, and arrow functions in JavaScript.",
+            "material": "https://materials.example.com/js/functions.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Objects and Arrays",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Working with Objects",
+            "duration": "16:30",
+            "videoUrl": "https://videos.example.com/js/objects",
+            "script": "Understand JavaScript objects, properties, methods, and object manipulation.",
+            "material": "https://materials.example.com/js/objects.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Array Methods",
+            "duration": "21:45",
+            "videoUrl": "https://videos.example.com/js/arrays",
+            "script": "Master essential array methods like map, filter, reduce, forEach, and more.",
+            "material": "https://materials.example.com/js/array-methods.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Asynchronous JavaScript",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Callbacks and Promises",
+            "duration": "19:55",
+            "videoUrl": "https://videos.example.com/js/async-basics",
+            "script": "Learn how to handle asynchronous operations using callbacks and promises.",
+            "material": "https://materials.example.com/js/async.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Async/Await",
+            "duration": "18:20",
+            "videoUrl": "https://videos.example.com/js/async-await",
+            "script": "Write cleaner asynchronous code using the modern async/await syntax.",
+            "material": "https://materials.example.com/js/async-await.pdf"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "DOM Manipulation",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Selecting Elements",
+            "duration": "15:10",
+            "videoUrl": "https://videos.example.com/js/dom-selectors",
+            "script": "Learn different methods to select and access DOM elements in JavaScript.",
+            "material": "https://materials.example.com/js/dom-selectors.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Modifying the DOM",
+            "duration": "20:35",
+            "videoUrl": "https://videos.example.com/js/dom-manipulation",
+            "script": "Master techniques for creating, updating, and removing DOM elements dynamically.",
+            "material": "https://materials.example.com/js/dom-manipulation.pdf"
+          }
+        ]
+      }
+    ],
+    "4": [
+      {
+        "id": 1,
+        "title": "Introduction to UI/UX",
+        "sections": [
+          {
+            "id": 1,
+            "title": "What is UI/UX Design?",
+            "duration": "10:50",
+            "videoUrl": "https://videos.example.com/uiux/intro",
+            "script": "Understand the difference between UI and UX and their importance in product design.",
+            "material": "https://materials.example.com/uiux/intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Design Thinking Process",
+            "duration": "14:30",
+            "videoUrl": "https://videos.example.com/uiux/design-thinking",
+            "script": "Learn the five stages of design thinking: empathize, define, ideate, prototype, and test.",
+            "material": "https://materials.example.com/uiux/design-thinking.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "User Research",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Conducting User Interviews",
+            "duration": "16:40",
+            "videoUrl": "https://videos.example.com/uiux/user-interviews",
+            "script": "Master the art of gathering user insights through effective interviewing techniques.",
+            "material": "https://materials.example.com/uiux/interviews.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Creating User Personas",
+            "duration": "13:25",
+            "videoUrl": "https://videos.example.com/uiux/personas",
+            "script": "Build realistic user personas to guide design decisions and improve user experience.",
+            "material": "https://materials.example.com/uiux/personas.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Wireframing and Prototyping",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Low-Fidelity Wireframes",
+            "duration": "15:55",
+            "videoUrl": "https://videos.example.com/uiux/wireframes",
+            "script": "Learn to create quick wireframes to visualize layout and structure before detailed design.",
+            "material": "https://materials.example.com/uiux/wireframing.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Interactive Prototypes",
+            "duration": "18:15",
+            "videoUrl": "https://videos.example.com/uiux/prototypes",
+            "script": "Build clickable prototypes to test user flows and gather feedback early in the process.",
+            "material": "https://materials.example.com/uiux/prototyping.pdf"
+          }
+        ]
+      }
+    ],
+    "5": [
+      {
+        "id": 1,
+        "title": "Node.js Fundamentals",
+        "sections": [
+          {
+            "id": 1,
+            "title": "Introduction to Node.js",
+            "duration": "12:20",
+            "videoUrl": "https://videos.example.com/nodejs/intro",
+            "script": "Understand what Node.js is, how it works, and why it's popular for backend development.",
+            "material": "https://materials.example.com/nodejs/intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "NPM and Package Management",
+            "duration": "14:45",
+            "videoUrl": "https://videos.example.com/nodejs/npm",
+            "script": "Learn how to use NPM to manage packages and dependencies in Node.js projects.",
+            "material": "https://materials.example.com/nodejs/npm-guide.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Express.js Basics",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Setting Up Express",
+            "duration": "16:10",
+            "videoUrl": "https://videos.example.com/express/setup",
+            "script": "Create your first Express server and understand the basics of routing and middleware.",
+            "material": "https://materials.example.com/express/setup.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Building RESTful APIs",
+            "duration": "22:30",
+            "videoUrl": "https://videos.example.com/express/rest-api",
+            "script": "Design and implement RESTful APIs using Express with proper HTTP methods and status codes.",
+            "material": "https://materials.example.com/express/rest-api.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Middleware and Error Handling",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Custom Middleware",
+            "duration": "17:50",
+            "videoUrl": "https://videos.example.com/express/middleware",
+            "script": "Create and use custom middleware for logging, authentication, and request processing.",
+            "material": "https://materials.example.com/express/middleware.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Error Handling Strategies",
+            "duration": "15:35",
+            "videoUrl": "https://videos.example.com/express/error-handling",
+            "script": "Implement robust error handling to create reliable and user-friendly APIs.",
+            "material": "https://materials.example.com/express/errors.pdf"
+          }
+        ]
+      }
+    ],
+    "6": [
+      {
+        "id": 1,
+        "title": "Database Concepts",
+        "sections": [
+          {
+            "id": 1,
+            "title": "Relational vs NoSQL",
+            "duration": "13:30",
+            "videoUrl": "https://videos.example.com/database/types",
+            "script": "Compare relational and NoSQL databases to understand when to use each type.",
+            "material": "https://materials.example.com/database/db-types.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Database Design Principles",
+            "duration": "18:40",
+            "videoUrl": "https://videos.example.com/database/design",
+            "script": "Learn normalization, relationships, and best practices for designing efficient databases.",
+            "material": "https://materials.example.com/database/design.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "SQL Fundamentals",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Basic SQL Queries",
+            "duration": "16:25",
+            "videoUrl": "https://videos.example.com/sql/basics",
+            "script": "Master SELECT, INSERT, UPDATE, and DELETE statements for data manipulation.",
+            "material": "https://materials.example.com/sql/basic-queries.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Joins and Relationships",
+            "duration": "21:15",
+            "videoUrl": "https://videos.example.com/sql/joins",
+            "script": "Understand different types of SQL joins and how to query related data across tables.",
+            "material": "https://materials.example.com/sql/joins.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "MongoDB Basics",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Introduction to MongoDB",
+            "duration": "14:50",
+            "videoUrl": "https://videos.example.com/mongodb/intro",
+            "script": "Learn about document-based databases and MongoDB's flexible schema approach.",
+            "material": "https://materials.example.com/mongodb/intro.pdf"
+          },
+          {
+            "id": 6,
+            "title": "CRUD Operations",
+            "duration": "19:30",
+            "videoUrl": "https://videos.example.com/mongodb/crud",
+            "script": "Perform create, read, update, and delete operations in MongoDB collections.",
+            "material": "https://materials.example.com/mongodb/crud.pdf"
+          }
+        ]
+      }
+    ],
+    "7": [
+      {
+        "id": 1,
+        "title": "AI Foundations",
+        "sections": [
+          {
+            "id": 1,
+            "title": "What is Artificial Intelligence?",
+            "duration": "11:45",
+            "videoUrl": "https://videos.example.com/ai/intro",
+            "script": "Explore the definition, history, and different types of artificial intelligence.",
+            "material": "https://materials.example.com/ai/ai-intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Machine Learning vs Deep Learning",
+            "duration": "15:20",
+            "videoUrl": "https://videos.example.com/ai/ml-vs-dl",
+            "script": "Understand the differences between traditional ML and deep learning approaches.",
+            "material": "https://materials.example.com/ai/ml-dl-comparison.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Machine Learning Basics",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Supervised Learning",
+            "duration": "18:35",
+            "videoUrl": "https://videos.example.com/ai/supervised",
+            "script": "Learn about classification and regression problems in supervised learning.",
+            "material": "https://materials.example.com/ai/supervised-learning.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Unsupervised Learning",
+            "duration": "17:10",
+            "videoUrl": "https://videos.example.com/ai/unsupervised",
+            "script": "Explore clustering and dimensionality reduction in unsupervised learning.",
+            "material": "https://materials.example.com/ai/unsupervised-learning.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Neural Networks",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Introduction to Neural Networks",
+            "duration": "20:25",
+            "videoUrl": "https://videos.example.com/ai/neural-nets",
+            "script": "Understand how artificial neural networks mimic the human brain to solve complex problems.",
+            "material": "https://materials.example.com/ai/neural-networks.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Training Neural Networks",
+            "duration": "22:40",
+            "videoUrl": "https://videos.example.com/ai/training",
+            "script": "Learn about backpropagation, gradient descent, and optimization techniques.",
+            "material": "https://materials.example.com/ai/training-networks.pdf"
+          }
+        ]
+      }
+    ],
+    "8": [
+      {
+        "id": 1,
+        "title": "Python Basics",
+        "sections": [
+          {
+            "id": 1,
+            "title": "Getting Started with Python",
+            "duration": "12:15",
+            "videoUrl": "https://videos.example.com/python/intro",
+            "script": "Install Python, set up your environment, and write your first Python program.",
+            "material": "https://materials.example.com/python/getting-started.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Variables and Data Types",
+            "duration": "14:50",
+            "videoUrl": "https://videos.example.com/python/variables",
+            "script": "Learn about Python's dynamic typing system and built-in data types.",
+            "material": "https://materials.example.com/python/data-types.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Control Flow",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Conditionals",
+            "duration": "13:30",
+            "videoUrl": "https://videos.example.com/python/conditionals",
+            "script": "Master if, elif, and else statements for decision-making in Python.",
+            "material": "https://materials.example.com/python/conditionals.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Loops",
+            "duration": "16:45",
+            "videoUrl": "https://videos.example.com/python/loops",
+            "script": "Use for and while loops to iterate over data and repeat operations.",
+            "material": "https://materials.example.com/python/loops.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Functions and Modules",
+        "sections": [
+          {
+            "id": 5,
+            "title": "Defining Functions",
+            "duration": "15:20",
+            "videoUrl": "https://videos.example.com/python/functions",
+            "script": "Create reusable functions with parameters, return values, and default arguments.",
+            "material": "https://materials.example.com/python/functions.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Working with Modules",
+            "duration": "17:35",
+            "videoUrl": "https://videos.example.com/python/modules",
+            "script": "Import and use built-in modules and create your own custom modules.",
+            "material": "https://materials.example.com/python/modules.pdf"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Data Structures",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Lists and Tuples",
+            "duration": "18:10",
+            "videoUrl": "https://videos.example.com/python/lists-tuples",
+            "script": "Work with ordered collections using lists and immutable tuples in Python.",
+            "material": "https://materials.example.com/python/lists-tuples.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Dictionaries and Sets",
+            "duration": "19:45",
+            "videoUrl": "https://videos.example.com/python/dicts-sets",
+            "script": "Use dictionaries for key-value pairs and sets for unique collections.",
+            "material": "https://materials.example.com/python/dicts-sets.pdf"
+          }
+        ]
+      }
+    ],
+    "9": [
+      {
+        "id": 1,
+        "title": "Performance Fundamentals",
+        "sections": [
+          {
+            "id": 1,
+            "title": "Why Performance Matters",
+            "duration": "10:30",
+            "videoUrl": "https://videos.example.com/perf/why-performance",
+            "script": "Understand the business impact of website performance on user experience and conversions.",
+            "material": "https://materials.example.com/perf/intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Measuring Performance",
+            "duration": "16:20",
+            "videoUrl": "https://videos.example.com/perf/measuring",
+            "script": "Learn to use tools like Lighthouse, WebPageTest, and Chrome DevTools to measure performance.",
+            "material": "https://materials.example.com/perf/measuring.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Loading Optimization",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Image Optimization",
+            "duration": "18:45",
+            "videoUrl": "https://videos.example.com/perf/images",
+            "script": "Optimize images using compression, lazy loading, and modern formats like WebP.",
+            "material": "https://materials.example.com/perf/images.pdf"
+          },
+          {
+            "id": 4,
+            "title": "Code Splitting",
+            "duration": "20:15",
+            "videoUrl": "https://videos.example.com/perf/code-splitting",
+            "script": "Reduce initial bundle size by splitting code and loading resources on demand.",
+            "material": "https://materials.example.com/perf/code-splitting.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Runtime Performance",
+        "sections": [
+          {
+            "id": 5,
+            "title": "JavaScript Performance",
+            "duration": "19:30",
+            "videoUrl": "https://videos.example.com/perf/js-perf",
+            "script": "Optimize JavaScript execution, avoid memory leaks, and reduce rendering bottlenecks.",
+            "material": "https://materials.example.com/perf/js-performance.pdf"
+          },
+          {
+            "id": 6,
+            "title": "CSS Performance",
+            "duration": "14:55",
+            "videoUrl": "https://videos.example.com/perf/css-perf",
+            "script": "Write efficient CSS selectors and minimize layout thrashing for smooth animations.",
+            "material": "https://materials.example.com/perf/css-performance.pdf"
+          }
+        ]
+      }
+    ],
+    "10": [
+      {
+        "id": 1,
+        "title": "Full-Stack Overview",
+        "sections": [
+          {
+            "id": 1,
+            "title": "What is Full-Stack Development?",
+            "duration": "11:20",
+            "videoUrl": "https://videos.example.com/fullstack/intro",
+            "script": "Understand the role of a full-stack developer and the technologies involved.",
+            "material": "https://materials.example.com/fullstack/intro.pdf"
+          },
+          {
+            "id": 2,
+            "title": "Tech Stack Selection",
+            "duration": "15:40",
+            "videoUrl": "https://videos.example.com/fullstack/tech-stack",
+            "script": "Learn how to choose the right frontend, backend, and database technologies for your project.",
+            "material": "https://materials.example.com/fullstack/tech-stack.pdf"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Frontend Integration",
+        "sections": [
+          {
+            "id": 3,
+            "title": "Connecting Frontend to Backend",
+            "duration": "19:25",
+            "videoUrl": "https://videos.example.com/fullstack/integration",
+            "script": "Make API calls from your frontend and handle responses effectively.",
+            "material": "https://materials.example.com/fullstack/api-integration.pdf"
+          },
+          {
+            "id": 4,
+            "title": "State Management",
+            "duration": "21:50",
+            "videoUrl": "https://videos.example.com/fullstack/state",
+            "script": "Manage application state across frontend and backend using Redux or Context API.",
+            "material": "https://materials.example.com/fullstack/state-management.pdf"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Authentication and Security",
+        "sections": [
+          {
+            "id": 5,
+            "title": "User Authentication",
+            "duration": "22:30",
+            "videoUrl": "https://videos.example.com/fullstack/auth",
+            "script": "Implement secure authentication using JWT tokens and session management.",
+            "material": "https://materials.example.com/fullstack/authentication.pdf"
+          },
+          {
+            "id": 6,
+            "title": "Security Best Practices",
+            "duration": "18:15",
+            "videoUrl": "https://videos.example.com/fullstack/security",
+            "script": "Protect your application from common vulnerabilities like XSS, CSRF, and SQL injection.",
+            "material": "https://materials.example.com/fullstack/security.pdf"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Deployment",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Preparing for Production",
+            "duration": "17:40",
+            "videoUrl": "https://videos.example.com/fullstack/production",
+            "script": "Optimize your application and configure it for production deployment.",
+            "material": "https://materials.example.com/fullstack/production.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Deploying Full-Stack Apps",
+            "duration": "20:55",
+            "videoUrl": "https://videos.example.com/fullstack/deployment",
+            "script": "Deploy your frontend and backend to cloud platforms like Vercel, Netlify, and Heroku.",
+            "material": "https://materials.example.com/fullstack/deployment.pdf"
+          }
+        ]
+      }
+    ]
+  }
+}

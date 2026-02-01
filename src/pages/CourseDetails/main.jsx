@@ -6,7 +6,7 @@ function CourseDetails() {
   return (
     <div>
       <DetailsSection id={id} />
-      <ChaptersDetails />
+      <ChaptersDetails id={id} />
     </div>
   );
 }

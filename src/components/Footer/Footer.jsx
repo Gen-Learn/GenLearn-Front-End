@@ -1,44 +1,46 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 import logo from "../../assets/images/LogoFooter.png";
 export default function Footer() {
   return (
-    <footer className="bg-[#f0f2f5] py-8 px-6">
+    <footer className="bg-[#f0f2f5] py-8 px-6 text-center">
       <div className="max-w-6xl mx-auto">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
           {/* Logo Section */}
-          <div className="flex items-start">
+          <Link to="/" className="flex items-start">
             <img src={logo} alt="GenLearn Logo" />
-          </div>
+          </Link>
 
           {/* Our Site Section */}
           <div>
             <h3 className="font-semibold text-gray-800 mb-4">Our site</h3>
             <ul className="space-y-2">
               <li>
-                <a
+                <Link
                   href="#"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
+                  to="/generate"
                   href="#"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Generate
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                <Link
+                  to="/courses"
+                  className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Courses
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -50,7 +52,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Terms & Condition
                 </a>
@@ -58,7 +60,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Contact us
                 </a>
@@ -69,24 +71,24 @@ export default function Footer() {
           {/* Contact Us Section */}
           <div>
             <h3 className="font-semibold text-gray-800 mb-4">Contact us</h3>
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-center items-center">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-[#8864b5] hover:bg-[#f0f2f5] transition-all shadow-sm"
                 aria-label="Facebook"
               >
                 <Facebook size={20} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-pink-600 hover:bg-pink-50 transition-all shadow-sm"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-[#8864b5] hover:bg-[#f0f2f5] transition-all shadow-sm"
                 aria-label="Instagram"
               >
                 <Instagram size={20} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-blue-700 hover:bg-blue-50 transition-all shadow-sm"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-[#8864b5] hover:bg-[#f0f2f5] transition-all shadow-sm"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={20} />

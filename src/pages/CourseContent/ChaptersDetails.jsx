@@ -11,11 +11,6 @@ export function ChaptersDetails( { id } ) {
     }));
   };
 
-  const totalSections = chapters.reduce(
-    (sum, chapter) => sum + chapter.sections.length,
-    0,
-  );
-
   return (
     <div className="flex justify-center items-center">
       <div className="bg-white rounded-lg p-6 w-[80%]">
@@ -24,9 +19,6 @@ export function ChaptersDetails( { id } ) {
           <h2 className="text-2xl font-semibold bg-linear-to-r from-cyan-500 to-purple-600 bg-clip-text text-transparent">
             Course Content
           </h2>
-          <p className="text-gray-500 text-sm">
-            Total: {chapters.length} Chapters & {totalSections} Sections
-          </p>
         </div>
 
         {/* Chapters List */}

@@ -26,11 +26,14 @@ function DetailsSection({ id }) {
       </div>
 
       {/******************************************************content**************************************/}
-      <div className=" grid gap-10 grid-cols-1 md:grid-cols-2  mb-20 w-[80%]">
+      <div className=" grid gap-10 grid-cols-1 lg:grid-cols-2  mb-20 w-[80%]">
         {/*image side */}
-        <div className="flex justify-center items-center rounded-2xl overflow-hidden shadow-lg border border-[#798d8f]  ">
-          <img src={img} alt={course.title} className="w-full" />
-        </div>
+
+        <img
+          src={img}
+          alt={course.title}
+          className="w-full flex justify-center items-center rounded-2xl overflow-hidden shadow-lg border border-[#798d8f]  "
+        />
         {/*description side */}
         <div className=" p-6 w-full">
           {/* Title */}
@@ -94,9 +97,12 @@ function DetailsSection({ id }) {
 
           {/* Button */}
           <div className="w-full flex justify-center items-center">
-            <button className="w-[50%] bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+            <Link
+              to={`/course/${course.id}`}
+              className="w-[50%] bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center"
+            >
               Go to Course
-            </button>
+            </Link>
           </div>
         </div>
       </div>
