@@ -8,7 +8,7 @@ function HeroSection({ width }) {
       <div
         className={`flex flex-col justify-center   ${width > 900 ? "text-left items-start" : "text-center"} items-center `}
       >
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight sm:leading-[3.5rem] md:leading-[4rem]">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight sm:leading-14 md:leading-16">
           Turn Any
           <span className="font-normal"> Book</span> Into an Interactive
           <span className="text-[#b967c7]"> Course</span>
@@ -18,7 +18,7 @@ function HeroSection({ width }) {
           summaries and videos all in one place.
         </p>
         <Link to="/generate">
-          <button className="font-bold mt-6 sm:mt-8 w-full sm:w-[280px] md:w-[300px] bg-gradient-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
+          <button className="font-bold mt-6 sm:mt-8 w-full sm:w-[280px] md:w-[300px] bg-linear-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
             Generate Course
           </button>
         </Link>

@@ -1,4 +1,4 @@
-import img from "../../assets/images/Frame 3.jpg";
+import img from "../../assets/images/signup.png";
 
 import { Link } from "react-router";
 import Input from "../../components/Input/Input.jsx";

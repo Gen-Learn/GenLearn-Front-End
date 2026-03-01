@@ -1,4 +1,4 @@
-import img from "../../assets/images/Frame2.jpg";
+import img from "../../assets/images/login.png";
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
@@ -41,7 +41,7 @@ function SignUp() {
             </div>
             <div>
               <Link
-                to="/forgotPassword"
+                to="/forgot-Password"
                 className=" text-[#a082c4] hover:underline underline-offset-2 text-[15px] sm:text-[16px]"
               >
                 Forgot Password?

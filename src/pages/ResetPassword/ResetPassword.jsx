@@ -1,4 +1,4 @@
-import img from "../../assets/images/amico.jpg";
+import img from "../../assets/images/resetpassword.png";
 import { IoIosArrowBack } from "react-icons/io";
 
 import { Link } from "react-router";
