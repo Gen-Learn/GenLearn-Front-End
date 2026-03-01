@@ -58,7 +58,7 @@ function SignUp() {
             </p>
           </div>
 
-          <Button Content="Sign Up" className="my-4" />
+          <Button Content="Sign Up" className="my-4" onClick={undefined} />
 
           {/* login */}
           <p className="text-center">

@@ -1,20 +1,34 @@
-import React, { useState ,} from "react";
+import React, { useState } from "react";
 import chaptersData from "../../data/chapters.json";
-const courseChapters = chaptersData.chaptersByCourse;
-export function ChaptersDetails( { id } ) {
-  const [expandedChapters, setExpandedChapters] = useState({});
+const courseChapters: Record<
+  string,
+  {
+    id: number;
+    title: string;
+    sections: {
+      id: number;
+      title: string;
+      duration: string;
+      videoUrl: string;
+      script: string;
+      material: string;
+    }[];
+  }[]
+> = chaptersData.chaptersByCourse;
+type Props = {
+  id: string;
+};
+export function ChaptersDetails({ id }: Props) {
+  const [expandedChapters, setExpandedChapters] = useState<
+    Record<number, boolean>
+  >({});
   const chapters = courseChapters[id] || [];
-  const toggleChapter = (chapterId) => {
+  const toggleChapter = (chapterId: number) => {
     setExpandedChapters((prev) => ({
       ...prev,
       [chapterId]: !prev[chapterId],
     }));
   };
-
-  const totalSections = chapters.reduce(
-    (sum, chapter) => sum + chapter.sections.length,
-    0,
-  );
 
   return (
     <div className="flex justify-center items-center">
@@ -24,9 +38,6 @@ export function ChaptersDetails( { id } ) {
           <h2 className="text-2xl font-semibold bg-linear-to-r from-cyan-500 to-purple-600 bg-clip-text text-transparent">
             Course Content
           </h2>
-          <p className="text-gray-500 text-sm">
-            Total: {chapters.length} Chapters & {totalSections} Sections
-          </p>
         </div>
 
         {/* Chapters List */}

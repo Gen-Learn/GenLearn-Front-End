@@ -1,4 +1,8 @@
-function NavAndTitle({setActiveTab }) {
+function NavAndTitle({
+  setActiveTab,
+}: {
+  setActiveTab: (tab: string) => void;
+}) {
   return (
     <section className="w-full flex justify-center items-center px-4 sm:px-6 lg:px-8">
       <div className="relative w-[80%]">

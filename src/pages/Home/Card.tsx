@@ -1,6 +1,13 @@
 import { Children } from "react";
-
-function Card({ children, bgColor, iconBgColor, content, titleone, titletwo }) {
+type Props = {
+  children: React.ReactNode;
+  bgColor: string;
+  iconBgColor: string;
+  content: string;
+  titleone: string;
+  titletwo: string;
+};
+function Card({ children, bgColor, iconBgColor, content, titleone, titletwo }: Props) {
   return (
     <div
       className={` ${bgColor} w-[250px] h-[250px] md:w-[300px] md:h-[300px] relative rounded-4xl rounded-tl-none  p-6 shadow-lg max-w-sm `}

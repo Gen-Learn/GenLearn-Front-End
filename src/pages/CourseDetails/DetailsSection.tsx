@@ -2,9 +2,13 @@ import Courses from "../../data/Courses.json";
 import { Link } from "react-router-dom";
 import img from "../../assets/images/Cardimg.png";
 import { FaArrowLeft } from "react-icons/fa";
-
-function DetailsSection({ id }) {
-  const course = Courses.Courses.find((course) => course.id === Number(id));
+type Props = {
+  id: string;
+};
+function DetailsSection({ id }: Props) {
+  const course: any = Courses.Courses.find(
+    (course) => course.id === Number(id),
+  );
   return (
     <section className="flex flex-col justify-center items-center">
       {/*header*/}
@@ -67,7 +71,7 @@ function DetailsSection({ id }) {
 
           {/* Fields/Tags */}
           <div className="flex gap-3 mb-6">
-            {course.fields.map((field, index) => (
+            {course.fields.map((field: string, index: number) => (
               <span
                 key={index}
                 className="text-sm text-gray-700 bg-[#eae4ed] px-10 py-1  rounded-full"

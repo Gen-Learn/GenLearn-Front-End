@@ -8,29 +8,29 @@ export default function Generate() {
     { id: 2, name: 'Book one.pdf', size: '10 MB', progress: 78 }
   ]);
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
     handleFiles(files);
   };
 
-  const handleFileInput = (e) => {
-    const files = Array.from(e.target.files);
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
     handleFiles(files);
   };
 
-  const handleFiles = (files) => {
+  const handleFiles = (files: File[]) => {
     const newFiles = files.map((file, index) => ({
       id: Date.now() + index,
       name: file.name,
@@ -40,7 +40,7 @@ export default function Generate() {
     setUploadedFiles([...uploadedFiles, ...newFiles]);
   };
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -48,7 +48,7 @@ export default function Generate() {
     return Math.round(bytes / Math.pow(k, i)) + ' ' + sizes[i];
   };
 
-  const removeFile = (id) => {
+  const removeFile = (id: number) => {
     setUploadedFiles(uploadedFiles.filter(file => file.id !== id));
   };
 
@@ -141,11 +141,11 @@ export default function Generate() {
                 <div className="flex items-center gap-3">
                   <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
+                      className="h-full bg-linear-to-r from-purple-500 to-pink-500 transition-all"
                       style={{ width: `${file.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-700 min-w-[3rem] text-right">
+                  <span className="text-sm font-medium text-gray-700 min-w-12 text-right">
                     {file.progress}%
                   </span>
                 </div>
@@ -154,7 +154,7 @@ export default function Generate() {
           </div>
 
           {/* Generate Course Button */}
-          <button className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">
+          <button className="w-full bg-linear-to-r from-cyan-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">
             Generate Course
           </button>
         </div>

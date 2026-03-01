@@ -1,10 +1,10 @@
-import img from "../../assets/images/forgotpassword.png";
+import img from "../../assets/images/resetpassword.png";
 import { IoIosArrowBack } from "react-icons/io";
 
 import { Link } from "react-router";
 import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
-function ForgotPassword() {
+function ResetPassword() {
   return (
     <div className="max-w-4/5 m-auto h-screen flex justify-center items-center">
       <div className="flex justify-evenly items-center py-10">
@@ -13,29 +13,31 @@ function ForgotPassword() {
         </div>
         <div className="lg:w-5/12 flex flex-col  p-8">
           {/* title */}
-          <h1 className="sm:text-[30px] text-[22px] font-bold mb-4  ">
-            Forgot Your Password?
+          <h1 className="sm:text-[30px] text-[24px] font-bold mb-4  ">
+            Reset Your Password?
           </h1>
           {/* description */}
           <h2 className="sm:text-2xl text-[18px] font-bold text-[#8864b5]">
-            Enter your Email
+            Enter new password
           </h2>
-          <p className="sm:text-[18px] text-[16px]  text-[#505b61] mb-3">
-            Enter your email to get the code.
+          <p className="sm:text-[18px] text-[12px]  text-[#505b61] mb-3">
+            Turn every book into an interactive experience
           </p>
           {/* form */}
           <form action="">
-            <Input type="normal" placeholder="example@gmail.com" />
+            <Input
+              type="password"
+              placeholder="*****************"
+              title="New Password"
+            />
+            <Input
+              type="password"
+              placeholder="*****************"
+              title="Confirm New Password"
+            />
           </form>
 
-          <Button Content="Send Mail" className="my-4" />
-
-          <p className="text-center">
-            Didn’t get any mail?{" "}
-            <span className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text text-transparent font-bold underline underline-offset-2 decoration-[#E522B5]">
-              Send again
-            </span>
-          </p>
+          <Button Content="Reset Password" className="my-4" onClick={undefined} />
 
           {/* login */}
           <p className="text-center">
@@ -53,4 +55,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ResetPassword;

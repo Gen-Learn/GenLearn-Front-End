@@ -7,7 +7,7 @@ function Courses() {
   return (
     <main>
       <HeroSectionCourses />
-      <NavAndTitle activeTab={activeTab} setActiveTab={setActiveTab} />
+      <NavAndTitle setActiveTab={setActiveTab} />
       <GridCourses status={activeTab} />
     </main>
   );

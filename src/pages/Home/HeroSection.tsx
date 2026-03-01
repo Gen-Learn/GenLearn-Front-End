@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import HeroImg from "../../assets/images/HomeHeroSection.png";
-function HeroSection({ width }) {
+type Props = {
+  width: number;
+};
+function HeroSection({ width }: Props) {
   return (
     <section
       className={`w-[80%] flex flex-col md:flex-row grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 my-6 md:my-10 px-4 md:px-0 py-16`}

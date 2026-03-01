@@ -4,7 +4,12 @@ import { LuEye } from "react-icons/lu";
 // type: normal , password
 // placeholder: "string"
 // title: "string" also id
-function Input({ type, placeholder, title }) {
+type InputProps = {
+  type: "normal" | "password";
+  placeholder: string;
+  title: string;
+};
+function Input({ type, placeholder, title }: InputProps) {
   const [HidePassword, setHidePassword] = useState(true);
   return (
     <>

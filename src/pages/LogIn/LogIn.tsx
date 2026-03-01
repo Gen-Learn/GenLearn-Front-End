@@ -49,7 +49,7 @@ function SignUp() {
             </div>
           </div>
 
-          <Button Content="Log In" className="my-4" />
+          <Button Content="Log In" className="my-4" onClick={undefined} />
           {/* or */}
           <div className="relative  my-10">
             <hr className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text  font-bold underline underline-offset-2 decoration-[#E522B5] block w-full" />

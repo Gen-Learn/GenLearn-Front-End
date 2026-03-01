@@ -2,7 +2,7 @@ import courses from "../../data/Courses.json";
 import { Link } from "react-router-dom";
 const cardsData = courses.Courses;
 
-function GridCourses(status) {
+function GridCourses(status: { status: string }) {
   return (
     <section className="w-full flex justify-center items-center">
       <div className=" w-[80%]  grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-20 place-items-center">

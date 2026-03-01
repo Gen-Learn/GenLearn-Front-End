@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import BeforAuthMobile from "./BeforAuthMobile";
-function MobileNav({ setIsMenuOpen }) {
+type MobileNavProps = {
+  setIsMenuOpen: (isOpen: boolean) => void;
+};
+function MobileNav({ setIsMenuOpen }: MobileNavProps) {
   return (
     <div className="md:hidden flex justify-center items-center">
       <ul className=" flex flex-col justify-between items-center mx-2  text-[#505b61] font-semibold gap-10">

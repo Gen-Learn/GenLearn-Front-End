@@ -2,11 +2,11 @@ import DetailsSection from "./DetailsSection";
 import { useParams } from "react-router";
 import { ChaptersDetails } from "./ChaptersDetails";
 function CourseDetails() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   return (
     <div>
-      <DetailsSection id={id} />
-      <ChaptersDetails id={id} />
+      <DetailsSection id={id!} />
+      <ChaptersDetails id={id!} />
     </div>
   );
 }

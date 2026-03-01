@@ -19,7 +19,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="#"
+                  to="/"
                   className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Home
@@ -28,7 +28,6 @@ export default function Footer() {
               <li>
                 <Link
                   to="/generate"
-                  href="#"
                   className="text-gray-600 hover:text-[#8864b5] transition-colors"
                 >
                   Generate

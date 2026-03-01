@@ -1,5 +1,9 @@
+import { type } from "node:os";
 import { Link } from "react-router-dom";
-function BeforAuthMobile({ setIsMenuOpen }) {
+type BeforAuthMobileProps = {
+  setIsMenuOpen: (isOpen: boolean) => void;
+};
+function BeforAuthMobile({ setIsMenuOpen }: BeforAuthMobileProps) {
   return (
     <ul className="flex justify-between items-center gap-10  flex-col">
       <li

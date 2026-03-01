@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
-function CahpterVideo({ id }) {
+type Props = {
+  id: string;
+};
+function CahpterVideo({ id }: Props) {
   return (
     <div>
       <button>

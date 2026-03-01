@@ -1,4 +1,10 @@
-function BurgerMenuIcon({ setIsMenuOpen, isMenuOpen, className = "" }) {
+
+type BurgerMenuIconProps = {
+  setIsMenuOpen: (isOpen: boolean) => void;
+  isMenuOpen: boolean;
+  className?: string;
+};
+function BurgerMenuIcon({ setIsMenuOpen, isMenuOpen, className = "" }:BurgerMenuIconProps) {
   return (
     <div>
       <button
