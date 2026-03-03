@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
-import SignUp from "./pages/signUp/signUp";
-import ReserPassword from "./pages/resetPassword/resetPassword";
-import ForgotPassword from "./pages/forgotPassword/ForgotPassword";
-import Login from "./pages/logIn/logIn";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SignUp from "./pages/SignUp/SignUp";
+import ReserPassword from "./pages/ResetPassword/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import Header from "@/components/Header/Header";
+import Login from "./pages//LogIn/LogIn";
 import Home from "./pages/Home/Home";
-import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import Generate from "./pages/Generate/Generate";
 import Courses from "./pages/Courses/main";
@@ -13,7 +13,7 @@ import CourseContent from "./pages/CourseContent/main";
 function App() {
   return (
     <>
-      <Router basename="/GenLearn">
+      <Router>
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />

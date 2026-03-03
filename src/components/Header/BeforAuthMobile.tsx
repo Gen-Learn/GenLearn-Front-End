@@ -1,4 +1,3 @@
-import { type } from "node:os";
 import { Link } from "react-router-dom";
 type BeforAuthMobileProps = {
   setIsMenuOpen: (isOpen: boolean) => void;
