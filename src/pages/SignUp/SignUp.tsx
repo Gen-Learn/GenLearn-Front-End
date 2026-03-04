@@ -1,9 +1,30 @@
 import img from "../../assets/images/signup.png";
-
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
 import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
 function SignUp() {
+  const { register, isLoading, error, clearError } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    password2: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    try {
+      await register(form);
+      navigate("/");
+    } catch {
+      // error is already set in context
+    }
+  };
   return (
     <div className="max-w-4/5 m-auto h-screen flex justify-center items-center">
       <div className="flex justify-evenly items-center py-10">
@@ -20,45 +41,59 @@ function SignUp() {
             Turn every book into an interactive experience
           </p>
           {/* form */}
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <Input
               type="normal"
               placeholder="Mohamed Mahmoud"
               title="Username"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
             />
             <Input
               type="normal"
-              placeholder="*****************"
+              placeholder="example@gmail.com"
               title="Email Address"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <Input
               type="password"
               placeholder="*****************"
               title="Password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
             <Input
               type="password"
               placeholder="*****************"
               title="Confirm Password"
+              value={form.password2}
+              onChange={(e) => setForm({ ...form, password2: e.target.value })}
             />
-          </form>
-          {/* checkbox */}
-          <div className="flex items-center">
-            <input type="checkbox" />
-            <p className="ml-2.5 text-[14px] sm:text-[16px]">
-              I agree to the
-              <span className="text-blue-500 text-[14px] sm:text-[16px]">
-                Terms{" "}
-              </span>
-              and
-              <span className="text-blue-500 text-[14px] sm:text-[16px]">
-                {" "}
-                Privacy Policy
-              </span>
-            </p>
-          </div>
+            {/* checkbox */}
+            <div className="flex items-center">
+              <input type="checkbox" />
+              <p className="ml-2.5 text-[14px] sm:text-[16px]">
+                I agree to the
+                <span className="text-blue-500 text-[14px] sm:text-[16px]">
+                  Terms{" "}
+                </span>
+                and
+                <span className="text-blue-500 text-[14px] sm:text-[16px]">
+                  {" "}
+                  Privacy Policy
+                </span>
+              </p>
+            </div>
 
-          <Button Content="Sign Up" className="my-4" onClick={undefined} />
+            <Button
+              type="submit"
+              Content={isLoading ? "Signing Up..." : "Sign Up"}
+              className="my-4 w-full"
+              onClick={undefined}
+            />
+            <p className="text-center text-red-500">{error}</p>
+          </form>
 
           {/* login */}
           <p className="text-center">

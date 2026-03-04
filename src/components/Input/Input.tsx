@@ -8,8 +8,10 @@ type InputProps = {
   type: "normal" | "password";
   placeholder: string;
   title: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
-function Input({ type, placeholder, title }: InputProps) {
+function Input({ type, placeholder, title, value, onChange }: InputProps) {
   const [HidePassword, setHidePassword] = useState(true);
   return (
     <>
@@ -23,6 +25,8 @@ function Input({ type, placeholder, title }: InputProps) {
             placeholder={placeholder}
             id={title}
             className="px-4 py-2 rounded-xl border-2 border-[##9192ab]"
+            value={value}
+            onChange={onChange}
           />
         </div>
       ) : (
