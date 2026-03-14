@@ -1,11 +1,27 @@
 import img from "../../assets/images/login.png";
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
 import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
 function SignUp() {
+  const { login, isLoading, error, clearError } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    try {
+      await login(form);
+      navigate("/"); // redirect after successful login
+    } catch {
+      console.error("Login failed - check error state for details");
+    }
+  };
   return (
     <div className="max-w-4/5 m-auto h-screen flex justify-center items-center">
       <div className="flex justify-evenly items-center py-10">
@@ -19,37 +35,54 @@ function SignUp() {
             Continue your personalized learning plan
           </p>
           {/* form */}
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <Input
               type="normal"
+              value={form.email}
               placeholder="example@gmail.com"
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               title="Email Address"
+              required
             />
             <Input
               type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="*****************"
               title="Password"
+              required
             />
-          </form>
-          {/* checkbox */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input type="checkbox" />
-              <p className="ml-2.5 text-[#a082c4] text-[15px] sm:text-[16px]">
-                Remember me
-              </p>
+            {/* checkbox */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input type="checkbox" />
+                <p className="ml-2.5 text-[#a082c4] text-[15px] sm:text-[16px]">
+                  Remember me
+                </p>
+              </div>
+              <div>
+                <Link
+                  to="/forgot-Password"
+                  className=" text-[#a082c4] hover:underline underline-offset-2 text-[15px] sm:text-[16px]"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
+            <Button
+              type="submit"
+              Content="Log In"
+              className="my-4 w-full"
+              disabled={isLoading}
+              onClick={undefined}
+            />
             <div>
-              <Link
-                to="/forgot-Password"
-                className=" text-[#a082c4] hover:underline underline-offset-2 text-[15px] sm:text-[16px]"
-              >
-                Forgot Password?
-              </Link>
+              {error && (
+                <p className="text-red-500 text-center mt-2">{error}</p>
+              )}
             </div>
-          </div>
+          </form>
 
-          <Button Content="Log In" className="my-4" onClick={undefined} />
           {/* or */}
           <div className="relative  my-10">
             <hr className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text  font-bold underline underline-offset-2 decoration-[#E522B5] block w-full" />

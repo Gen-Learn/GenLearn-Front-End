@@ -1,10 +1,35 @@
 import img from "../../assets/images/resetpassword.png";
 import { IoIosArrowBack } from "react-icons/io";
-
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router";
-import Input from "../../components/Input/Input.jsx";
-import Button from "../../components/Button/Button.jsx";
+import Input from "../../components/Input/Input";
+import Button from "../../components/Button/Button";
 function ResetPassword() {
+  const { resetPassword, isLoading, error, clearError } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
+  const [password2, setPassword2] = useState("");
+  const userId = searchParams.get("userId") || "";
+  const [form, setForm] = useState({
+    newPassword: "",
+    userId: userId,
+    resetPasswordToken: token,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    try {
+      if (form.newPassword !== password2) return;
+      await resetPassword(form );
+      navigate("/login");
+    } catch {
+      // error set in context
+    }
+  };
   return (
     <div className="max-w-4/5 m-auto h-screen flex justify-center items-center">
       <div className="flex justify-evenly items-center py-10">
@@ -24,20 +49,38 @@ function ResetPassword() {
             Turn every book into an interactive experience
           </p>
           {/* form */}
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <Input
               type="password"
               placeholder="*****************"
+              value={form.newPassword}
+              onChange={(e) =>
+                setForm({ ...form, newPassword: e.target.value })
+              }
               title="New Password"
+              required
             />
             <Input
               type="password"
               placeholder="*****************"
+              value={password2}
+              onChange={(e) => setPassword2(e.target.value)}
               title="Confirm New Password"
+              required
             />
+            <Button
+              Content="Reset Password"
+              className="my-4 w-full"
+              onClick={undefined}
+              type="submit"
+              disabled={isLoading}
+            />
+            <div>
+              {error && (
+                <p className="text-red-500 text-center mt-2">{error}</p>
+              )}
+            </div>
           </form>
-
-          <Button Content="Reset Password" className="my-4" onClick={undefined} />
 
           {/* login */}
           <p className="text-center">

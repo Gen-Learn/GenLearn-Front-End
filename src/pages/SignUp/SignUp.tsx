@@ -7,18 +7,22 @@ import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
 function SignUp() {
   const { register, isLoading, error, clearError } = useAuth();
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
-    password2: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Sending to backend:", form); 
     clearError();
     try {
+      if (form.password !== confirmPassword) {
+        return;
+      }
       await register(form);
       navigate("/");
     } catch {
@@ -45,9 +49,9 @@ function SignUp() {
             <Input
               type="normal"
               placeholder="Mohamed Mahmoud"
-              title="Username"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              title="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <Input
               type="normal"
@@ -67,8 +71,8 @@ function SignUp() {
               type="password"
               placeholder="*****************"
               title="Confirm Password"
-              value={form.password2}
-              onChange={(e) => setForm({ ...form, password2: e.target.value })}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
             {/* checkbox */}
             <div className="flex items-center">

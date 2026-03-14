@@ -2,9 +2,32 @@ import img from "../../assets/images/forgotpassword.png";
 import { IoIosArrowBack } from "react-icons/io";
 
 import { Link } from "react-router";
-import Input from "../../components/Input/Input.tsx";
-import Button from "../../components/Button/Button.tsx";
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import Input from "../../components/Input/Input";
+import Button from "../../components/Button/Button";
+import Swal from "sweetalert2";
 function ForgotPassword() {
+  const { forgotPassword, isLoading, error, clearError } = useAuth();
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    try {
+      await forgotPassword({ email, resetMethod: "email" });
+      setSent(true);
+    } catch {
+      // error set in context
+    }
+  };
+  if (sent) {
+    Swal.fire({
+      title: "Email Sent! Check your inbox",
+      icon: "success",
+    });
+  }
   return (
     <div className="max-w-4/5 m-auto h-screen flex justify-center items-center">
       <div className="flex justify-evenly items-center py-10">
@@ -24,11 +47,27 @@ function ForgotPassword() {
             Enter your email to get the code.
           </p>
           {/* form */}
-          <form action="">
-            <Input type="normal" placeholder="example@gmail.com" title="Email" />
+          <form onSubmit={handleSubmit}>
+            <Input
+              type="normal"
+              placeholder="example@gmail.com"
+              title="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Button
+              Content="Send Mail"
+              className="my-4 w-full"
+              onClick={undefined}
+              disabled={isLoading}
+              type="submit"
+            />
+            <div>
+              {error && (
+                <p className="text-red-500 text-center mt-2">{error}</p>
+              )}
+            </div>
           </form>
-
-          <Button Content="Send Mail" className="my-4" onClick={undefined} />
 
           <p className="text-center">
             Didn’t get any mail?{" "}

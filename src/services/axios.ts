@@ -5,7 +5,7 @@ const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // needed if backend uses HttpOnly cookies for refresh token
+  // withCredentials: true, // needed if backend uses HttpOnly cookies for refresh token
 });
 
 // ── Request interceptor: attach access token ──────────────────────────────────

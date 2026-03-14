@@ -4,6 +4,9 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    port: 3001,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

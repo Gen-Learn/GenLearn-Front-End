@@ -10,8 +10,16 @@ type InputProps = {
   title: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
 };
-function Input({ type, placeholder, title, value, onChange }: InputProps) {
+function Input({
+  type,
+  placeholder,
+  title,
+  value,
+  onChange,
+  required,
+}: InputProps) {
   const [HidePassword, setHidePassword] = useState(true);
   return (
     <>
@@ -22,6 +30,7 @@ function Input({ type, placeholder, title, value, onChange }: InputProps) {
           </label>
           <input
             type={type}
+            required={required}
             placeholder={placeholder}
             id={title}
             className="px-4 py-2 rounded-xl border-2 border-[##9192ab]"
@@ -37,9 +46,12 @@ function Input({ type, placeholder, title, value, onChange }: InputProps) {
           <div className="relative">
             <input
               type={HidePassword ? "password" : "text"}
+              required={required}
               placeholder={placeholder}
               id={title}
               className="px-4 py-2 rounded-xl border-2 border-[##9192ab] w-full"
+              value={value}
+              onChange={onChange}
             />
             <span
               className="absolute right-3 top-[40%] cursor-pointer text-black"

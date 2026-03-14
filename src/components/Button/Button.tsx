@@ -3,13 +3,15 @@ type ButtonProps = {
   onClick?: () => void;
   className?: string;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 };
 
-function Button({ Content, onClick, className, type }: ButtonProps) {
+function Button({ Content, onClick, className, type, disabled }: ButtonProps) {
   return (
     <button
       onClick={onClick}
       type={type || "button"}
+      disabled={disabled}
       className={`bg-linear-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-2 rounded-xl  active:scale-95 transition-transform duration-200 ${className}`}
     >
       {Content}
