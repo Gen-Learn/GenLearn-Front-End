@@ -6,7 +6,7 @@ function StayMotivated() {
   return (
     <div className="w-[80%] max-w-7xl mx-auto  py-8 mt-16">
       {/* Motivation Section */}
-      <div className="h-[280px] md:h-80 bg-linear-to-r from-[#ba76c4] to-[#8b64b5] rounded-3xl px-8  mb-16 relative flex items-center justify-center ">
+      <div className="h-70 md:h-80 bg-linear-to-r from-[#ba76c4] to-[#8b64b5] rounded-3xl px-8  mb-16 relative flex items-center justify-center ">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col justify-center items-center text-white z-10">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">

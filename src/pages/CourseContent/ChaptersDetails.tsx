@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import chaptersData from "../../data/chapters.json";
+import { IoIosArrowDown } from "react-icons/io";
+import { MdOutlineSlowMotionVideo } from "react-icons/md";
+
 const courseChapters: Record<
   string,
   {
@@ -17,12 +20,19 @@ const courseChapters: Record<
 > = chaptersData.chaptersByCourse;
 type Props = {
   id: string;
+  className?: string;
 };
 export function ChaptersDetails({ id }: Props) {
+  const chapters = courseChapters[id] || [];
   const [expandedChapters, setExpandedChapters] = useState<
     Record<number, boolean>
-  >({});
-  const chapters = courseChapters[id] || [];
+  >(() => {
+    const initialState: Record<number, boolean> = {};
+    chapters.forEach((chapter) => {
+      initialState[chapter.id] = true;
+    });
+    return initialState;
+  });
   const toggleChapter = (chapterId: number) => {
     setExpandedChapters((prev) => ({
       ...prev,
@@ -31,8 +41,8 @@ export function ChaptersDetails({ id }: Props) {
   };
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="bg-white rounded-lg p-6 w-[80%]">
+    <div className="flex justify-center items-center ">
+      <div className="bg-white rounded-lg p-2.5 w-full">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold bg-linear-to-r from-cyan-500 to-purple-600 bg-clip-text text-transparent">
@@ -53,24 +63,12 @@ export function ChaptersDetails({ id }: Props) {
                 className="w-full flex items-center justify-between p-4  transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <svg
+                  <IoIosArrowDown
                     className={`w-5 h-5 text-gray-600 transition-transform ${
                       expandedChapters[chapter.id] ? "rotate-180" : ""
                     }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                  <span className="font-medium text-gray-800">
-                    {chapter.title}
-                  </span>
+                  />
+                  <span className="text-sm text-gray-800">{chapter.title}</span>
                 </div>
                 <span className="text-sm text-gray-400">
                   {chapter.sections.length} section
@@ -82,7 +80,7 @@ export function ChaptersDetails({ id }: Props) {
               <div
                 className={`bg-gray-50 border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
                   expandedChapters[chapter.id]
-                    ? "max-h-[2000px] opacity-100"
+                    ? "max-h-500 opacity-100"
                     : "max-h-0 opacity-0"
                 }`}
               >
@@ -92,25 +90,8 @@ export function ChaptersDetails({ id }: Props) {
                     className="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                      <MdOutlineSlowMotionVideo className="w-5 h-5 text-gray-400" />
+
                       <span className="text-gray-700">{section.title}</span>
                     </div>
                     <span className="text-sm text-gray-400">

@@ -90,7 +90,7 @@ export function ChaptersDetails({ id }: Props) {
               <div
                 className={`bg-gray-50 border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
                   expandedChapters[chapter.id]
-                    ? "max-h-[2000px] opacity-100"
+                    ? "max-h-500 opacity-100"
                     : "max-h-0 opacity-0"
                 }`}
               >
