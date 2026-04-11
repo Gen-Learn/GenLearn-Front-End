@@ -88,6 +88,69 @@
             "material": "https://materials.example.com/web-dev/flexbox-guide.pdf"
           }
         ]
+      },{
+        "id": 4,
+        "title": "Responsive Design",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Media Queries",
+            "duration": "17:40",
+            "videoUrl": "https://videos.example.com/web-dev/media-queries",
+            "script": "Learn how to create responsive layouts that adapt to different screen sizes using media queries.",
+            "material": "https://materials.example.com/web-dev/responsive.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Flexbox Layout",
+            "duration": "21:10",
+            "videoUrl": "https://videos.example.com/web-dev/flexbox",
+            "script": "Master the flexbox layout system for creating flexible and responsive page structures.",
+            "material": "https://materials.example.com/web-dev/flexbox-guide.pdf"
+          }
+        ]
+      },{
+        "id": 4,
+        "title": "Responsive Design",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Media Queries",
+            "duration": "17:40",
+            "videoUrl": "https://videos.example.com/web-dev/media-queries",
+            "script": "Learn how to create responsive layouts that adapt to different screen sizes using media queries.",
+            "material": "https://materials.example.com/web-dev/responsive.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Flexbox Layout",
+            "duration": "21:10",
+            "videoUrl": "https://videos.example.com/web-dev/flexbox",
+            "script": "Master the flexbox layout system for creating flexible and responsive page structures.",
+            "material": "https://materials.example.com/web-dev/flexbox-guide.pdf"
+          }
+        ]
+      },{
+        "id": 4,
+        "title": "Responsive Design",
+        "sections": [
+          {
+            "id": 7,
+            "title": "Media Queries",
+            "duration": "17:40",
+            "videoUrl": "https://videos.example.com/web-dev/media-queries",
+            "script": "Learn how to create responsive layouts that adapt to different screen sizes using media queries.",
+            "material": "https://materials.example.com/web-dev/responsive.pdf"
+          },
+          {
+            "id": 8,
+            "title": "Flexbox Layout",
+            "duration": "21:10",
+            "videoUrl": "https://videos.example.com/web-dev/flexbox",
+            "script": "Master the flexbox layout system for creating flexible and responsive page structures.",
+            "material": "https://materials.example.com/web-dev/flexbox-guide.pdf"
+          }
+        ]
       }
     ],
     "2": [

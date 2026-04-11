@@ -22,7 +22,7 @@ type Props = {
   id: string;
   className?: string;
 };
-export function ChaptersDetails({ id }: Props) {
+export function ChaptersDetails({ id, className }: Props) {
   const chapters = courseChapters[id] || [];
   const [expandedChapters, setExpandedChapters] = useState<
     Record<number, boolean>
@@ -41,17 +41,10 @@ export function ChaptersDetails({ id }: Props) {
   };
 
   return (
-    <div className="flex justify-center items-center ">
+    <div className={`flex  ${className || ""}`}>
       <div className="bg-white rounded-lg p-2.5 w-full">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold bg-linear-to-r from-cyan-500 to-purple-600 bg-clip-text text-transparent">
-            Course Content
-          </h2>
-        </div>
-
         {/* Chapters List */}
-        <div>
+        <div className="max-h-screen overflow-y-auto ">
           {chapters.map((chapter) => (
             <div
               key={chapter.id}

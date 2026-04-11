@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import VideoPlayer from "./videoSection";
 import testVideo from "../../assets/videos/test.mp4";
 const videoSrc = testVideo;
 const scriptContent = [
@@ -45,7 +46,7 @@ export default function CahpterVideo({ className, id }: props) {
 
   return (
     <div
-      className={`w-full mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden font-sans ${className || ""}`}
+      className={`w-full  mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden font-sans ${className || ""}`}
     >
       {/* Back button */}
       <button className="px-4 py-3 border-b border-gray-100">
@@ -59,26 +60,8 @@ export default function CahpterVideo({ className, id }: props) {
       </button>
 
       {/* Video area */}
-      <div className="relative w-full min-h-60 bg-black">
-        <video
-          ref={videoRef}
-          controls
-          className="w-full h-full"
-          onEnded={() => {
-            setIsFinished(true);
-            console.log("Video finished!");
-          }}
-        >
-          <source src={videoSrc} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-
-        {/* ✅ Finished Badge */}
-        {isFinished && (
-          <div className="absolute top-3 right-3 bg-green-500 text-white text-xs px-3 py-1 rounded-full shadow">
-            ✔ Finished
-          </div>
-        )}
+      <div className="relative w-full  bg-black">
+        <VideoPlayer />
       </div>
 
       {/* Lesson title + duration */}

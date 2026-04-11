@@ -4,7 +4,7 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 import logo from "../../assets/images/LogoFooter.png";
 export default function Footer() {
   return (
-    <footer className="bg-[#f0f2f5] py-8 px-6 text-center">
+    <footer className="bg-[#f0f2f5] py-8 px-6 text-center mt-10">
       <div className="max-w-6xl mx-auto">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
