@@ -10,7 +10,7 @@ type Props = {
 function Card({ children, bgColor, iconBgColor, content, titleone, titletwo }: Props) {
   return (
     <div
-      className={` ${bgColor} w-[250px] h-[250px] md:w-[300px] md:h-[300px] relative rounded-4xl rounded-tl-none  p-6 shadow-lg max-w-sm `}
+      className={` ${bgColor} w-62.5 h-62.5 md:w-75 md:h-75 relative rounded-4xl rounded-tl-none  p-6 shadow-lg max-w-sm `}
     >
       <div
         className={` ${iconBgColor} w-20 h-20 rounded-xl rounded-tl-none flex items-center justify-center absolute top-0 left-0`}

@@ -122,20 +122,20 @@ export default function Chat({ className, setChatOpen, chatOpen }: props) {
                 <img
                   src={aiIcons}
                   alt="Nerdy"
-                  className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm flex-shrink-0"
+                  className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm shrink-0"
                 />
                 <div>
                   <p className="text-purple-900 text-xs mb-1 font-medium">
                     Nerdy
                   </p>
-                  <div className="bg-purple-100 rounded-tl-none rounded-2xl px-3 py-2 max-w-[200px]">
+                  <div className="bg-purple-100 rounded-tl-none rounded-2xl px-3 py-2 max-w-50">
                     <p className="text-purple-900 text-sm">{msg.text}</p>
                   </div>
                 </div>
               </div>
             ) : (
               <div key={msg.id} className="flex justify-end">
-                <div className="bg-purple-700 rounded-tr-none rounded-2xl px-3 py-2 max-w-[200px]">
+                <div className="bg-purple-700 rounded-tr-none rounded-2xl px-3 py-2 max-w-50">
                   <p className="text-white text-sm">{msg.text}</p>
                 </div>
               </div>
@@ -146,7 +146,7 @@ export default function Chat({ className, setChatOpen, chatOpen }: props) {
               <img
                 src={aiIcons}
                 alt="Nerdy"
-                className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm flex-shrink-0"
+                className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm shrink-0"
               />
               <div className="bg-purple-100 rounded-2xl rounded-tl-none px-3 py-2">
                 <p className="text-purple-400 text-sm animate-pulse">

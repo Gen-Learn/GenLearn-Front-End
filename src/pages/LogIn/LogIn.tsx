@@ -8,7 +8,7 @@ import { Link } from "react-router";
 import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/Button/Button.jsx";
 function SignUp() {
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
 
@@ -18,6 +18,7 @@ function SignUp() {
     try {
       await login(form);
       navigate("/"); // redirect after successful login
+      console.log("Login successful" + isAuthenticated);
     } catch {
       console.error("Login failed - check error state for details");
     }

@@ -90,8 +90,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     try {
       const data = await authService.login(payload);
+      console.log("Login response:", data); // Debug log
       setUser(data.user);
       localStorage.setItem("user", JSON.stringify(data.user));
+      console.log("User set to:", data.user); // Debug log
     } catch (err) {
       handleError(err);
       throw err;
@@ -110,6 +112,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setUser(null);
       localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       setIsLoading(false);
     }
   };
@@ -144,7 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated: !!localStorage.getItem("accessToken"),
         isLoading,
         error,
         register,

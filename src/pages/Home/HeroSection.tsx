@@ -21,7 +21,7 @@ function HeroSection({ width }: Props) {
           summaries and videos all in one place.
         </p>
         <Link to="/generate">
-          <button className="font-bold mt-6 sm:mt-8 w-full sm:w-[280px] md:w-[300px] bg-linear-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
+          <button className="font-bold mt-6 sm:mt-8 w-full sm:w-70 md:w-75 bg-linear-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
             Generate Course
           </button>
         </Link>

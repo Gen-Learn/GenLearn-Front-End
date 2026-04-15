@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import AfterAuthMobile from "./AfterAuthMobile";
 import BeforAuthMobile from "./BeforAuthMobile";
 type MobileNavProps = {
   setIsMenuOpen: (isOpen: boolean) => void;
 };
 function MobileNav({ setIsMenuOpen }: MobileNavProps) {
+  const { isAuthenticated } = useAuth();
   return (
     <div className="md:hidden flex justify-center items-center">
       <ul className=" flex flex-col justify-between items-center mx-2  text-[#505b61] font-semibold gap-10">
@@ -25,7 +28,11 @@ function MobileNav({ setIsMenuOpen }: MobileNavProps) {
         >
           <Link to="/courses">Courses</Link>
         </li>
-        <BeforAuthMobile setIsMenuOpen={setIsMenuOpen} />
+        {isAuthenticated ? (
+          <AfterAuthMobile setIsMenuOpen={setIsMenuOpen} />
+        ) : (
+          <BeforAuthMobile setIsMenuOpen={setIsMenuOpen} />
+        )}
       </ul>
     </div>
   );
