@@ -95,9 +95,9 @@ export default function Chat({ className, setChatOpen, chatOpen }: props) {
     <div
       className={`flex items-center justify-center h-screen bg-gray-100 ${className}`}
     >
-      <div className=" w-full h-full flex flex-col  overflow-hidden shadow-lg bg-purple-400">
+      <div className=" w-full h-full flex flex-col  overflow-hidden shadow-lg bg-[#D9B7E1]">
         {/* Header */}
-        <div className="bg-purple-700 px-4 py-3 flex items-center gap-3">
+        <div className="bg-[#8b65b5] px-4 py-3 flex items-center gap-3">
           <img src={aiIcons} alt="Nerdy" className="w-6 h-6" />
           <div className="flex-1">
             <p className="text-white font-medium text-sm">Nerdy</p>
@@ -109,7 +109,10 @@ export default function Chat({ className, setChatOpen, chatOpen }: props) {
           >
             <MdOutlineRefresh size={20} />
           </button>
-          <button onClick={() => setChatOpen?.(false)} className="text-purple-200 hover:text-white transition-colors">
+          <button
+            onClick={() => setChatOpen?.(false)}
+            className="text-purple-200 hover:text-white transition-colors"
+          >
             <LuLogOut size={18} />
           </button>
         </div>
