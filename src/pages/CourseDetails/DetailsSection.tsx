@@ -1,14 +1,79 @@
-import Courses from "../../data/Courses.json";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axiosInstance from "../../services/axios";
 import img from "../../assets/images/Cardimg.png";
 import { FaArrowLeft } from "react-icons/fa";
+import Course from "../../types/coursesModel";
+
+const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
 type Props = {
   id: string;
 };
+
 function DetailsSection({ id }: Props) {
-  const course: any = Courses.Courses.find(
-    (course) => course.id === Number(id),
-  );
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(
+          `${domain}/api/v1/courses/${id}`,
+        );
+        setCourse(response.data.data.course);
+        console.log(response.data.data.course);
+        setError(null);
+      } catch (err) {
+        setError("Failed to fetch course details");
+        console.error("Error fetching course:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCourse();
+    }
+  }, [id]);
+  if (loading) {
+    return (
+      <section className="flex flex-col justify-center items-center">
+        <div className="w-[80%] mt-10 mb-6 text-center">
+          <p className="text-gray-600">Loading course details...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !course) {
+    return (
+      <section className="flex flex-col justify-center items-center">
+        <div className="flex justify-between items-center w-[80%] mt-10 mb-6">
+          <h1
+            className="text-4xl font-bold 
+              bg-linear-to-r from-[#22b5e6] via-[#8f65c9]  to-[#e622b5]
+              bg-clip-text text-transparent"
+          >
+            Course Details
+          </h1>
+          <Link
+            to="/courses"
+            className="group flex justify-center items-center py-2 px-4 border border-[#8b65b5] text-[#8b65b5] rounded-lg hover:bg-[#8b65b5] hover:text-white transition-colors duration-300"
+          >
+            <FaArrowLeft className="transition-all duration-300 -ml-6 opacity-0 group-hover:ml-0 group-hover:mr-2 group-hover:opacity-100" />
+            Back to Courses
+          </Link>
+        </div>
+        <div className="text-center text-red-600">
+          <p>{error || "Course not found"}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="flex flex-col justify-center items-center">
       {/*header*/}
@@ -30,25 +95,29 @@ function DetailsSection({ id }: Props) {
       </div>
 
       {/******************************************************content**************************************/}
-      <div className=" grid gap-10 grid-cols-1 lg:grid-cols-2  mb-20 w-[80%]">
+      <div className=" grid gap-10 grid-cols-1 sm:grid-cols-2  mb-20 w-[80%]">
         {/*image side */}
 
-        <img
-          src={img}
-          alt={course.title}
-          className="w-full flex justify-center items-center rounded-2xl overflow-hidden shadow-lg border border-[#798d8f]  "
-        />
+        <div className="w-full flex justify-center items-center rounded-2xl overflow-hidden shadow-lg border border-[#798d8f]  ">
+          <img
+            src={img}
+            alt={course.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
         {/*description side */}
         <div className=" p-6 w-full">
           {/* Title */}
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            {course.title}
+            {course.name}
           </h2>
 
           {/* Description */}
-          <p className="text-gray-600 text-sm mb-4">{course.description}</p>
+          <p className="line-clamp-5 text-gray-600 text-sm mb-4">
+            {course.description}
+          </p>
 
-          {/* Chapter Count */}
+          {/* Sections Count */}
           <div className="flex items-center gap-2 mb-6">
             <svg
               className="w-5 h-5 text-gray-700"
@@ -64,21 +133,16 @@ function DetailsSection({ id }: Props) {
               />
             </svg>
             <span className="text-gray-700 font-medium">
-              {course.numberofchapters} chapter
-              {course.numberofchapters !== 1 ? "s" : ""}
+              {course.numsOfSections} section
+              {course.numsOfSections !== 1 ? "s" : ""}
             </span>
           </div>
 
-          {/* Fields/Tags */}
+          {/* Status Badge */}
           <div className="flex gap-3 mb-6">
-            {course.fields.map((field: string, index: number) => (
-              <span
-                key={index}
-                className="text-sm text-gray-700 bg-[#eae4ed] px-10 py-1  rounded-full"
-              >
-                {field}
-              </span>
-            ))}
+            <span className="text-sm text-gray-700 bg-[#eae4ed] px-10 py-1 rounded-full capitalize">
+              {course.status}
+            </span>
           </div>
 
           {/* Progress Bar */}
@@ -103,7 +167,7 @@ function DetailsSection({ id }: Props) {
           <div className="w-full flex justify-center items-center">
             <Link
               to={`/course/${course.id}`}
-              className="w-[50%] bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center"
+              className="w-[80%] bg-purple-600 text-[14px] hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center"
             >
               Go to Course
             </Link>

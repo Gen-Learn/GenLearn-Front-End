@@ -42,6 +42,13 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const refreshToken = localStorage.getItem("refreshToken");
+    const accessToken = localStorage.getItem("accessToken");
+
+    // If no tokens exist, user is logged out - reject immediately
+    if (!accessToken && !refreshToken) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -55,17 +62,25 @@ axiosInstance.interceptors.response.use(
           .catch((err) => Promise.reject(err));
       }
 
+      // If there's no refresh token, can't refresh - logout
+      if (!refreshToken) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
         const { data } = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/api/v1/auth/refresh`,
           { refresh: refreshToken },
         );
 
-        const newAccessToken = data.access;
+        const newAccessToken = data.data.accessToken;
         localStorage.setItem("accessToken", newAccessToken);
         axiosInstance.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
@@ -76,6 +91,7 @@ axiosInstance.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {

@@ -18,19 +18,19 @@ function NavAndTitle({
               All Status
             </li>
             <li
-              onClick={() => setActiveTab("Not Started")}
+              onClick={() => setActiveTab("not_started")}
               className="bg-[#f6edf7] rounded-xl hover:bg-[#b967c7] hover:text-white px-3 sm:px-4 py-2 cursor-pointer transition-colors duration-300 whitespace-nowrap"
             >
               Not Started
             </li>
             <li
-              onClick={() => setActiveTab("In Progress")}
+              onClick={() => setActiveTab("in_progress")}
               className="bg-[#f6edf7] rounded-xl hover:bg-[#b967c7] hover:text-white px-3 sm:px-4 py-2 cursor-pointer transition-colors duration-300 whitespace-nowrap"
             >
               In Progress
             </li>
             <li
-              onClick={() => setActiveTab("Completed")}
+              onClick={() => setActiveTab("completed")}
               className="bg-[#f6edf7] rounded-xl hover:bg-[#b967c7] hover:text-white px-3 sm:px-4 py-2 cursor-pointer transition-colors duration-300 whitespace-nowrap"
             >
               Completed

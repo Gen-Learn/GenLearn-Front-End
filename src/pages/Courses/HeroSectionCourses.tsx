@@ -6,7 +6,7 @@ function HeroSectionCourses() {
         <p className="text-xl sm:text-2xl md:text-3xl font-bold">
           You've Got This!
         </p>
-        <p className="text-base sm:text-lg md:text-[23px] w-full sm:w-[80%] md:w-[70%] pr-0 sm:pr-32 md:pr-0 ">
+        <p className=" text-[16px] lg:text-[20px] md:text-[23px] w-full sm:w-[80%] md:w-[70%] pr-0 sm:pr-32 md:pr-0 ">
           A new lesson today means new knowledge gained. Keep going and let your
           learning journey grow stronger every day.
         </p>

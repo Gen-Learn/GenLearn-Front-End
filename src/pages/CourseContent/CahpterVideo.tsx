@@ -1,48 +1,54 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import VideoPlayer from "./videoSection";
-import testVideo from "../../assets/videos/test.mp4";
-const videoSrc = testVideo;
-const scriptContent = [
-  "Hello everyone, and welcome!",
-  "In this video, we'll talk about the basics of Artificial Intelligence, or AI.",
-  "Artificial Intelligence refers to the ability of machines or computer systems to perform tasks that normally require human intelligence. These tasks include learning from experience, understanding language, recognizing images, and making decisions.",
-  "AI systems don't think like humans, but they simulate intelligence by analyzing large amounts of data and finding patterns. The more data an AI system receives, the better it becomes at making accurate predictions or decisions.",
-  "We already interact with AI in our daily lives. Examples include voice assistants like Siri or Google Assistant, recommendation systems on platforms such as YouTube and Netflix, facial recognition on smartphones, chatbots, and navigation apps that predict traffic.",
-  "There are three main categories of AI:",
-];
+import axiosInstance from "../../services/axios";
+import Course, { Lecture } from "../../types/coursesModel";
 
-const aiCategories = [
-  {
-    label: "Narrow AI",
-    desc: "Designed to handle a specific task very well, like spam detection or image recognition.",
-  },
-  {
-    label: "General AI",
-    desc: "Would have human-like intelligence and the ability to learn any task. This type does not exist yet.",
-  },
-  {
-    label: "Super AI",
-    desc: "Would surpass human intelligence and remains theoretical.",
-  },
-];
-
-const closingText = [
-  "AI is powered by several key technologies. Machine Learning allows systems to learn from data without being explicitly programmed. Deep Learning uses neural networks inspired by the human brain to process complex data like images and speech. Natural Language Processing helps machines understand and respond to human language.",
-  "In conclusion, AI is transforming how we live and work by making systems smarter, more efficient, and more adaptive. As AI continues to evolve, it will play an even bigger role in shaping the future of technology. Thank you for watching!",
-];
+const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 type props = {
   className?: string;
   id?: string;
+  selectedLecture?: Lecture | null;
 };
+
 // --- VideoPlayer component ---
-export default function CahpterVideo({ className, id }: props) {
+export default function CahpterVideo({
+  className,
+  id,
+  selectedLecture,
+}: props) {
   const [activeTab, setActiveTab] = useState("script");
-  const [isFinished, setIsFinished] = useState(false);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(
+          `${domain}/api/v1/courses/${id}`,
+        );
+        const courseData: Course = response.data.data.course;
+        setCourse(courseData);
+        console.log(courseData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch course:", err);
+        setError("Failed to load course content");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCourse();
+    }
+  }, [id]);
 
   return (
     <div
@@ -60,20 +66,41 @@ export default function CahpterVideo({ className, id }: props) {
       </button>
 
       {/* Video area */}
-      <div className="relative w-full  bg-black">
-        <VideoPlayer />
+      <div className="relative w-full bg-black">
+        {loading ? (
+          <div className="h-96 flex items-center justify-center bg-black">
+            <div className="text-white text-center">
+              <div className="mb-4">Loading content...</div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="h-96 flex items-center justify-center bg-black">
+            <div className="text-red-400 text-center">{error}</div>
+          </div>
+        ) : selectedLecture ? (
+          <VideoPlayer lectureId={selectedLecture?.id} courseId={id} />
+        ) : (
+          <div className="h-96 flex items-center justify-center bg-black">
+            <div className="text-gray-400 text-center">
+              <p>Select a lecture to play</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Lesson title + duration */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
         <div>
           <p className="text-[15px] font-medium text-gray-900">
-            1 - Introduction
+            {selectedLecture?.name || "Select a lecture"}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">chapter 1</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {course?.name || "Course"}
+          </p>
         </div>
         <span className="text-xs text-gray-500 bg-gray-100 rounded-lg px-2.5 py-1">
-          3 m
+          Video
         </span>
       </div>
 
@@ -98,18 +125,20 @@ export default function CahpterVideo({ className, id }: props) {
       <div className="px-5 py-4 max-h-80 overflow-y-auto">
         {activeTab === "script" ? (
           <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
-            {scriptContent.map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-            {aiCategories.map((cat) => (
-              <p key={cat.label}>
-                <span className="font-medium text-gray-900">{cat.label}</span> —{" "}
-                {cat.desc}
+            {selectedLecture?.scripts && selectedLecture.scripts.length > 0 ? (
+              selectedLecture.scripts.map((script, i) => (
+                <div key={i}>
+                  <p className="text-xs text-gray-500 mb-1 font-semibold">
+                    {script.language}
+                  </p>
+                  <p className="whitespace-pre-wrap">{script.content}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-400">
+                No scripts available for this lecture.
               </p>
-            ))}
-            {closingText.map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
+            )}
           </div>
         ) : (
           <p className="text-sm text-gray-400">

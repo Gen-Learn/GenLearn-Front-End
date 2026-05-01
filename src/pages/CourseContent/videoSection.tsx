@@ -3,68 +3,128 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import axiosInstance from "../../services/axios";
 
-// Backend video stream URL
-const videoSrc = "https://genlearn-backend-egehcshjhabscsgu.francecentral-01.azurewebsites.net/api/v1/lectures/3d0cf0d6-1fef-4bcf-8528-73422f45f8d0/stream";
+const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-export default function VideoPlayer() {
+type VideoPlayerProps = {
+  lectureId?: string;
+  courseId?: string;
+};
+
+export default function VideoPlayer({ lectureId, courseId }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerRef = useRef<any>(null);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Effect 1: Initialize Video.js ONCE on mount, never recreate it
   useEffect(() => {
-    // Fetch video stream with authentication
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    playerRef.current = videojs(videoElement, {
+      controls: true,
+      fluid: true,
+      sources: [],
+    });
+
+    // Cleanup only on full component unmount
+    return () => {
+      if (playerRef.current && !playerRef.current.isDisposed()) {
+        playerRef.current.dispose();
+        playerRef.current = null;
+      }
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, []); // <-- empty deps: runs once
+
+  // Effect 2: Fetch new video and UPDATE the existing player's source
+  useEffect(() => {
+    if (!lectureId) {
+      setError("No lecture selected");
+      return;
+    }
+
+    if (!playerRef.current || playerRef.current.isDisposed()) return;
+
+    const controller = new AbortController();
+
     const fetchVideo = async () => {
       try {
-        const response = await axiosInstance.get(videoSrc, {
+        setLoading(true);
+        setError(null);
+
+        // Pause and clear current source while loading
+        playerRef.current.pause();
+        playerRef.current.src([]);
+
+        // Revoke previous blob URL
+        if (blobUrlRef.current) {
+          URL.revokeObjectURL(blobUrlRef.current);
+          blobUrlRef.current = null;
+        }
+
+        const videoUrl = `${domain}/api/v1/lectures/${lectureId}/stream`;
+        const response = await axiosInstance.get(videoUrl, {
           responseType: "blob",
+          signal: controller.signal,
         });
+
         const blob = new Blob([response.data], { type: "video/mp4" });
         const url = URL.createObjectURL(blob);
-        setBlobUrl(url);
-      } catch (error) {
-        console.error("Failed to fetch video:", error);
+        blobUrlRef.current = url;
+
+        // Just swap the source — no dispose/reinit
+        if (playerRef.current && !playerRef.current.isDisposed()) {
+          playerRef.current.src([{ src: url, type: "video/mp4" }]);
+          playerRef.current.load();
+        }
+      } catch (err: any) {
+        if (err.name === "CanceledError" || err.name === "AbortError") return;
+        console.error("Failed to fetch video:", err);
+        setError("Failed to load video. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchVideo();
-  }, []);
 
-  useEffect(() => {
-    const videoElement = videoRef.current;
-
-    // 🛑 IMPORTANT: check element exists and blob is ready
-    if (!videoElement || !blobUrl) return;
-
-    // 🛑 Prevent double init (React Strict Mode)
-    if (!playerRef.current) {
-      playerRef.current = videojs(videoElement, {
-        controls: true,
-        fluid: true,
-        sources: [
-          {
-            src: blobUrl,
-            type: "video/mp4",
-          },
-        ],
-      });
-
-      console.log("Video.js initialized");
-    }
-
+    // Cancel in-flight request if lectureId changes mid-fetch
     return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
-      }
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
+      controller.abort();
     };
-  }, [blobUrl]);
+  }, [lectureId]);
 
   return (
-    <div data-vjs-player>
-      <video ref={videoRef} className="video-js vjs-big-play-centered" />
+    <div className="relative">
+      {/* Always keep this mounted — Video.js owns this node */}
+      <div data-vjs-player>
+        <video ref={videoRef} className="video-js vjs-big-play-centered" />
+      </div>
+
+      {/* Loading overlay — sits on top, doesn't touch the video node */}
+      {loading && (
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
+          <div className="text-white text-center">
+            <div className="mb-4">Loading video...</div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto" />
+          </div>
+        </div>
+      )}
+
+      {/* Error overlay */}
+      {error && !loading && (
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
+          <div className="text-red-400 text-center">
+            <p>{error}</p>
+            {!lectureId && <p className="text-sm mt-2">No lecture selected</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
