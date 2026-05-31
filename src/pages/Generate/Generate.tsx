@@ -1,164 +1,457 @@
-import React, { useState } from 'react';
-import { Upload, FileText, X } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Upload, FileText, X, CheckCircle2, Loader2, AlertCircle, RefreshCw, Sparkles } from "lucide-react";
+import axiosInstance from "../../services/axios";
+import {
+  fetchGenerateJobStatus,
+  buildGeneratedFileUrl,
+} from "../../services/generateService";
+import { connectToGenerationSocket, disconnectSocket } from "../../services/socket";
+
+type UploadedFileEntry = {
+  id: number;
+  file: File;
+  name: string;
+  size: string;
+};
+
+const statusLabel = (status: string | null) => {
+  if (!status) return "Not started";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
+const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${Math.round(bytes / Math.pow(k, i))} ${sizes[i]}`;
+};
+
+/**
+ * Submits all files to /api/v1/generate/test via axiosInstance so it
+ * inherits the base URL and Authorization interceptor automatically.
+ */
+async function submitToGenerateEndpoint(
+  files: File[],
+  onProgress: (pct: number) => void
+): Promise<unknown> {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("file", file));
+
+  const { data } = await axiosInstance.post("/api/v1/generate/test", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (e) => {
+      if (e.total) {
+        onProgress(Math.round((e.loaded / e.total) * 95));
+      }
+    },
+  });
+
+  onProgress(100);
+  return data;
+}
 
 export default function Generate() {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { id: 1, name: 'Book one.pdf', size: '10 MB', progress: 78 },
-    { id: 2, name: 'Book one.pdf', size: '10 MB', progress: 78 }
-  ]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileEntry[]>([]);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [jobStatus, setJobStatus] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isPolling, setIsPolling] = useState(false);
 
+  // ─── Job polling ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!jobId || !isPolling) return;
+
+    const refreshStatus = async () => {
+      try {
+        const response = await fetchGenerateJobStatus(jobId);
+
+        const status =
+          response?.data?.status ||
+          response?.data?.jobStatus ||
+          response?.status;
+
+        const filename =
+          response?.data?.filename ||
+          response?.data?.fileName ||
+          response?.filename ||
+          response?.fileName;
+
+        const remoteUrl = response?.data?.downloadUrl || response?.downloadUrl;
+
+        if (status) {
+          const normalized = status.toString().toLowerCase();
+          setJobStatus(normalized);
+
+          if (["completed", "done", "success"].includes(normalized)) {
+            setIsPolling(false);
+            if (remoteUrl) setDownloadUrl(remoteUrl);
+            else if (filename) setDownloadUrl(buildGeneratedFileUrl(filename.toString()));
+          }
+
+          if (["failed", "error", "cancelled"].includes(normalized)) {
+            setIsPolling(false);
+            if (remoteUrl) setDownloadUrl(remoteUrl);
+          }
+        }
+      } catch (err) {
+        setError(getErrorMessage(err));
+        setIsPolling(false);
+      }
+    };
+
+    refreshStatus();
+    const intervalId = window.setInterval(refreshStatus, 3000);
+    return () => window.clearInterval(intervalId);
+  }, [jobId, isPolling]);
+
+  // Real-time job updates via WebSocket (socket.io)
+  React.useEffect(() => {
+    if (!jobId) return;
+
+    const socket = connectToGenerationSocket(jobId, {
+      onJoined: (payload) => {
+        // optional: update status from server payload
+        const status = payload?.status || payload?.jobStatus;
+        if (status) setJobStatus(String(status).toLowerCase());
+      },
+      onCompleted: (payload) => {
+        const remoteUrl = payload?.downloadUrl || payload?.downloadUrl || payload?.fileName || payload?.filename || payload?.fileName;
+        setJobStatus("completed");
+        setIsPolling(false);
+        if (remoteUrl) setDownloadUrl(remoteUrl as string);
+        else if (payload?.fileName) setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
+      },
+      onFailed: (payload) => {
+        setJobStatus("failed");
+        setIsPolling(false);
+        if (payload?.message) setError(String(payload.message));
+      },
+    });
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [jobId]);
+
+  const getErrorMessage = (error: unknown) => {
+    if (error instanceof Error) return error.message;
+    return "An unexpected error occurred.";
+  };
+
+  // ─── Drag & drop ─────────────────────────────────────────────────────────────
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
-
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
   };
-
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
+    handleFiles(Array.from(e.dataTransfer.files));
   };
-
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    handleFiles(files);
+    handleFiles(Array.from(e.target.files || []));
+    e.target.value = "";
   };
 
   const handleFiles = (files: File[]) => {
-    const newFiles = files.map((file, index) => ({
+    const newEntries: UploadedFileEntry[] = files.map((file, index) => ({
       id: Date.now() + index,
+      file,
       name: file.name,
       size: formatFileSize(file.size),
-      progress: Math.floor(Math.random() * 100)
     }));
-    setUploadedFiles([...uploadedFiles, ...newFiles]);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i)) + ' ' + sizes[i];
+    setUploadedFiles((prev) => [...prev, ...newEntries]);
   };
 
   const removeFile = (id: number) => {
-    setUploadedFiles(uploadedFiles.filter(file => file.id !== id));
+    setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-50 min-h-screen">
-      {/* Header Section */}
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Upload Your Learning Material
-        </h1>
-        <p className="text-gray-600 text-sm">
-          Upload books, PDFs or documents and we'll convert them into a full interactive course.
-        </p>
-      </div>
+  // ─── Generate ────────────────────────────────────────────────────────────────
+  const handleGenerateCourse = async () => {
+    if (uploadedFiles.length === 0) {
+      setError("Please add at least one file before generating.");
+      return;
+    }
 
-      {/* Drag and Drop Zone */}
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-lg p-12 mb-8 text-center transition-all ${
-          isDragging
-            ? 'border-purple-500 bg-purple-50'
-            : 'border-purple-300 bg-white'
-        }`}
-      >
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-            <Upload className="w-8 h-8 text-purple-600" />
+    setError(null);
+    setIsSubmitting(true);
+    setUploadProgress(0);
+    setDownloadUrl(null);
+    setJobStatus(null);
+    setJobId(null);
+
+    try {
+      const data = await submitToGenerateEndpoint(
+        uploadedFiles.map((e) => e.file),
+        setUploadProgress
+      ) as Record<string, unknown>;
+
+      // Response: { statusCode: 202, data: { jobId, status, resourceId } }
+      const responseData = (data as any)?.data ?? data;
+      const id = responseData?.jobId;
+      const status = responseData?.status;
+
+      if (!id) throw new Error("No job ID returned from the server.");
+
+      setJobId(id.toString());
+      setJobStatus(status ? status.toString().toLowerCase() : "pending");
+      setIsPolling(true);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setUploadProgress(0);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const refreshJobStatus = () => {
+    if (!jobId) return;
+    setError(null);
+    setIsPolling(true);
+  };
+
+  const clearAll = () => {
+    setJobId(null);
+    setJobStatus(null);
+    setDownloadUrl(null);
+    setError(null);
+    setIsPolling(false);
+    setUploadProgress(0);
+  };
+
+  const isJobDone = jobStatus ? ["completed", "done", "success"].includes(jobStatus) : false;
+  const isJobFailed = jobStatus ? ["failed", "error", "cancelled"].includes(jobStatus) : false;
+  const isJobRunning = jobStatus && !isJobDone && !isJobFailed;
+
+  return (
+    <div className="min-h-screen bg-gray-50 max-w-4xl mx-auto">
+      {/* ── Header ── */}
+      <div className="px-6 py-5">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
-          
-          <p className="text-gray-700 mb-1">
-            Drag & drop your files here
-          </p>
-          <p className="text-gray-500 text-sm mb-2">
-            or click to{' '}
-            <label className="text-purple-600 cursor-pointer hover:underline">
-              browse
-              <input
-                type="file"
-                multiple
-                onChange={handleFileInput}
-                className="hidden"
-                accept=".pdf,.doc,.docx,.txt"
-              />
-            </label>
-          </p>
-          <p className="text-gray-400 text-xs mt-2">
-            Supported formats (files below
-          </p>
-          <p className="text-gray-400 text-xs">
-            size .DOCX, TXT)
-          </p>
+          <div>
+            <h1 className="text-base font-semibold text-gray-900 leading-none">
+              Course Generator
+            </h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Upload documents · AI builds your course
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Uploaded Material Section */}
-      {uploadedFiles.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Uploaded Material
-          </h2>
-          
-          <div className="space-y-3 mb-6">
-            {uploadedFiles.map((file) => (
-              <div
-                key={file.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800 text-sm">
-                        {file.name}
-                      </p>
-                      <p className="text-xs text-gray-500">{file.size}</p>
-                    </div>
+      <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+
+        {/* ── Drop zone ── */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`
+            relative rounded-2xl border-2 border-dashed transition-all duration-200
+            ${isDragging
+              ? "border-violet-500 bg-violet-50 scale-[1.01]"
+              : "border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50/40"
+            }
+          `}
+        >
+          <label className="flex flex-col items-center gap-3 py-12 px-6 cursor-pointer">
+            <div className={`
+              w-14 h-14 rounded-2xl flex items-center justify-center transition-colors
+              ${isDragging ? "bg-violet-100" : "bg-gray-100"}
+            `}>
+              <Upload className={`w-6 h-6 transition-colors ${isDragging ? "text-violet-600" : "text-gray-500"}`} />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-800">Drop your files here</p>
+              <p className="text-xs text-gray-500 mt-1">
+                or{" "}
+                <span className="text-violet-600 font-medium">browse to upload</span>
+                {" "}· PDF, DOCX, TXT
+              </p>
+            </div>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileInput}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.txt"
+            />
+          </label>
+        </div>
+
+        {/* ── File list ── */}
+        {uploadedFiles.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-700">Files</h2>
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                <CheckCircle2 className="w-3 h-3" />
+                {uploadedFiles.length} ready
+              </span>
+            </div>
+            <div className="space-y-2">
+              {uploadedFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className="bg-white border border-emerald-100 rounded-xl p-3.5 flex items-center gap-3"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
+                    <p className="text-xs text-gray-400">{file.size}</p>
                   </div>
                   <button
                     onClick={() => removeFile(file.id)}
-                    className="text-gray-400 hover:text-gray-600"
+                    disabled={isSubmitting}
+                    className="text-gray-300 hover:text-gray-500 transition-colors p-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Remove file"
                   >
-                    <X size={18} />
+                    <X size={15} />
                   </button>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="h-full bg-linear-to-r from-purple-500 to-pink-500 transition-all"
-                      style={{ width: `${file.progress}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 min-w-12 text-right">
-                    {file.progress}%
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Generate Course Button */}
-          <button className="w-full bg-linear-to-r from-cyan-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">
-            Generate Course
+        {/* ── Generate button ── */}
+        <div className="pt-2 space-y-3">
+          <button
+            type="button"
+            onClick={handleGenerateCourse}
+            disabled={isSubmitting || uploadedFiles.length === 0}
+            className={`
+              w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl
+              text-sm font-semibold text-white transition-all duration-200
+              ${uploadedFiles.length > 0 && !isSubmitting
+                ? "bg-gradient-to-r from-violet-600 to-cyan-500 hover:opacity-90 shadow-sm hover:shadow-md active:scale-[0.99]"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }
+            `}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {uploadProgress < 100 ? "Uploading…" : "Generating…"}
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                Generate Course
+              </>
+            )}
           </button>
+
+          {/* Upload progress bar */}
+          {isSubmitting && (
+            <div className="space-y-1.5">
+              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-xs text-gray-400">
+                  {uploadProgress < 95
+                    ? "Uploading files to server…"
+                    : uploadProgress < 100
+                    ? "Finalizing upload…"
+                    : "Files received — generating course…"}
+                </p>
+                <p className="text-xs font-medium text-gray-500 tabular-nums">
+                  {uploadProgress}%
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* ── Error ── */}
+        {error && (
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* ── Job status card ── */}
+        {(jobId || jobStatus || downloadUrl) && (
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
+            {jobStatus && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Status</span>
+                <span className={`
+                  inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
+                  ${isJobDone ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : ""}
+                  ${isJobFailed ? "bg-red-50 text-red-700 border border-red-200" : ""}
+                  ${isJobRunning ? "bg-violet-50 text-violet-700 border border-violet-200" : ""}
+                `}>
+                  {isJobRunning && <Loader2 className="w-3 h-3 animate-spin" />}
+                  {isJobDone && <CheckCircle2 className="w-3 h-3" />}
+                  {isJobFailed && <AlertCircle className="w-3 h-3" />}
+                  {statusLabel(jobStatus)}
+                </span>
+              </div>
+            )}
+
+            {jobId && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">Job ID</p>
+                <p className="text-xs font-mono text-gray-600 bg-gray-50 rounded-lg px-3 py-2 break-all">
+                  {jobId}
+                </p>
+              </div>
+            )}
+
+            {downloadUrl && (
+              <a
+                href={downloadUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Open Generated Course
+              </a>
+            )}
+
+            <div className="flex gap-2 pt-1">
+              {jobId && !downloadUrl && isJobRunning && (
+                <button
+                  type="button"
+                  onClick={refreshJobStatus}
+                  className="flex-1 inline-flex justify-center items-center gap-1.5 text-xs font-medium text-violet-600 border border-violet-200 bg-violet-50 hover:bg-violet-100 rounded-lg py-2 transition-colors"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Refresh
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={clearAll}
+                className="flex-1 inline-flex justify-center items-center text-xs font-medium text-gray-500 border border-gray-200 bg-white hover:bg-gray-50 rounded-lg py-2 transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
