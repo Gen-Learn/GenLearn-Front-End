@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Upload, FileText, X, CheckCircle2, Loader2, AlertCircle, RefreshCw, Sparkles } from "lucide-react";
 import axiosInstance from "../../services/axios";
-import {
-  fetchGenerateJobStatus,
-  buildGeneratedFileUrl,
-} from "../../services/generateService";
+import { buildGeneratedFileUrl } from "../../services/generateService";
 import { connectToGenerationSocket, disconnectSocket } from "../../services/socket";
 
 type UploadedFileEntry = {
@@ -60,54 +57,6 @@ export default function Generate() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [isPolling, setIsPolling] = useState(false);
-
-  // ─── Job polling ─────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!jobId || !isPolling) return;
-
-    const refreshStatus = async () => {
-      try {
-        const response = await fetchGenerateJobStatus(jobId);
-
-        const status =
-          response?.data?.status ||
-          response?.data?.jobStatus ||
-          response?.status;
-
-        const filename =
-          response?.data?.filename ||
-          response?.data?.fileName ||
-          response?.filename ||
-          response?.fileName;
-
-        const remoteUrl = response?.data?.downloadUrl || response?.downloadUrl;
-
-        if (status) {
-          const normalized = status.toString().toLowerCase();
-          setJobStatus(normalized);
-
-          if (["completed", "done", "success"].includes(normalized)) {
-            setIsPolling(false);
-            if (remoteUrl) setDownloadUrl(remoteUrl);
-            else if (filename) setDownloadUrl(buildGeneratedFileUrl(filename.toString()));
-          }
-
-          if (["failed", "error", "cancelled"].includes(normalized)) {
-            setIsPolling(false);
-            if (remoteUrl) setDownloadUrl(remoteUrl);
-          }
-        }
-      } catch (err) {
-        setError(getErrorMessage(err));
-        setIsPolling(false);
-      }
-    };
-
-    refreshStatus();
-    const intervalId = window.setInterval(refreshStatus, 3000);
-    return () => window.clearInterval(intervalId);
-  }, [jobId, isPolling]);
 
   // Real-time job updates via WebSocket (socket.io)
   React.useEffect(() => {
@@ -122,13 +71,11 @@ export default function Generate() {
       onCompleted: (payload) => {
         const remoteUrl = payload?.downloadUrl || payload?.downloadUrl || payload?.fileName || payload?.filename || payload?.fileName;
         setJobStatus("completed");
-        setIsPolling(false);
         if (remoteUrl) setDownloadUrl(remoteUrl as string);
         else if (payload?.fileName) setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
       },
       onFailed: (payload) => {
         setJobStatus("failed");
-        setIsPolling(false);
         if (payload?.message) setError(String(payload.message));
       },
     });
@@ -205,7 +152,6 @@ export default function Generate() {
 
       setJobId(id.toString());
       setJobStatus(status ? status.toString().toLowerCase() : "pending");
-      setIsPolling(true);
     } catch (err) {
       setError(getErrorMessage(err));
       setUploadProgress(0);
@@ -214,18 +160,11 @@ export default function Generate() {
     }
   };
 
-  const refreshJobStatus = () => {
-    if (!jobId) return;
-    setError(null);
-    setIsPolling(true);
-  };
-
   const clearAll = () => {
     setJobId(null);
     setJobStatus(null);
     setDownloadUrl(null);
     setError(null);
-    setIsPolling(false);
     setUploadProgress(0);
   };
 
@@ -431,16 +370,7 @@ export default function Generate() {
             )}
 
             <div className="flex gap-2 pt-1">
-              {jobId && !downloadUrl && isJobRunning && (
-                <button
-                  type="button"
-                  onClick={refreshJobStatus}
-                  className="flex-1 inline-flex justify-center items-center gap-1.5 text-xs font-medium text-violet-600 border border-violet-200 bg-violet-50 hover:bg-violet-100 rounded-lg py-2 transition-colors"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Refresh
-                </button>
-              )}
+
               <button
                 type="button"
                 onClick={clearAll}

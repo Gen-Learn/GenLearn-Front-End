@@ -17,38 +17,75 @@ type Callbacks = {
 };
 
 let socket: Socket | null = null;
+let currentCallbacks: Callbacks | null = null;
+let currentJobId: string | null = null;
 
 export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = {}) => {
   if (!jobId) return null;
 
-  // Reuse existing socket if already connected
-  if (socket && socket.connected) {
-    socket.emit("joinJob", { jobId });
-    return socket;
+  currentCallbacks = callbacks;
+  currentJobId = jobId;
+
+  if (!socket || !socket.connected) {
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    const apiBase = (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost:3000";
+    const url = `${apiBase.replace(/\/+$/, "")}/generation`;
+    const socketPath = "/socket.io";
+
+    console.log("[Socket] Initializing connection to:", url);
+
+    socket = io(url, {
+      path: socketPath,
+      transports: ["websocket"],
+      auth: token ? { token } : undefined,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+    });
+
+    socket.on("connect", () => {
+      console.log("[Socket] Connected to generation server");
+      if (currentJobId) {
+        socket!.emit("joinJob", { jobId: currentJobId });
+      }
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("[Socket] Connection error:", err);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log("[Socket] Disconnected:", reason);
+    });
   }
 
-  const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
-  const url = (import.meta.env.VITE_GENERATION_SOCKET_URL as string) || "http://localhost:3000/generation";
+  console.log(`[Socket] Joining job: ${jobId}`);
+  socket.emit("joinJob", { jobId });
 
-  socket = io(url, {
-    path: "/socket.io",
-    transports: ["websocket"],
-    auth: token ? { token } : undefined,
-    // If your server requires a namespace instead of a path, adapt accordingly.
+  socket.off("joinedJob");
+  socket.off("jobCompleted");
+  socket.off("jobFailed");
+
+  socket.on("joinedJob", (payload: JobEventPayload) => {
+    console.log("[Socket] joinedJob event:", payload);
+    if (currentCallbacks?.onJoined) {
+      currentCallbacks.onJoined(payload);
+    }
   });
 
-  socket.on("connect", () => {
-    socket?.emit("joinJob", { jobId });
+  socket.on("jobCompleted", (payload: JobEventPayload) => {
+    console.log("[Socket] jobCompleted event:", payload);
+    if (currentCallbacks?.onCompleted) {
+      currentCallbacks.onCompleted(payload);
+    }
   });
 
-  socket.on("joinedJob", (payload: JobEventPayload) => callbacks.onJoined?.(payload));
-  socket.on("jobCompleted", (payload: JobEventPayload) => callbacks.onCompleted?.(payload));
-  socket.on("jobFailed", (payload: JobEventPayload) => callbacks.onFailed?.(payload));
-
-  socket.on("connect_error", (err) => {
-    // Keep a console message for debugging; components should handle UX.
-    // eslint-disable-next-line no-console
-    console.error("Generation socket connect_error:", err);
+  socket.on("jobFailed", (payload: JobEventPayload) => {
+    console.log("[Socket] jobFailed event:", payload);
+    if (currentCallbacks?.onFailed) {
+      currentCallbacks.onFailed(payload);
+    }
   });
 
   return socket;
@@ -57,10 +94,16 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
 export const disconnectSocket = () => {
   if (socket) {
     try {
+      console.log("[Socket] Disconnecting socket");
+      socket.off("joinedJob");
+      socket.off("jobCompleted");
+      socket.off("jobFailed");
       socket.disconnect();
     } catch (e) {
       // ignore
     }
     socket = null;
+    currentCallbacks = null;
+    currentJobId = null;
   }
 };
