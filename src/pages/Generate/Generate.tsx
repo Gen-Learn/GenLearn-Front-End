@@ -3,7 +3,8 @@ import { Upload, FileText, X, CheckCircle2, Loader2, AlertCircle, RefreshCw, Spa
 import axiosInstance from "../../services/axios";
 import { buildGeneratedFileUrl } from "../../services/generateService";
 import { connectToGenerationSocket, disconnectSocket } from "../../services/socket";
-
+import { useNotification } from "@/contexts/NotificationContext";
+import { Link } from "react-router-dom";
 type UploadedFileEntry = {
   id: number;
   file: File;
@@ -59,6 +60,8 @@ export default function Generate() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // Real-time job updates via WebSocket (socket.io)
+  const { addNotification } = useNotification();
+
   React.useEffect(() => {
     if (!jobId) return;
 
@@ -73,6 +76,12 @@ export default function Generate() {
         setJobStatus("completed");
         if (remoteUrl) setDownloadUrl(remoteUrl as string);
         else if (payload?.fileName) setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
+
+        addNotification({
+          title: "Generation complete",
+          message: "Your course generation is finished and ready to download.",
+          courseId: payload?.downloadUrl as string | undefined,
+        });
       },
       onFailed: (payload) => {
         setJobStatus("failed");
@@ -83,7 +92,7 @@ export default function Generate() {
     return () => {
       disconnectSocket();
     };
-  }, [jobId]);
+  }, [jobId, addNotification]);
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
@@ -177,7 +186,7 @@ export default function Generate() {
       {/* ── Header ── */}
       <div className="px-6 py-5">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-600 to-cyan-500 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -334,7 +343,16 @@ export default function Generate() {
           <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
             {jobStatus && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Status</span>
+                {downloadUrl && (
+              <Link
+                to={downloadUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Open Generated Course
+              </Link>
+            )}
                 <span className={`
                   inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full
                   ${isJobDone ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : ""}
@@ -351,24 +369,11 @@ export default function Generate() {
 
             {jobId && (
               <div>
-                <p className="text-xs text-gray-400 mb-1">Job ID</p>
-                <p className="text-xs font-mono text-gray-600 bg-gray-50 rounded-lg px-3 py-2 break-all">
-                  {jobId}
+                <p className="text-xs font-mono text-gray-600 bg-gray-50 rounded-lg px-3 py-2 break-all text-center">
+                  course is being generated wait a moment, we will notify you when it's ready
                 </p>
               </div>
             )}
-
-            {downloadUrl && (
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-              >
-                Open Generated Course
-              </a>
-            )}
-
             <div className="flex gap-2 pt-1">
 
               <button

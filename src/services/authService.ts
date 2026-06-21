@@ -43,6 +43,9 @@ export interface User {
   id: number | string;
   name: string;
   email: string;
+  profilePicture: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AuthResponse {
@@ -94,10 +97,24 @@ const authService = {
     );
     const { accessToken, refreshToken, user } = data.data;
     saveTokens(accessToken, refreshToken);
+
+    const currentUser =
+      user ?? (await authService.getCurrentUser());
+
     return {
-      user: user ?? null,
+      user: currentUser ?? null,
       tokens: { access: accessToken, refresh: refreshToken ?? "" },
     };
+  },
+
+  /**
+   * GET /api/v1/users/me
+   */
+  getCurrentUser: async (): Promise<User> => {
+    const { data } = await axiosInstance.get<{ data: { user: User } }>(
+      "/api/v1/users/me",
+    );
+    return data.data.user;
   },
 
   /**
