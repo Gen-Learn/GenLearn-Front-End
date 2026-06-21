@@ -15,6 +15,7 @@ import Chat from "./components/AIChat/Chat";
 import AiIcon from "./components/AiIcon/AiIcon";
 import useMediaQuery from "./hooks/useMediaQuery";
 import Profile from "./pages/profile/profile";
+import ManageAccount from "./pages/ManageAccount/ManageAccount";
 function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -53,6 +54,7 @@ function App() {
               <Route path="/course-details/:id" element={<CourseDetails />} />
               <Route path="/course/:id" element={<CourseContent />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/manage-account" element={<ManageAccount />} />
             </Routes>
             <Footer />
           </div>

@@ -54,7 +54,7 @@ function AfterAuth() {
             <Link to="/profile" className="text-sm block px-4 py-2 hover:bg-gray-100">
               Profile
             </Link>
-            <Link to="/logout" className="text-sm block px-4 py-2 hover:bg-gray-100">
+            <Link to="/manage-account" className="text-sm block px-4 py-2 hover:bg-gray-100">
               Manage Account
             </Link>
             <div onClick={logout} className="text-sm block px-4 py-2 hover:bg-gray-100">

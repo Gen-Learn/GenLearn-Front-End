@@ -118,6 +118,14 @@ const authService = {
   },
 
   /**
+   * DELETE /api/v1/users/me
+   */
+  deleteAccount: async (): Promise<void> => {
+    await axiosInstance.delete("/api/v1/users/me");
+    clearTokens();
+  },
+
+  /**
    * POST /api/v1/auth/logout
    */
   logout: async (): Promise<void> => {

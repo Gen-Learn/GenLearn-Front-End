@@ -23,6 +23,7 @@ interface AuthContextType {
   register: (payload: RegisterPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   clearError: () => void;
@@ -118,6 +119,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await authService.deleteAccount();
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      setIsLoading(false);
+    }
+  };
+
   const forgotPassword = async (payload: ForgotPasswordPayload) => {
     setIsLoading(true);
     setError(null);
@@ -154,6 +172,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         login,
         logout,
+        deleteAccount,
         forgotPassword,
         resetPassword,
         clearError,

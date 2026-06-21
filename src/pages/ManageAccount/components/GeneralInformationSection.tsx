@@ -1,0 +1,74 @@
+import { useRef, useState } from 'react';
+import { IoSettingsOutline } from 'react-icons/io5';
+import { LuUpload } from 'react-icons/lu';
+import SectionCard from './SectionCard';
+import { FormField, TextAreaField } from './FormField';
+import SaveButton from './SaveButton';
+
+const GeneralInformationSection = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatar, setAvatar] = useState(
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Mohamed&backgroundColor=b6e3f4'
+  );
+  const [name, setName] = useState('Mohamed Mahmoud');
+  const [bio, setBio] = useState('');
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatar(URL.createObjectURL(file));
+    }
+  };
+
+  return (
+    <SectionCard icon={<IoSettingsOutline />} title="General Information">
+      <div className="flex items-center gap-4 mb-6">
+        <img
+          src={avatar}
+          alt="Profile avatar"
+          className="w-16 h-16 rounded-full border border-gray-200 object-cover bg-white"
+        />
+        <div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-2 border border-brand-purple text-brand-violet text-[12px] font-medium rounded-lg px-3.5 py-2 hover:bg-purple-50 transition-colors"
+          >
+            <LuUpload size={14} />
+            Upload Picture
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <p className="text-gray-400 text-[11px] mt-1.5">Formats: JPG, JPEG, PNG.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <FormField
+          label="Your Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <FormField label="Email Address" value="example@gmail.com" disabled className="bg-gray-100 text-gray-400 cursor-not-allowed" />
+      </div>
+
+      <div className="mb-6">
+        <TextAreaField
+          label="Biography"
+          placeholder="Write a short summary about yourself ..."
+          rows={4}
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+        />
+      </div>
+
+      <SaveButton />
+    </SectionCard>
+  );
+};
+
+export default GeneralInformationSection;
