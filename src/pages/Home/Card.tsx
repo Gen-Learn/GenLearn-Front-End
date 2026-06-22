@@ -48,7 +48,7 @@ function Card({
   return (
     <div
       ref={cardRef}
-      className={`${bgColor} w-[250px] h-[250px] md:w-[300px] md:h-[300px] relative rounded-4xl rounded-tl-none p-6 shadow-lg max-w-sm overflow-hidden`}
+      className={`${bgColor} mx-auto w-full max-w-[300px] h-[250px] md:h-[300px] relative rounded-4xl rounded-tl-none p-6 shadow-sm overflow-hidden`}
     >
       <div
         className={`${iconBgColor} ${isActive ? "rounded-xl" : "rounded-4xl"} flex items-center justify-center absolute top-0 left-0  rounded-4xl rounded-tl-none transition-all duration-500 ease-out`}

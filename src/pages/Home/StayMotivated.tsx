@@ -9,16 +9,16 @@ function StayMotivated() {
       <div className="h-70 md:h-80 gradient-bg rounded-3xl px-8  mb-16 relative flex items-center justify-center ">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col justify-center items-center text-white z-10">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            <h1 className="text-2xl md:text-4xl font-bold mb-4 text-center">
               Stay Motivated. Achieve More.
             </h1>
-            <p className="text-lg text-center md:text-xl mb-6 opacity-95">
+            <p className="text-sm text-center md:text-xl mb-6 opacity-95">
               Learning doesn't have to feel boring or overwhelming. Our platform
               turns progress into rewards helping you stay consistent, focused,
               and motivated every day.
             </p>
             <Link to="/generate">
-              <button className="bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-8 rounded-lg border-2 border-white/40 transition-all duration-300 backdrop-blur-sm">
+              <button className="text-sm bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-8 rounded-lg border-2 border-white/40 transition-all duration-300 backdrop-blur-sm">
                 Start Now!
               </button>
             </Link>

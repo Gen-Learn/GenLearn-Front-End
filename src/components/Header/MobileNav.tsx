@@ -9,7 +9,7 @@ function MobileNav({ setIsMenuOpen }: MobileNavProps) {
   const { isAuthenticated } = useAuth();
   return (
     <div className="md:hidden flex justify-center items-center">
-      <ul className=" flex flex-col justify-between items-center mx-2  text-[#505b61] font-semibold gap-10">
+      <ul className=" flex flex-col justify-between items-center mx-2  text-[#505b61] font-semibold gap-3 mt-5">
         <li
           className="hover:text-[#8864b5]"
           onClick={() => setIsMenuOpen(false)}

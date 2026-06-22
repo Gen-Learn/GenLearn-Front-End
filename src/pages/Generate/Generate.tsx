@@ -182,7 +182,7 @@ export default function Generate() {
   const isJobRunning = jobStatus && !isJobDone && !isJobFailed;
 
   return (
-    <div className="min-h-screen bg-gray-50 max-w-4xl mx-auto">
+    <div className="smmin-h-screen bg-gray-50 max-w-4xl mx-auto">
       {/* ── Header ── */}
       <div className="max-w-2xl mx-auto px-6 py-5 space-y-6">
         <div className="max-w-2xl mx-auto flex items-center gap-3">

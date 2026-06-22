@@ -18,7 +18,6 @@ function SignUp() {
     try {
       await login(form);
       navigate("/"); // redirect after successful login
-      console.log("Login successful" + isAuthenticated);
     } catch {
       console.error("Login failed - check error state for details");
     }

@@ -4,7 +4,7 @@ type BeforAuthMobileProps = {
 };
 function BeforAuthMobile({ setIsMenuOpen }: BeforAuthMobileProps) {
   return (
-    <ul className="flex justify-between items-center gap-10  flex-col">
+    <ul className="flex justify-between items-center gap-3  flex-col">
       <li
         className="rounded-xl  hover:text-[#8864b5] transition-colors duration-300"
         onClick={() => setIsMenuOpen(false)}
