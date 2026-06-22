@@ -102,7 +102,7 @@ function SignUp() {
           {/* login */}
           <p className="text-center">
             Already have account?{" "}
-            <span className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text text-transparent font-bold underline underline-offset-2 decoration-[#E522B5]">
+            <span className="gradient-bg-text font-bold   decoration-[#E522B5]">
               <Link to="/login">Sign In</Link>
             </span>
           </p>

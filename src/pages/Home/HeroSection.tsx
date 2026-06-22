@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import 'animate.css';
 import HeroImg from "../../assets/images/HomeHeroSection.png";
 type Props = {
   width: number;
@@ -14,22 +15,22 @@ function HeroSection({ width }: Props) {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight sm:leading-14 md:leading-16">
           Turn Any
           <span className="font-normal"> Book</span> Into an Interactive
-          <span className="text-[#b967c7]"> Course</span>
+          <span className="gradient-bg-text bg-clip-text text-transparent"> Course</span>
         </h1>
         <p className="mt-4 sm:mt-6 md:mt-8 text-lg sm:text-xl md:text-2xl font-semibold text-[#505b61]">
           Upload your material and let AI transform it into short lessons,
           summaries and videos all in one place.
         </p>
         <Link to="/generate">
-          <button className="font-bold mt-6 sm:mt-8 w-full sm:w-70 md:w-75 bg-linear-to-r from-[#22B5E5] to-[#E522B5] text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
+          <button className="gradient-bg font-bold mt-6 sm:mt-8 w-full sm:w-70 md:w-75 text-white px-4 py-3 md:py-2 rounded-xl active:scale-95 transition-transform duration-200">
             Generate Course
           </button>
         </Link>
       </div>
 
       {width > 900 && (
-        <div className="flex justify-center items-center mt-6 md:mt-0">
-          <img src={HeroImg} alt="GenLearn" className="w-full rounded-2xl" />
+        <div className="w-[60%] flex justify-center items-center mt-4  md:mt-0">
+          <img src={HeroImg} alt="GenLearn" className="animate__animated animate__pulse animate__infinite animate__slower  w-full rounded-2xl" />
         </div>
       )}
     </section>

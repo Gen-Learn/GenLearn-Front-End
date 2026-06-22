@@ -87,25 +87,25 @@ function SignUp() {
           {/* or */}
           <div className="relative  my-10">
             <hr className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text  font-bold underline underline-offset-2 decoration-[#E522B5] block w-full" />
-            <p className="text-center text-[#505b61] p-4 bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <p className="text-[10px] md:text-[16px] text-center text-[#505b61] p-4 bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               Or Sign in with
             </p>
           </div>
           {/* google & facebook */}
           <div className="flex justify-center gap-4 my-4">
-            <button className="p-0.5  bg-linear-to-r rounded-sm from-[#22B5E5] to-[#E522B5]">
+            <button className="p-0.5  gradient-bg rounded-sm">
               <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100 h-full">
                 <FcGoogle />
-                <span className="text-[15px] text-[#505b61]">
-                  Sign in with Google
+                <span className="text-[10px] md:text-[16px] text-[#505b61]">
+                   Google
                 </span>
               </div>
             </button>
-            <button className="p-0.5  bg-linear-to-r rounded-sm from-[#22B5E5] to-[#E522B5]">
+            <button className="p-0.5  gradient-bg rounded-sm">
               <div className="flex items-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gray-100 h-full">
                 <FaFacebook className="text-blue-700" />
-                <span className="text-[15px] text-[#505b61]">
-                  Sign in with Facebook
+                <span className="text-[10px] md:text-[15px] text-[#505b61]">
+                   Facebook
                 </span>
               </div>
             </button>
@@ -114,7 +114,7 @@ function SignUp() {
           {/* Sign up */}
           <p className="text-center">
             Don’t have account??{" "}
-            <span className="bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text text-transparent font-bold underline underline-offset-2 decoration-[#E522B5]">
+            <span className="gradient-bg-text font-bold   decoration-[#E522B5]">
               <Link to="/signup">Sign Up</Link>
             </span>
           </p>

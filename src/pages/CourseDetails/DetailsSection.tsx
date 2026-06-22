@@ -80,8 +80,7 @@ function DetailsSection({ id }: Props) {
       <div className="flex justify-between items-center w-[80%] mt-10 mb-6">
         <h1
           className="text-4xl font-bold 
-            bg-linear-to-r from-[#22b5e6] via-[#8f65c9]  to-[#e622b5]
-            bg-clip-text text-transparent"
+           gradient-bg-text"
         >
           Course Details
         </h1>
@@ -167,7 +166,7 @@ function DetailsSection({ id }: Props) {
           <div className="w-full flex justify-center items-center">
             <Link
               to={`/course/${course.id}`}
-              className="w-[80%] bg-purple-600 text-[14px] hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center"
+              className="w-[80%] gradient-bg text-[14px]  text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center"
             >
               Go to Course
             </Link>

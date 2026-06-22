@@ -26,3 +26,40 @@ code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+@keyframes BackgroundColorAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(
+    135deg,
+    #22b5e5,
+    #e522b5,
+    #8b5cf6,
+    #22b5e5
+  );
+  background-size: 300% 300%;
+  animation: BackgroundColorAnimation 8s ease infinite;
+}
+.gradient-bg-text {
+  background: linear-gradient(
+    135deg,
+    #22b5e5,
+    #e522b5,
+    #8b5cf6,
+    #22b5e5
+  );
+  background-size: 300% 300%;
+  animation: BackgroundColorAnimation 8s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

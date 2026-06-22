@@ -6,13 +6,13 @@ function StayMotivated() {
   return (
     <div className="w-[80%] max-w-7xl mx-auto  py-8 mt-16">
       {/* Motivation Section */}
-      <div className="h-70 md:h-80 bg-linear-to-r from-[#ba76c4] to-[#8b64b5] rounded-3xl px-8  mb-16 relative flex items-center justify-center ">
+      <div className="h-70 md:h-80 gradient-bg rounded-3xl px-8  mb-16 relative flex items-center justify-center ">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col justify-center items-center text-white z-10">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Stay Motivated. Achieve More.
             </h1>
-            <p className="text-lg md:text-xl mb-6 opacity-95">
+            <p className="text-lg text-center md:text-xl mb-6 opacity-95">
               Learning doesn't have to feel boring or overwhelming. Our platform
               turns progress into rewards helping you stay consistent, focused,
               and motivated every day.
@@ -24,7 +24,7 @@ function StayMotivated() {
             </Link>
           </div>
           {width > 1000 && (
-            <div className="shrink-0">
+            <div className="shrink-0 ">
               <img
                 src={girlimg}
                 alt="Happy student with trophy"

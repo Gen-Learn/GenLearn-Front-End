@@ -7,7 +7,7 @@ import type { UserProfile } from '../types';
 const ProfileHeader = ({user}: { user: UserProfile }) => (
   <div className="bg-[#f3e9fb] rounded-3xl p-5 grid md:grid-cols-2 grid-cols-1 gap-5">
     <div>
-        <span className="text-[30px] bg-linear-to-r from-[#22B5E5] to-[#E522B5] bg-clip-text text-transparent font-bold decoration-[#E522B5]">
+        <span className="text-[30px] gradient-bg-text font-bold ">
           Profile
         </span>
         <div className="flex items-center gap-4 ">

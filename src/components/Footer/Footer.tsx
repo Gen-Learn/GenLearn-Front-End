@@ -99,7 +99,7 @@ export default function Footer() {
         {/* Copyright Section */}
         <div className="border-t border-gray-300 pt-4">
           <p className="text-center text-sm text-gray-500">
-            Copyright © 2025 Genlearn Team | Designed by Genlearn Team
+            Copyright © 2026 Genlearn Team | Designed by Genlearn Team
           </p>
         </div>
       </div>

@@ -77,7 +77,7 @@ export function ChaptersDetails({ id }: Props) {
       <div className="bg-white rounded-lg p-6 w-[80%]">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold bg-linear-to-r from-cyan-500 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-2xl font-semibold gradient-bg-text">
             Course Content
           </h2>
           <p className="text-gray-500 text-sm">

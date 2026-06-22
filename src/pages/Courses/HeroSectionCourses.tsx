@@ -2,7 +2,7 @@ import Boy from "../../assets/images/CoursesBoy.png";
 function HeroSectionCourses() {
   return (
     <section className="w-full flex justify-center items-center px-4">
-      <div className="relative text-white bg-linear-to-l from-[#22B5E5] to-[#E522B5] h-[75px] sm:h-[100px] md:h-[150px] lg:h-[225px] max-w-[80%] min-h-[200px] rounded-3xl flex justify-evenly items-start flex-col px-6 sm:px-10 pt-6 sm:pt-8 mt-40 mb-10">
+      <div className="relative text-white gradient-bg h-[75px] sm:h-[100px] md:h-[150px] lg:h-[225px] max-w-[80%] min-h-[200px] rounded-3xl flex justify-evenly items-start flex-col px-6 sm:px-10 pt-6 sm:pt-8 mt-40 mb-10">
         <p className="text-xl sm:text-2xl md:text-3xl font-bold">
           You've Got This!
         </p>

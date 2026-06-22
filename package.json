@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "animate.css": "^4.1.1",
+    "animejs": "^4.5.0",
     "axios": "^1.13.6",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

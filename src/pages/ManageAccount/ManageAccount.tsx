@@ -23,7 +23,7 @@ export default function ManageAccount() {
   return (
     <div className="min-h-screen bg-[#f4f4f6] flex items-center justify-center p-6">
       <div className="w-full max-w-4xl bg-brand-page rounded-3xl p-6 flex justify-center items-center flex-col">
-        <span className="self-start bg-linear-to-r from-sky-500 to-fuchsia-500 bg-clip-text text-transparent text-xl font-bold mb-6">
+        <span className="self-start gradient-bg-text text-2xl font-bold mb-6">
           Manage Account
         </span>
 

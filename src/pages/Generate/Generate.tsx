@@ -184,13 +184,10 @@ export default function Generate() {
   return (
     <div className="min-h-screen bg-gray-50 max-w-4xl mx-auto">
       {/* ── Header ── */}
-      <div className="px-6 py-5">
+      <div className="max-w-2xl mx-auto px-6 py-5 space-y-6">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-600 to-cyan-500 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
           <div>
-            <h1 className="text-base font-semibold text-gray-900 leading-none">
+            <h1 className="gradient-bg-text text-2xl font-bold text-gray-900 leading-none">
               Course Generator
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -287,7 +284,7 @@ export default function Generate() {
               w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl
               text-sm font-semibold text-white transition-all duration-200
               ${uploadedFiles.length > 0 && !isSubmitting
-                ? "bg-gradient-to-r from-violet-600 to-cyan-500 hover:opacity-90 shadow-sm hover:shadow-md active:scale-[0.99]"
+                ? "gradient-bg hover:opacity-90 shadow-sm hover:shadow-md active:scale-[0.99]"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }
             `}
