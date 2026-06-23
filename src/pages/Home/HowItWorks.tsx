@@ -45,7 +45,7 @@ function HowItWorks() {
 
   return (
     <section className="w-full flex justify-center items-center bg-[#f3e7f7] rounded-2xl">
-      <div className="w-[80%] py-12">
+      <div className="w-full sm:w-[80%] pt-8">
         <div>
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
           <p className="text-center text-gray-600 mb-8">
@@ -54,7 +54,7 @@ function HowItWorks() {
         </div>
 
         {/* Desktop / iPad: fixed static row, no swiping */}
-        <div className="hidden md:flex flex-row gap-4 items-center my-10 justify-between">
+        <div className="hidden md:flex flex-row gap-4 items-center sm:my-10 justify-between">
           {steps.map((step) => (
             <Card
               key={step.id}

@@ -3,6 +3,8 @@ import { IoSend } from "react-icons/io5";
 import { MdOutlineRefresh } from "react-icons/md";
 import { LuLogOut } from "react-icons/lu";
 import aiIcons from "../../assets/images/ai.png";
+import AOS from "aos";
+import "aos/dist/aos.css";
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -15,6 +17,7 @@ type props = {
   chatOpen?: boolean;
 };
 export default function Chat({ className, setChatOpen, chatOpen }: props) {
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -90,9 +93,15 @@ export default function Chat({ className, setChatOpen, chatOpen }: props) {
       },
     ]);
   };
-
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  }, []);
   return (
     <div
+      data-aos="fade-right"
       className={`flex items-center justify-center h-screen bg-gray-100 ${className}`}
     >
       <div className=" w-full h-full flex flex-col  overflow-hidden shadow-lg bg-[#D9B7E1]">

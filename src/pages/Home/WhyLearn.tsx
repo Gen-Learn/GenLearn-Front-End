@@ -2,16 +2,8 @@ import questionimg from "../../assets/images/QuestionHomePage.png";
 
 function WhyLearn() {
   return (
-    <section className=" w-full flex justify-center items-center bg-[#f4e9f7]">
+    <section className=" w-full flex justify-center items-center bg-[#f4e9f7] py-5">
       <div className="mb-12 w-[80%]">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          Why Learn With Our Platform?
-        </h2>
-        <p className="text-lg text-gray-600 mb-12">
-          Discover a smarter, more engaging way to turn reading into real
-          understanding and progress.
-        </p>
-
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Image */}
           <div className="shrink-0 animate__animated animate__pulse animate__infinite animate__slower">
@@ -24,6 +16,13 @@ function WhyLearn() {
 
           {/* Right Features */}
           <div className="flex-1 space-y-8">
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
+          Why Learn With Our Platform?
+        </h2>
+        <p className="text-md text-gray-600 mb-12">
+          Discover a smarter, more engaging way to turn reading into real
+          understanding and progress.
+        </p>
             {/* Feature 1 */}
             <div className="flex gap-4">
               <div>
