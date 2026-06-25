@@ -12,13 +12,13 @@ const ProfileHeader = ({user}: { user: UserProfile }) => (
         </span>
         <div className="flex items-center gap-4 ">
           <img
-            src={user.profilePicture || "https://api.dicebear.com/7.x/adventurer/svg?seed=Mohamed&backgroundColor=b6e3f4"}
-            alt={`${user.name} avatar`}
+            src={"https://api.dicebear.com/7.x/adventurer/svg?seed=Mohamed&backgroundColor=b6e3f4"}
+            alt={`abdallah avatar`}
             className="w-16 h-16 rounded-2xl border-2 border-white object-cover bg-white"
           />
           <div>
             <h2 className="text-brand-text font-bold text-base leading-tight">
-              {user.name}
+              abdallah
             </h2>
             <p className="text-gray-400 text-[12px] leading-snug max-w-xs mt-0.5">
               Passionate about continuous learning, using smart tools to turn information into

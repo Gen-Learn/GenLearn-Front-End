@@ -73,15 +73,19 @@ export default function VideoPlayer({ lectureId, courseId }: VideoPlayerProps) {
           signal: controller.signal,
         });
 
-        const blob = new Blob([response.data], { type: "video/mp4" });
-        const url = URL.createObjectURL(blob);
-        blobUrlRef.current = url;
+        const url = URL.createObjectURL(response.data);
+        console.log("Headers:", response.headers);
+        console.log("Blob Type:", response.data.type);
+        console.log("Blob Size:", response.data.size);
+        console.log(
+          "Content-Range:",
+          response.headers["content-range"]
+        );
 
-        // Just swap the source — no dispose/reinit
-        if (playerRef.current && !playerRef.current.isDisposed()) {
-          playerRef.current.src([{ src: url, type: "video/mp4" }]);
-          playerRef.current.load();
-        }
+        playerRef.current.src({
+          src: url,
+          type: "video/mp4",
+        });
       } catch (err: any) {
         if (err.name === "CanceledError" || err.name === "AbortError") return;
         console.error("Failed to fetch video:", err);

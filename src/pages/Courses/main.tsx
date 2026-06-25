@@ -4,9 +4,13 @@ import GridCourses from "./GridCourses";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router";
+import {useEffect} from "react";
 function Courses() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [activeTab, setActiveTab] = useState("All");
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
     if (!isAuthenticated) {
       return (
         <div className="min-h-screen flex items-center justify-center p-6">

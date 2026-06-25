@@ -1,43 +1,15 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axiosInstance from "../../services/axios";
+import { useGetSingleCource } from "../../hooks/useGetSingleCource";
 import img from "../../assets/images/Cardimg.png";
 import { FaArrowLeft } from "react-icons/fa";
-import Course from "../../types/coursesModel";
-
-const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 type Props = {
   id: string;
 };
 
 function DetailsSection({ id }: Props) {
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          `${domain}/api/v1/courses/${id}`,
-        );
-        setCourse(response.data.data.course);
-        console.log(response.data.data.course);
-        setError(null);
-      } catch (err) {
-        setError("Failed to fetch course details");
-        console.error("Error fetching course:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchCourse();
-    }
-  }, [id]);
+  const { course, loading, error } = useGetSingleCource(id || "");
+ 
   if (loading) {
     return (
       <section className="flex flex-col justify-center items-center">

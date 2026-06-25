@@ -1,66 +1,39 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdOutlineSlowMotionVideo } from "react-icons/md";
-import axiosInstance from "../../services/axios";
-import Course, { Lecture } from "../../types/coursesModel";
-
-const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-
+import  { Lecture ,Section } from "../../types/coursesModel";
+import {useGetSingleCource} from "../../hooks/useGetSingleCource";
 type Props = {
-  id: string;
+  CourceId: string;
   className?: string;
   onSelectLecture: (lecture: Lecture) => void;
+  setQuizId: (quizId: string | null) => void;
 };
 
-export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function ChaptersDetails({ CourceId, className, onSelectLecture, setQuizId }: Props) {
+
+  const { course, loading:courceLoading, error:courseError } = useGetSingleCource(CourceId || "");
+
+
+  // State to manage expanded/collapsed sections
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({});
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          `${domain}/api/v1/courses/${id}`,
-        );
-        const courseData: Course = response.data.data.course;
-        setCourse(courseData);
+  // Effect to expand all sections by default when course data is loaded
+useEffect(() => {
+  if (course?.sections) {
+    const initialState: Record<string, boolean> = {};
 
-        // Expand all sections by default
-        const initialState: Record<string, boolean> = {};
-        if (courseData.sections) {
-          courseData.sections.forEach((section) => {
-            initialState[section.id] = true;
-          });
-        }
-        setExpandedSections(initialState);
+    course.sections.forEach((section: Section) => {
+      initialState[section.id] = true;
+    });
 
-        // Select the first lecture automatically
-        if (
-          courseData.sections &&
-          courseData.sections.length > 0 &&
-          courseData.sections[0].lectures &&
-          courseData.sections[0].lectures.length > 0
-        ) {
-          onSelectLecture(courseData.sections[0].lectures[0]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch course:", err);
-        setError("Failed to load course sections");
-      } finally {
-        setLoading(false);
-      }
-    };
+    setExpandedSections(initialState);
+  }
+}, [course]);
 
-    if (id) {
-      fetchCourse();
-    }
-  }, [id, onSelectLecture]);
-
+    // toggleSection function to expand/collapse sections
   const toggleSection = (sectionId: string) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -68,7 +41,8 @@ export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
     }));
   };
 
-  if (loading) {
+  //if loading show loading message, if error show error message, if course is null show no sections available message
+  if (courceLoading) {
     return (
       <div className={`flex ${className || ""}`}>
         <div className="bg-white rounded-lg p-2.5 w-full text-center">
@@ -77,12 +51,12 @@ export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
       </div>
     );
   }
-
-  if (error || !course) {
+    //if error or course is null show error message
+  if (courseError || !course) {
     return (
       <div className={`flex ${className || ""}`}>
         <div className="bg-white rounded-lg p-2.5 w-full text-center">
-          <p className="text-red-600">{error || "No sections available"}</p>
+          <p className="text-red-600">{courseError || "No sections available"}</p>
         </div>
       </div>
     );
@@ -97,7 +71,7 @@ export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
         {/* Sections List */}
         <div className="max-h-screen overflow-y-auto">
           {course.sections && course.sections.length > 0 ? (
-            course.sections.map((section) => (
+            course.sections.map((section: Section) => (
               <div
                 key={section.id}
                 className="border border-gray-200 rounded-lg overflow-hidden bg-[#f5edf7] mb-2"
@@ -133,7 +107,8 @@ export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
                 >
                   {section.lectures && section.lectures.length > 0 ? (
                     section.lectures.map((lecture) => (
-                      <button
+                      <div className="flex flex-col" key={lecture.id}>
+                        <button
                         key={lecture.id}
                         onClick={() => onSelectLecture(lecture)}
                         className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
@@ -146,12 +121,44 @@ export function ChaptersDetails({ id, className, onSelectLecture }: Props) {
                         </div>
                         <span className="text-xs text-gray-400">Play</span>
                       </button>
+
+                     {lecture.quizzes && lecture.quizzes.length > 0 && (
+                        <button
+                          onClick={() => setQuizId(lecture.quizzes?.[0]?.id ?? null)}
+                          className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <MdOutlineSlowMotionVideo className="w-5 h-5 text-purple-600" />
+                            <span className="text-gray-700 text-sm">
+                              Lecture Quiz
+                            </span>
+                          </div>
+
+                          <span className="text-xs text-gray-400">Solve</span>
+                        </button>
+                      )}
+                      </div>
                     ))
                   ) : (
                     <div className="p-4 text-center text-gray-500 text-sm">
                       No lectures available
                     </div>
                   )}
+                      {section.quizzes && section.quizzes.length > 0 && (
+                        <button
+                          onClick={() => setQuizId(section.quizzes?.[0]?.id ?? null)}
+                          className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <MdOutlineSlowMotionVideo className="w-5 h-5 text-purple-600" />
+                            <span className="text-gray-700 text-sm">
+                              Chapter Quiz
+                            </span>
+                          </div>
+
+                          <span className="text-xs text-gray-400">Solve</span>
+                        </button>
+                      )}
                 </div>
               </div>
             ))

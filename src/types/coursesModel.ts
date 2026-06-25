@@ -9,16 +9,22 @@ export default interface Course {
   updatedAt: string;
   sections: Section[];
 }
+export interface QuizReference {
+  id: string;
+}
+
 export interface Section {
   id: string;
   name: string;
   lectures: Lecture[];
+  quizzes?: QuizReference[];
 }
 export interface Lecture {
   id: string;
   name: string;
   url: string;
   scripts: Script[];
+  quizzes?: QuizReference[];
 }
 export interface Script {
   id: string;

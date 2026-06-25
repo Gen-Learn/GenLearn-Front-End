@@ -36,7 +36,7 @@ async function submitToGenerateEndpoint(
   const formData = new FormData();
   files.forEach((file) => formData.append("file", file));
 
-  const { data } = await axiosInstance.post("/api/v1/generate/test", formData, {
+  const { data } = await axiosInstance.post("/api/v1/generate", formData, {
     headers: { "Content-Type": "multipart/form-data" },
     onUploadProgress: (e) => {
       if (e.total) {
@@ -62,9 +62,9 @@ export default function Generate() {
   // Real-time job updates via WebSocket (socket.io)
   const { addNotification } = useNotification();
 
-  React.useEffect(() => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
     if (!jobId) return;
-
     const socket = connectToGenerationSocket(jobId, {
       onJoined: (payload) => {
         // optional: update status from server payload

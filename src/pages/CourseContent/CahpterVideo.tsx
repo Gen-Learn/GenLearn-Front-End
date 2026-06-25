@@ -1,55 +1,28 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import VideoPlayer from "./videoSection";
-import axiosInstance from "../../services/axios";
-import Course, { Lecture } from "../../types/coursesModel";
-
-const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+import { useGetSingleCource } from "../../hooks/useGetSingleCource";
+import  { Lecture } from "../../types/coursesModel";
+import { useGetQuiz } from "@/hooks/useGetQuiz";
 
 type props = {
   className?: string;
-  id?: string;
+  CourceId?: string;
   selectedLecture?: Lecture | null;
+  quizId?: string | null;
 };
 
 // --- VideoPlayer component ---
 export default function CahpterVideo({
   className,
-  id,
+  CourceId,
   selectedLecture,
+  quizId
 }: props) {
   const [activeTab, setActiveTab] = useState("script");
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          `${domain}/api/v1/courses/${id}`,
-        );
-        const courseData: Course = response.data.data.course;
-        setCourse(courseData);
-        console.log(courseData);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch course:", err);
-        setError("Failed to load course content");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchCourse();
-    }
-  }, [id]);
-
+  const { course, loading, error } = useGetSingleCource(CourceId || "");
+    const { quiz, loading:quizLoading, error:quizError } = useGetQuiz(quizId || "");
   return (
     <div
       className={`w-full  mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden font-sans ${className || ""}`}
@@ -79,7 +52,7 @@ export default function CahpterVideo({
             <div className="text-red-400 text-center">{error}</div>
           </div>
         ) : selectedLecture ? (
-          <VideoPlayer lectureId={selectedLecture?.id} courseId={id} />
+          <VideoPlayer lectureId={selectedLecture?.id} courseId={CourceId} />
         ) : (
           <div className="h-96 flex items-center justify-center bg-black">
             <div className="text-gray-400 text-center">

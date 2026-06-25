@@ -1,49 +1,42 @@
-import React, { useState, useEffect } from "react";
-import axiosInstance from "../../services/axios";
-import Course, { Section } from "../../types/coursesModel";
+import { useState ,useEffect} from "react";
 
-const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+import {useGetSingleCource} from "../../hooks/useGetSingleCource";
 
 type Props = {
   id: string;
 };
 
 export function ChaptersDetails({ id }: Props) {
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { course, loading, error } = useGetSingleCource(id);
+
+  // State to manage expanded/collapsed sections
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({});
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          `${domain}/api/v1/courses/${id}`,
-        );
-        setCourse(response.data.data.course);
-        setError(null);
-      } catch (err) {
-        setError("Failed to fetch course content");
-        console.error("Error fetching course:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchCourse();
-    }
-  }, [id]);
-
+  // toggleSection function to expand/collapse sections
   const toggleSection = (sectionId: string) => {
     setExpandedSections((prev) => ({
       ...prev,
       [sectionId]: !prev[sectionId],
     }));
-  };
+     };
+
+      // Calculate total lectures
+       const totalLectures = course?.sections.reduce(
+    (sum, section) => sum + (section.lectures?.length || 0),
+    0,
+  );
+    // Effect to expand all sections by default when course data is loaded
+     useEffect(() => {
+    if (course && course.sections) {
+      const initialState: Record<string, boolean> = {};
+      course.sections.forEach((section) => {
+        initialState[section.id] = true; // Expand all sections by default
+      });
+      setExpandedSections(initialState);
+    }
+  }, [course]);
 
   if (loading) {
     return (
@@ -66,11 +59,6 @@ export function ChaptersDetails({ id }: Props) {
       </div>
     );
   }
-
-  const totalLectures = course.sections.reduce(
-    (sum, section) => sum + (section.lectures?.length || 0),
-    0,
-  );
 
   return (
     <div className="flex justify-center items-center">
