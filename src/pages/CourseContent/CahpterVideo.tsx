@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import VideoPlayer from "./videoSection";
+import VideoPlayer from "./components/video";
+import QuizSection from "./components/quiz";
 import { useGetSingleCource } from "../../hooks/useGetSingleCource";
-import  { Lecture } from "../../types/coursesModel";
-import { useGetQuiz } from "@/hooks/useGetQuiz";
+import { Lecture } from "../../types/coursesModel";
 
 type props = {
   className?: string;
   CourceId?: string;
   selectedLecture?: Lecture | null;
   quizId?: string | null;
+  setQuizId?: (quizId: string | null) => void;
 };
 
 // --- VideoPlayer component ---
@@ -18,11 +19,36 @@ export default function CahpterVideo({
   className,
   CourceId,
   selectedLecture,
-  quizId
+  quizId,
+  setQuizId,
 }: props) {
   const [activeTab, setActiveTab] = useState("script");
+  const [showQuiz, setShowQuiz] = useState(false);
   const { course, loading, error } = useGetSingleCource(CourceId || "");
-    const { quiz, loading:quizLoading, error:quizError } = useGetQuiz(quizId || "");
+
+  useEffect(() => {
+    if (!quizId) {
+      setShowQuiz(false);
+      return;
+    }
+
+    setShowQuiz(true);
+  }, [quizId]);
+
+  useEffect(() => {
+    if (!quizId) {
+      setShowQuiz(false);
+    }
+  }, [quizId, selectedLecture]);
+
+  const handleVideoEnded = () => {
+    const lectureQuizId = selectedLecture?.quizzes?.[0]?.id;
+    if (lectureQuizId) {
+      setQuizId?.(lectureQuizId);
+      setShowQuiz(true);
+    }
+  };
+
   return (
     <div
       className={`w-full  mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden font-sans ${className || ""}`}
@@ -51,8 +77,12 @@ export default function CahpterVideo({
           <div className="h-96 flex items-center justify-center bg-black">
             <div className="text-red-400 text-center">{error}</div>
           </div>
-        ) : selectedLecture ? (
-          <VideoPlayer lectureId={selectedLecture?.id} courseId={CourceId} />
+        ) : selectedLecture && !showQuiz ? (
+          <VideoPlayer lectureId={selectedLecture?.id} courseId={CourceId} onEnded={handleVideoEnded} />
+        ) : showQuiz ? (
+          <div className="px-4 py-6 sm:px-6">
+            <QuizSection quizId={quizId ?? null} onBackToVideo={() => setShowQuiz(false)} />
+          </div>
         ) : (
           <div className="h-96 flex items-center justify-center bg-black">
             <div className="text-gray-400 text-center">
@@ -66,59 +96,63 @@ export default function CahpterVideo({
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
         <div>
           <p className="text-[15px] font-medium text-gray-900">
-            {selectedLecture?.name || "Select a lecture"}
+            {showQuiz ? "Practice quiz" : selectedLecture?.name || "Select a lecture"}
           </p>
           <p className="text-xs text-gray-400 mt-0.5">
             {course?.name || "Course"}
           </p>
         </div>
         <span className="text-xs text-gray-500 bg-gray-100 rounded-lg px-2.5 py-1">
-          Video
+          {showQuiz ? "Quiz" : "Video"}
         </span>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-100 px-5">
-        {["script", "materials"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`py-2.5 px-4 text-sm capitalize transition-colors border-b-2 -mb-px ${
-              activeTab === tab
-                ? "border-gray-900 text-gray-900 font-medium"
-                : "border-transparent text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
+      {!showQuiz && (
+        <>
+          {/* Tabs */}
+          <div className="flex border-b border-gray-100 px-5">
+            {["script", "materials"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-2.5 px-4 text-sm capitalize transition-colors border-b-2 -mb-px ${
+                  activeTab === tab
+                    ? "border-gray-900 text-gray-900 font-medium"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
 
-      {/* Tab panels */}
-      <div className="px-5 py-4 max-h-80 overflow-y-auto">
-        {activeTab === "script" ? (
-          <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
-            {selectedLecture?.scripts && selectedLecture.scripts.length > 0 ? (
-              selectedLecture.scripts.map((script, i) => (
-                <div key={i}>
-                  <p className="text-xs text-gray-500 mb-1 font-semibold">
-                    {script.language}
+          {/* Tab panels */}
+          <div className="px-5 py-4 max-h-80 overflow-y-auto">
+            {activeTab === "script" ? (
+              <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
+                {selectedLecture?.scripts && selectedLecture.scripts.length > 0 ? (
+                  selectedLecture.scripts.map((script, i) => (
+                    <div key={i}>
+                      <p className="text-xs text-gray-500 mb-1 font-semibold">
+                        {script.language}
+                      </p>
+                      <p className="whitespace-pre-wrap">{script.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    No scripts available for this lecture.
                   </p>
-                  <p className="whitespace-pre-wrap">{script.content}</p>
-                </div>
-              ))
+                )}
+              </div>
             ) : (
               <p className="text-sm text-gray-400">
-                No scripts available for this lecture.
+                No materials available for this lesson.
               </p>
             )}
           </div>
-        ) : (
-          <p className="text-sm text-gray-400">
-            No materials available for this lesson.
-          </p>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }

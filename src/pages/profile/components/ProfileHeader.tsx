@@ -3,8 +3,8 @@ import { HiOutlineFire } from 'react-icons/hi2';
 import { LuBookOpenCheck } from 'react-icons/lu';
 import { PiMedalLight } from 'react-icons/pi';
 import StatCard from './StatCard';
-import type { UserProfile } from '../types';
-const ProfileHeader = ({user}: { user: UserProfile }) => (
+import {User} from "../../../types/userModel"
+const ProfileHeader = ({user}: { user: User }) => (
   <div className="bg-[#f3e9fb] rounded-3xl p-5 grid md:grid-cols-2 grid-cols-1 gap-5">
     <div>
         <span className="text-[30px] gradient-bg-text font-bold ">
@@ -18,7 +18,7 @@ const ProfileHeader = ({user}: { user: UserProfile }) => (
           />
           <div>
             <h2 className="text-brand-text font-bold text-base leading-tight">
-              abdallah
+              {user?.name}
             </h2>
             <p className="text-gray-400 text-[12px] leading-snug max-w-xs mt-0.5">
               Passionate about continuous learning, using smart tools to turn information into

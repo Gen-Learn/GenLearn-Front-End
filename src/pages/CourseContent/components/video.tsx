@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import axiosInstance from "../../services/axios";
+import axiosInstance from "../../../services/axios";
 
 const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 type VideoPlayerProps = {
   lectureId?: string;
   courseId?: string;
+  onEnded?: () => void;
 };
 
-export default function VideoPlayer({ lectureId, courseId }: VideoPlayerProps) {
+export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerRef = useRef<any>(null);
   const blobUrlRef = useRef<string | null>(null);
@@ -26,6 +27,10 @@ export default function VideoPlayer({ lectureId, courseId }: VideoPlayerProps) {
       controls: true,
       fluid: true,
       sources: [],
+    });
+
+    playerRef.current.on("ended", () => {
+      onEnded?.();
     });
 
     // Cleanup only on full component unmount
