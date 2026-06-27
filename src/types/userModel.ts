@@ -1,8 +1,11 @@
 export interface User {
-  id: string;
-  name: string;
-  email: string;
+  id: string | null;
+  name: string | null;
+  email: string | null;
   profilePicture: string | null;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  createdAt: string | null; // ISO date string
+  updatedAt: string | null; // ISO date string
+  biography:string | null;
 }
+
+

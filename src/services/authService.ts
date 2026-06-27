@@ -1,68 +1,13 @@
 import axiosInstance from "./axios";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-export interface RegisterPayload {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface ForgotPasswordPayload {
-  email: string;
-  resetMethod: "email";
-}
-
-export interface ResetPasswordPayload {
-  userId: string;
-  resetPasswordToken: string;
-  newPassword: string;
-}
-// Actual backend response shape
-interface BackendAuthResponse {
-  statusCode: number;
-  message: string;
-  data: {
-    accessToken: string;
-    refreshToken?: string; // optional — not returned by login currently
-    user?: User; // optional — not returned by login currently
-  };
-}
-
-export interface AuthTokens {
-  access: string;
-  refresh: string;
-}
-
-export interface User {
-  id: number | string;
-  name: string;
-  email: string;
-  profilePicture: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface AuthResponse {
-  user: User | null;
-  tokens: AuthTokens;
-}
-
+import { AuthResponse, AuthTokens, RegisterPayload, LoginPayload, ForgotPasswordPayload, ResetPasswordPayload,BackendAuthResponse } from "../types/authModel";
+import {getCurrentUser} from "./userService";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const saveTokens = (accessToken: string, refreshToken?: string) => {
+const saveTokens = (accessToken: string) => {
   localStorage.setItem("accessToken", accessToken);
-  if (refreshToken) {
-    localStorage.setItem("refreshToken", refreshToken);
-  }
 };
 
-const clearTokens = () => {
+export const clearTokens = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
@@ -79,10 +24,10 @@ const authService = {
       "/api/v1/auth/register",
       payload,
     );
-    const { accessToken, refreshToken, user } = data.data;
-    saveTokens(accessToken, refreshToken);
+    const { accessToken, refreshToken } = data.data;
+    saveTokens(accessToken);
     return {
-      user: user ?? null,
+      user: null,
       tokens: { access: accessToken, refresh: refreshToken ?? "" },
     };
   },
@@ -93,13 +38,16 @@ const authService = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     const { data } = await axiosInstance.post<BackendAuthResponse>(
       "/api/v1/auth/login",
-      payload,
+      payload,{
+        "withCredentials":true
+      }
+    
     );
     const { accessToken, refreshToken, user } = data.data;
-    saveTokens(accessToken, refreshToken);
+    saveTokens(accessToken);
 
     const currentUser =
-      user ?? (await authService.getCurrentUser());
+      user ?? (await getCurrentUser());
 
     return {
       user: currentUser ?? null,
@@ -108,45 +56,21 @@ const authService = {
   },
 
   /**
-   * GET /api/v1/users/me
-   */
-  getCurrentUser: async (): Promise<User> => {
-    const { data } = await axiosInstance.get<{ data: { user: User } }>(
-      "/api/v1/users/me",
-    );
-    return data.data.user;
-  },
-
-  /**
-   * DELETE /api/v1/users/me
-   */
-  deleteAccount: async (): Promise<void> => {
-    await axiosInstance.delete("/api/v1/users/me");
-    clearTokens();
-  },
-
-  /**
    * POST /api/v1/auth/logout
    */
-  logout: async (): Promise<void> => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    await axiosInstance.post("/api/v1/auth/logout", { refresh: refreshToken });
-    clearTokens();
-  },
+logout: async (): Promise<void> => {
+  await axiosInstance.post("/api/v1/auth/logout");
+  clearTokens();
+},
 
   /**
    * POST /api/v1/auth/refresh
    */
-  refresh: async (): Promise<AuthTokens> => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    const { data } = await axiosInstance.post<BackendAuthResponse>(
-      "/api/v1/auth/refresh",
-      { refresh: refreshToken },
-    );
-    const { accessToken } = data.data;
-    saveTokens(accessToken);
-    return { access: accessToken, refresh: refreshToken ?? "" };
-  },
+refresh: async (): Promise<AuthTokens> => {
+  const { data } = await axiosInstance.post<BackendAuthResponse>("/api/v1/auth/refresh");
+  const { accessToken } = data.data;
+  return { access: accessToken, refresh: "" };
+},
 
   /**
    * POST /api/v1/auth/forgot-password

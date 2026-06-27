@@ -5,7 +5,7 @@ import {useGetAllCourses} from "../../hooks/useGetAllCources";
 
 function GridCourses(status: { status: string }) {
   const { courses, loading, error } = useGetAllCourses();  
- 
+  console.log(courses);
   return (
     <section className="w-full flex justify-center items-center">
       <div className=" w-[80%]  grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-20 place-items-center">

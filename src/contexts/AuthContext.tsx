@@ -5,14 +5,15 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import authService, {
+import authService from "../services/authService";
+import {
   LoginPayload,
   RegisterPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
-  User,
-} from "../services/authService";
-
+} from "../types/authModel";
+import { User } from "../types/userModel";
+import {useGetUser} from "../hooks/useGetUser"
 // ── Context shape ─────────────────────────────────────────────────────────────
 
 interface AuthContextType {
@@ -23,7 +24,6 @@ interface AuthContextType {
   register: (payload: RegisterPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
-  deleteAccount: () => Promise<void>;
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   clearError: () => void;
@@ -86,22 +86,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (payload: LoginPayload) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await authService.login(payload);
-      console.log("Login response:", data); // Debug log
-      setUser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      console.log("User set to:", data.user); // Debug log
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const login = async (payload: LoginPayload) => {
+  setIsLoading(true);
+  setError(null);
+  try {
+    const { user } = await authService.login(payload);
+    setUser(user);
+    localStorage.setItem("user", JSON.stringify(user));
+  } catch (err) {
+    handleError(err);
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const logout = async () => {
     setIsLoading(true);
@@ -119,22 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteAccount = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      await authService.deleteAccount();
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      setUser(null);
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      setIsLoading(false);
-    }
-  };
+
 
   const forgotPassword = async (payload: ForgotPasswordPayload) => {
     setIsLoading(true);
@@ -172,7 +155,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         login,
         logout,
-        deleteAccount,
         forgotPassword,
         resetPassword,
         clearError,

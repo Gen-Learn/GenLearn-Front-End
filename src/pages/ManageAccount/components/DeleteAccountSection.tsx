@@ -1,33 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
 import { IoWarningOutline } from 'react-icons/io5';
-
+import { useDeleteUser } from '@/hooks/useDeleteUser';
 const DeleteAccountSection = () => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const { deleteAccount } = useAuth();
-
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete your account? This action cannot be undone.'
-    );
-    if (!confirmed) return;
-
-    setError(null);
-    setIsDeleting(true);
-
-    try {
-      await deleteAccount();
-      navigate('/login');
-    } catch (err) {
-      setError('Failed to delete account. Please try again.');
-      console.error('Account deletion error:', err);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    const {isDeleted,Error,HandleDeleteAccount}=useDeleteUser();
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -41,16 +15,16 @@ const DeleteAccountSection = () => {
         recovery. Your personal data and progress will be erased and lost.
       </p>
 
-      {error && (
-        <p className="text-sm text-red-600 mb-3">{error}</p>
+      {Error && (
+        <p className="text-sm text-red-600 mb-3">{Error}</p>
       )}
 
       <button
-        onClick={handleDelete}
-        disabled={isDeleting}
+        onClick={HandleDeleteAccount}
+        disabled={isDeleted}
         className="bg-red-600 text-white font-medium text-[13px] rounded-lg px-5 py-2.5 hover:bg-red-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isDeleting ? 'Deleting account...' : 'Delete My Account'}
+        {isDeleted ? 'Deleting account...' : 'Delete My Account'}
       </button>
     </div>
   );
