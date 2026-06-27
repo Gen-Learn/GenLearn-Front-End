@@ -46,7 +46,7 @@ function HowItWorks() {
   return (
     <section className="w-full flex justify-center items-center bg-[#f3e7f7] rounded-2xl">
       <div className="w-full sm:w-[80%] pt-8">
-        <div>
+        <div className="px-3">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
           <p className="text-center text-gray-600 mb-8">
             Turn Your Material Into a Learning Experience in Three Simple Steps
