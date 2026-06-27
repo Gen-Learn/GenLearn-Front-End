@@ -24,7 +24,7 @@ function WhyLearn() {
           understanding and progress.
         </p>
             {/* Feature 1 */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 text-[16px]">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   Bite-Sized Learning
@@ -37,7 +37,7 @@ function WhyLearn() {
             </div>
 
             {/* Feature 2 */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 text-[16px]">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   Smart Course Organization
@@ -50,7 +50,7 @@ function WhyLearn() {
             </div>
 
             {/* Feature 3 */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 text-[16px]">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   Motivating Gamification
