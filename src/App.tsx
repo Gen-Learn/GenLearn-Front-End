@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Outlet } from "react-router-dom";
 import { useState } from "react";
 
 import SignUp from "./pages/SignUp/SignUp";
@@ -18,6 +18,15 @@ import useMediaQuery from "./hooks/useMediaQuery";
 import Profile from "./pages/profile/profile";
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
 
+const Layout = () => {
+  return (
+    <div>
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
+  );
+};
 function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -79,23 +88,27 @@ function App() {
             }
           `}
         >
-          <Header />
+          
 
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/generate" element={<Generate />} />
+              <Route path="/courses" element={<Courses />} />
+              <Route path="/course-details/:id" element={<CourseDetails />} />
+              <Route path="/course/:id" element={<CourseContent />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/manage-account" element={<ManageAccount />} />
+            </Route>
+
+            {/* These render without Header/Footer */}
             <Route path="/forgot-Password" element={<ForgotPassword />} />
             <Route path="/reset-Password" element={<ReserPassword />} />
-            <Route path="/generate" element={<Generate />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/course-details/:id" element={<CourseDetails />} />
-            <Route path="/course/:id" element={<CourseContent />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/manage-account" element={<ManageAccount />} />
           </Routes>
 
-          <Footer />
+          
         </div>
 
         {/* Floating AI Button */}
