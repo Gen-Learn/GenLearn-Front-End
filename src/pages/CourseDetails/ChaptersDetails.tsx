@@ -64,11 +64,11 @@ export function ChaptersDetails({ id }: Props) {
     <div className="flex justify-center items-center">
       <div className="bg-white rounded-lg p-6 w-[80%]">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold gradient-bg-text">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold gradient-bg-text self-start">
             Course Content
           </h2>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 text-sm self-end">
             Total: {course.sections.length} Section
             {course.sections.length !== 1 ? "s" : ""} & {totalLectures} Lecture
             {totalLectures !== 1 ? "s" : ""}

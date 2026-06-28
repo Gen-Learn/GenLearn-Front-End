@@ -9,11 +9,14 @@ type Props = {
   onSelectLecture: (lecture: Lecture) => void;
   setQuizId: (quizId: string | null) => void;
 };
-
+type selectedButtonType = {
+  type: string | null;
+  id: string | null;
+};
 export function ChaptersDetails({ CourceId, className, onSelectLecture, setQuizId }: Props) {
 
   const { course, loading:courceLoading, error:courseError } = useGetSingleCource(CourceId || "");
-
+  const[selectedButton, setSelectedButton] = useState<selectedButtonType | null>(null);
 
   // State to manage expanded/collapsed sections
   const [expandedSections, setExpandedSections] = useState<
@@ -110,8 +113,12 @@ useEffect(() => {
                       <div className="flex flex-col" key={lecture.id}>
                         <button
                         key={lecture.id}
-                        onClick={() => onSelectLecture(lecture)}
-                        className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
+                        onClick={() => {
+                          onSelectLecture(lecture);
+                          setQuizId(null);
+                          setSelectedButton({ type: 'lecture', id: lecture.id });
+                        }}
+                        className={`w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left ${selectedButton?.id === lecture.id && selectedButton?.type === 'lecture' ? "bg-purple-100" : ""}`}
                       >
                         <div className="flex items-center gap-3">
                           <MdOutlineSlowMotionVideo className="w-5 h-5 text-purple-600" />
@@ -124,8 +131,11 @@ useEffect(() => {
 
                      {lecture.quizzes && lecture.quizzes.length > 0 && (
                         <button
-                          onClick={() => setQuizId(lecture.quizzes?.[0]?.id ?? null)}
-                          className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
+                          onClick={() => {
+                            setQuizId(lecture.quizzes?.[0]?.id ?? null);
+                            setSelectedButton({ type: 'lectureQuiz', id: lecture.id });
+                          }}
+                          className={`w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left ${selectedButton?.id === lecture.id && selectedButton?.type === 'lectureQuiz' ? "bg-purple-100" : ""}`}
                         >
                           <div className="flex items-center gap-3">
                             <MdOutlineSlowMotionVideo className="w-5 h-5 text-purple-600" />
@@ -146,8 +156,11 @@ useEffect(() => {
                   )}
                       {section.quizzes && section.quizzes.length > 0 && (
                         <button
-                          onClick={() => setQuizId(section.quizzes?.[0]?.id ?? null)}
-                          className="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left"
+                          onClick={() => {
+                            setQuizId(section.quizzes?.[0]?.id ?? null);
+                            setSelectedButton({ type: 'section', id: section.id });
+                          }}
+                          className={`w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-100 transition-colors text-left ${selectedButton?.id === section.id && selectedButton?.type === 'section' ? "bg-purple-100" : ""}`}
                         >
                           <div className="flex items-center gap-3">
                             <MdOutlineSlowMotionVideo className="w-5 h-5 text-purple-600" />

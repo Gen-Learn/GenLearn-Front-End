@@ -1,11 +1,12 @@
 interface SaveButtonProps {
-  onClick?: () => void;
+  onClick?: (user:{name:string, biography:string}) => void;
   label?: string;
+  Data:{name:string, biography:string}
 }
 
-const SaveButton = ({ onClick, label = 'Save Changes' }: SaveButtonProps) => (
+const SaveButton = ({Data, onClick, label = 'Save Changes' }: SaveButtonProps) => (
   <button
-    onClick={onClick}
+    onClick={() => onClick?.(Data)}
     className="border border-brand-purple text-brand-violet font-medium text-[13px] rounded-lg px-5 py-2.5 hover:bg-purple-50 active:scale-[0.98] transition-all"
   >
     {label}

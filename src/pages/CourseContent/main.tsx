@@ -4,13 +4,11 @@ import { ChaptersDetails } from "./ChaptersDetails";
 import CahpterVideo from "./CahpterVideo";
 import { Lecture } from "../../types/coursesModel";
 import { useGetSingleCource } from "../../hooks/useGetSingleCource";
-import { useGetQuiz } from "../../hooks/useGetQuiz";
 function CourseContent() {
   const { id: CourceId } = useParams<{ id: string }>();
   const [quizId, setQuizId] = useState<string | null>(null);
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const { course, loading: courseLoading, error: courseError } = useGetSingleCource(CourceId || "");
-  const { quiz, loading: quizLoading, error: quizError } = useGetQuiz(quizId || "");
 
   useEffect(() => {
     const firstLecture = course?.sections?.[0]?.lectures?.[0];
@@ -27,6 +25,7 @@ function CourseContent() {
           className="md:col-span-2"
           selectedLecture={selectedLecture}
           quizId={quizId}
+          setQuizId={setQuizId}
         />
         <ChaptersDetails
           CourceId={CourceId!}
