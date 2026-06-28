@@ -1,23 +1,13 @@
 import { BrowserRouter as Router, Routes, Route,Outlet } from "react-router-dom";
 import { useState } from "react";
-
-import SignUp from "./pages/SignUp/SignUp";
-import ReserPassword from "./pages/ResetPassword/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
-import Header from "@/components/Header/Header";
-import Login from "./pages//LogIn/LogIn";
-import Home from "./pages/Home/Home";
-import Footer from "./components/Footer/Footer";
-import Generate from "./pages/Generate/Generate";
-import Courses from "./pages/Courses/main";
-import CourseDetails from "./pages/CourseDetails/main";
-import CourseContent from "./pages/CourseContent/main";
+import ScrollToTop from "./ScrollToTop";
+import {Header ,Footer} from "@/layout/index";
 import Chat from "./components/AIChat/Chat";
 import AiIcon from "./components/AiIcon/AiIcon";
 import useMediaQuery from "./hooks/useMediaQuery";
-import Profile from "./pages/profile/profile";
+import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
-
+import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './static/index';
 const Layout = () => {
   return (
     <div>
@@ -33,6 +23,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop/>
       <div className="relative min-h-screen overflow-hidden">
         {/* Overlay */}
         <div
@@ -92,20 +83,26 @@ function App() {
 
           <Routes>
             <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
+              
               <Route path="/generate" element={<Generate />} />
               <Route path="/courses" element={<Courses />} />
               <Route path="/course-details/:id" element={<CourseDetails />} />
               <Route path="/course/:id" element={<CourseContent />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/manage-account" element={<ManageAccount />} />
+              
             </Route>
-
             {/* These render without Header/Footer */}
+            <Route path="/" element={<Home />} />
             <Route path="/forgot-Password" element={<ForgotPassword />} />
-            <Route path="/reset-Password" element={<ReserPassword />} />
+            <Route path="/reset-Password" element={<ResetPassword />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/terms" element={<TermsPage />} />
           </Routes>
 
           

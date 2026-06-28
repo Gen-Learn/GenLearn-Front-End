@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.js";
+
 :root {
   --primary-color: #1e40af;
   --secondary-color: #f3f4f6;
@@ -63,7 +65,7 @@ code {
   background-clip: text;
   color: transparent;
 }
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 
 @layer base {
   * {

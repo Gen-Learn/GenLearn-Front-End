@@ -1,15 +1,16 @@
 import img from "../../assets/images/login.png";
 import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft, Zap } from 'lucide-react';
-import { useState } from "react";
+import { useState ,useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
-import Input from "../../components/Input/Input.jsx";
 import Button from "../../components/ui/Button.jsx";
-function SignUp() {
+function Login() {
   const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,19 +18,18 @@ function SignUp() {
     try {
       await login(form);
       navigate("/"); // redirect after successful login
-    } catch {
-      console.error("Login failed - check error state for details");
+    } catch(err) {
+      console.error("Login failed - check error state for details",err);
     }
   };
-  // using single form state for email and password
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
-  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     
   };
+  useEffect(()=>{
+      clearError();
+    },[])
   return (
     <div className="min-h-screen bg-[#FAFAFC] flex">
       {/* Left Side - Illustration */}
@@ -224,7 +224,7 @@ function SignUp() {
           {/* Sign up link */}
           <p className="mt-8 text-center text-gray-600">
             Don't have an account?{' '}
-            <Link to="/sign-up" className="font-semibold text-primary-600 hover:text-primary-700">
+            <Link to="/signup" className="font-semibold text-primary-600 hover:text-primary-700">
               Sign up for free
             </Link>
           </p>
@@ -234,4 +234,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default Login;
