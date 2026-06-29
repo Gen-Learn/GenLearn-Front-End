@@ -1,20 +1,43 @@
-import HeroSection from "./HeroSection";
-import { useWindowSize } from "../../hooks/useWindowSize";
-import HowItWorks from "./HowItWorks";
-import StayMotivated from "./StayMotivated";
-import WhyLearn from "./WhyLearn";
+import { 
+  Hero,
+  TrustedBy,
+  HowItWorks,
+  Features,
+  SampleCourses,
+  Statistics,
+  Testimonials,
+  FAQ } from "./components/index";
+  import {Header ,Footer} from "@/layout/index";
+  
 import { useEffect } from "react";
 function Home() {
-  const { width } = useWindowSize();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLAnchorElement;
+      if (target.tagName === 'A' && target.getAttribute('href')?.startsWith('#') && !target.getAttribute('href')?.startsWith('#!/')) {
+        const id = target.getAttribute('href')?.slice(1);
+        const element = document.getElementById(id || '');
+        if (element) {
+          e.preventDefault();
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, []);
+
   return (
-    <div className="flex flex-col justify-center items-center ">
-      <HeroSection width={width} />
+    <div className="min-h-screen bg-[#FAFAFC]">
+      <Hero />
+      <TrustedBy />
       <HowItWorks />
-      <StayMotivated />
-      <WhyLearn />
+      <Features />
+      <SampleCourses />
+      <Statistics />
+      <Testimonials />
+      <FAQ />
     </div>
   );
 }

@@ -25,7 +25,7 @@ export const submitGenerateJob = async (files: File[]) => {
     formData.append("files", file);
   });
 
-  const { data } = await axiosInstance.post("/api/v1/generate/test", formData, {
+  const { data } = await axiosInstance.post("/api/v1/generate", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

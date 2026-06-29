@@ -1,76 +1,77 @@
 import axiosInstance from "./axios";
-import { AuthResponse, AuthTokens, RegisterPayload, LoginPayload, ForgotPasswordPayload, ResetPasswordPayload,BackendAuthResponse } from "../types/authModel";
-import {getCurrentUser} from "./userService";
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const saveTokens = (accessToken: string) => {
-  localStorage.setItem("accessToken", accessToken);
-};
-
-export const clearTokens = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
-};
+import {
+  AuthResponse,
+  RegisterPayload,
+  LoginPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
+  BackendAuthResponse,
+} from "../types/authModel";
+import { getCurrentUser } from "./userService";
 
 // ── Auth Service ──────────────────────────────────────────────────────────────
+// Zero localStorage usage. accessToken/refreshToken live exclusively in
+// httpOnly cookies set by the server via `Set-Cookie` — JS never reads or
+// writes them. The signed-in user is held only in React state (AuthContext),
+// re-derived from the server via getCurrentUser() whenever needed.
 
 const authService = {
   /**
    * POST /api/v1/auth/register
+   * Server sets accessToken/refreshToken as httpOnly cookies on the response.
    */
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     const { data } = await axiosInstance.post<BackendAuthResponse>(
       "/api/v1/auth/register",
       payload,
     );
-    const { accessToken, refreshToken } = data.data;
-    saveTokens(accessToken);
-    return {
-      user: null,
-      tokens: { access: accessToken, refresh: refreshToken ?? "" },
-    };
+    const resData = data.data as any;
+    const user = resData.user ?? null;
+    const tokens =
+      resData.tokens ??
+      (resData.accessToken
+        ? { accessToken: resData.accessToken, refreshToken: resData.refreshToken }
+        : null);
+    return { user, tokens };
   },
 
   /**
    * POST /api/v1/auth/login
+   * Server sets accessToken/refreshToken as httpOnly cookies on the response.
    */
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     const { data } = await axiosInstance.post<BackendAuthResponse>(
       "/api/v1/auth/login",
-      payload,{
-        "withCredentials":true
-      }
-    
+      payload,
     );
-    const { accessToken, refreshToken, user } = data.data;
-    saveTokens(accessToken);
-
-    const currentUser =
-      user ?? (await getCurrentUser());
-
-    return {
-      user: currentUser ?? null,
-      tokens: { access: accessToken, refresh: refreshToken ?? "" },
-    };
+    const resData = data.data as any;
+    const user = resData.user ?? null;
+    const tokens =
+      resData.tokens ??
+      (resData.accessToken
+        ? { accessToken: resData.accessToken, refreshToken: resData.refreshToken }
+        : null);
+    const currentUser = user ?? (await getCurrentUser());
+    return { user: currentUser ?? null, tokens };
   },
 
   /**
    * POST /api/v1/auth/logout
+   * Server clears the auth cookies (Set-Cookie with Max-Age=0).
    */
-logout: async (): Promise<void> => {
-  await axiosInstance.post("/api/v1/auth/logout");
-  clearTokens();
-},
+  logout: async (): Promise<void> => {
+    await axiosInstance.post("/api/v1/auth/logout");
+  },
 
   /**
    * POST /api/v1/auth/refresh
+   * Server reads the refreshToken cookie, rotates it, and sets a new
+   * accessToken cookie on the response. Triggered from the axios response
+   * interceptor on 401 — nothing for the client to store here.
    */
-refresh: async (): Promise<AuthTokens> => {
-  const { data } = await axiosInstance.post<BackendAuthResponse>("/api/v1/auth/refresh");
-  const { accessToken } = data.data;
-  return { access: accessToken, refresh: "" };
-},
+  refresh: async (): Promise<void> => {
+    await axiosInstance.post<BackendAuthResponse>("/api/v1/auth/refresh");
+  },
 
   /**
    * POST /api/v1/auth/forgot-password

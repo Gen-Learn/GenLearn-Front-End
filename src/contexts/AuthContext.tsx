@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import authService from "../services/authService";
+import { getCurrentUser } from "../services/userService";
 import {
   LoginPayload,
   RegisterPayload,
@@ -13,7 +14,7 @@ import {
   ResetPasswordPayload,
 } from "../types/authModel";
 import { User } from "../types/userModel";
-import {useGetUser} from "../hooks/useGetUser"
+
 // ── Context shape ─────────────────────────────────────────────────────────────
 
 interface AuthContextType {
@@ -21,6 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  setError: (error: string | null) => void;
   register: (payload: RegisterPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
@@ -37,24 +39,40 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // isLoading covers BOTH the initial session check on mount AND
+  // login/register/logout actions — all are "we don't know the final auth
+  // state yet" moments. Starts true because we don't know if there's a
+  // valid session cookie until the very first getCurrentUser() call resolves.
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Rehydrate user from localStorage on app load
+  // Rehydrate session on app load by asking the SERVER who we are — this is
+  // the only source of truth now. The accessToken cookie (httpOnly) is sent
+  // automatically by the browser; there's nothing in localStorage to read.
+  // If there's no valid cookie, getCurrentUser() resolves to null and we
+  // simply stay logged out. The axios response interceptor handles silently
+  // refreshing an expired accessToken (via the refreshToken cookie) before
+  // this ever has to fail outright.
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem("user");
+    let isMounted = true;
+
+    const rehydrate = async () => {
+      const currentUser = await getCurrentUser();
+      if (isMounted) {
+        setUser(currentUser);
+        setIsLoading(false);
       }
-    }
+    };
+
+    rehydrate();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleError = (err: unknown) => {
     if (err instanceof Error) {
-      // Try to extract backend error message
       const axiosError = err as {
         response?: { data?: { detail?: string; message?: string } };
       };
@@ -77,7 +95,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.register(payload);
       setUser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
     } catch (err) {
       handleError(err);
       throw err; // re-throw so the form can react if needed
@@ -86,20 +103,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-const login = async (payload: LoginPayload) => {
-  setIsLoading(true);
-  setError(null);
-  try {
-    const { user } = await authService.login(payload);
-    setUser(user);
-    localStorage.setItem("user", JSON.stringify(user));
-  } catch (err) {
-    handleError(err);
-    throw err;
-  } finally {
-    setIsLoading(false);
-  }
-};
+  const login = async (payload: LoginPayload) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { user } = await authService.login(payload);
+      setUser(user);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const logout = async () => {
     setIsLoading(true);
@@ -107,17 +123,14 @@ const login = async (payload: LoginPayload) => {
     try {
       await authService.logout();
     } catch {
-      // Even if the server call fails, clear local state
+      // Even if the server call fails, clear local state — worst case the
+      // cookie outlives the session in the UI's eyes, but the user is
+      // logged out client-side either way.
     } finally {
       setUser(null);
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
       setIsLoading(false);
     }
   };
-
-
 
   const forgotPassword = async (payload: ForgotPasswordPayload) => {
     setIsLoading(true);
@@ -149,9 +162,12 @@ const login = async (payload: LoginPayload) => {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!localStorage.getItem("accessToken"),
+        // The ONE place "am I signed in" is decided, app-wide. True only
+        // after the server confirms a valid session via the httpOnly cookie.
+        isAuthenticated: !!user,
         isLoading,
         error,
+        setError,
         register,
         login,
         logout,

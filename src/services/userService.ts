@@ -1,6 +1,8 @@
 import axiosInstance from "./axios";
 import { User } from "../types/userModel";
+
 const domain = import.meta.env.VITE_API_BASE_URL;
+
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
     const response = await axiosInstance.get(`${domain}/api/v1/users/me`);
@@ -10,6 +12,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
     return null;
   }
 };
+
 export const updateCurrentUser = async (
   userData: Partial<Pick<User, "name" | "email" | "biography">>
 ): Promise<User | null> => {
@@ -26,19 +29,22 @@ export const updateCurrentUser = async (
     return null;
   }
 };
+
 export const deleteCurrentUser = async (): Promise<boolean> => {
+  // Nothing to clean up in localStorage anymore — the session lives in
+  // httpOnly cookies. The backend's delete-account endpoint is expected to
+  // clear those cookies (Set-Cookie, Max-Age=0) on success, the same way
+  // /logout does. The caller (e.g. AuthContext) is responsible for clearing
+  // the in-memory `user` state once this resolves true.
   try {
     await axiosInstance.delete(`${domain}/api/v1/users/me`);
     return true;
   } catch (error) {
     console.error("Error deleting current user:", error);
     return false;
-  }finally {
-        localStorage.removeItem("user");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
   }
 };
+
 export const updateImageProfile = async (imageFile: File): Promise<User | null> => {
   try {
     const formData = new FormData();
@@ -54,6 +60,7 @@ export const updateImageProfile = async (imageFile: File): Promise<User | null> 
     return null;
   }
 };
+
 export const getImageProfile = async (userId: string): Promise<User | null> => {
   try {
     const response = await axiosInstance.get(`${domain}/api/v1/users/me/profile-image`);
@@ -63,6 +70,7 @@ export const getImageProfile = async (userId: string): Promise<User | null> => {
     return null;
   }
 };
+
 export const deleteImageProfile = async (): Promise<boolean> => {
   try {
     await axiosInstance.delete(`${domain}/api/v1/users/me/profile-image`);
