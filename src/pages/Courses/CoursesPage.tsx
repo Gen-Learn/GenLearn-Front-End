@@ -24,7 +24,6 @@ type DisplayCourse = {
   title: string;
   description: string;
   thumbnail: string;
-  difficulty: string;
   total_duration_minutes: number;
   sections_count: number;
   lectures_count: number;
@@ -52,12 +51,6 @@ export default function CoursesPage() {
       description: course.description,
       thumbnail:
         'https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800',
-      difficulty:
-        course.status === 'completed'
-          ? 'advanced'
-          : course.status === 'in_progress'
-          ? 'intermediate'
-          : 'beginner',
       total_duration_minutes: 0,
       sections_count: course.numsOfSections,
       lectures_count: lectures.length,
@@ -77,11 +70,6 @@ export default function CoursesPage() {
         c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    }
-
-    // Difficulty filter
-    if (difficultyFilter !== 'all') {
-      coursesCopy = coursesCopy.filter(c => c.difficulty === difficultyFilter);
     }
 
     // Status filter
@@ -109,7 +97,7 @@ export default function CoursesPage() {
     }
 
     return coursesCopy;
-  }, [courses, searchQuery, difficultyFilter, statusFilter, sortBy]);
+  }, [courses, searchQuery, statusFilter, sortBy]);
 
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
@@ -173,26 +161,6 @@ export default function CoursesPage() {
           {/* Filter Panel */}
           {showFilters && (
             <div className="flex flex-wrap gap-4 p-4 bg-white rounded-2xl border border-gray-200">
-              {/* Difficulty Filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Difficulty:</span>
-                <div className="flex gap-2">
-                  {(['all', 'beginner', 'intermediate', 'advanced'] as const).map((diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => setDifficultyFilter(diff)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        difficultyFilter === diff
-                          ? 'bg-primary-100 text-primary-700'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Status Filter */}
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700">Status:</span>

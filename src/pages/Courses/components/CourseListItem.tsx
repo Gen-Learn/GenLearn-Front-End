@@ -12,7 +12,6 @@ type props ={
     title: string| "Quantum Physics Fundamentals",
     description: string|null,
     thumbnail: string| "https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800",
-    difficulty: string| "Unknown",
     total_duration_minutes: number,
     sections_count: number | 4,
     lectures_count: number | 4,
@@ -28,9 +27,6 @@ export default function CourseListItem({ course, formatDuration }: { course: pro
     advanced: 'bg-red-100 text-red-700',
   };
 
-  const difficultyClass =
-    difficultyColors[course.difficulty as keyof typeof difficultyColors] ??
-    'bg-gray-100 text-gray-700';
 
   const statusLabels = {
     not_started: 'Not Started',
@@ -66,9 +62,6 @@ export default function CourseListItem({ course, formatDuration }: { course: pro
               </h3>
               <p className="text-sm text-gray-500 line-clamp-1 mt-1">{course.description}</p>
             </div>
-            <span className={`px-3 py-1 rounded-lg text-xs font-medium flex-shrink-0 ${difficultyClass}`}>
-              {course.difficulty.charAt(0).toUpperCase() + course.difficulty.slice(1)}
-            </span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-500 mb-3">

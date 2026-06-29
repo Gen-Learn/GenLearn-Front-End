@@ -12,7 +12,7 @@ type props ={
     title: string| "Quantum Physics Fundamentals",
     description: string|null,
     thumbnail: string| "https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800",
-    difficulty: string| "Unknown",
+
     total_duration_minutes: number,
     sections_count: number | 4,
     lectures_count: number | 4,
@@ -52,16 +52,6 @@ export default function CourseCard({ course, formatDuration }: { course: props; 
             </div>
           </div>
           <div className="absolute top-3 left-3 flex gap-2">
-            {(() => {
-              const diff = (course.difficulty || '').toLowerCase();
-              const classes = difficultyColors[diff] ?? 'bg-gray-100 text-gray-700';
-              const label = diff ? diff.charAt(0).toUpperCase() + diff.slice(1) : 'Unknown';
-              return (
-                <span className={`px-2 py-1 rounded-lg text-xs font-medium ${classes}`}>
-                  {label}
-                </span>
-              );
-            })()}
           </div>
           <div className="absolute bottom-3 right-3">
             <span className="flex items-center gap-1 text-white text-xs font-medium bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1">
