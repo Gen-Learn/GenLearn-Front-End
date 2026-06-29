@@ -18,7 +18,7 @@ export default function Header() {
   const inHomePage = location.pathname === "/";
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -66,12 +66,12 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+      className={`sticky top-0 z-40 border-b left-0 transition-all duration-300 ${scrolled
         ? 'bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-soft py-3'
-        : 'bg-transparent py-6'
-        }`}
+        : 'bg-white/80 py-3'
+         }` }
     >
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="" className="flex items-center gap-2 group">

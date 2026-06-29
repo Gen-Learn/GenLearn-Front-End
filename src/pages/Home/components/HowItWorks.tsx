@@ -51,8 +51,7 @@ export default function HowItWorks() {
         {/* Steps */}
         <div className="relative">
           {/* Connection Line - Desktop */}
-          <div className="hidden lg:block absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-gray-200 via-primary-200 to-gray-200 -translate-y-1/2" />
-
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, i) => (
               <div key={i} className="relative group">

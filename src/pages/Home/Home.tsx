@@ -30,7 +30,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
-      <Header />
       <Hero />
       <TrustedBy />
       <HowItWorks />
@@ -39,7 +38,6 @@ function Home() {
       <Statistics />
       <Testimonials />
       <FAQ />
-      <Footer />
     </div>
   );
 }

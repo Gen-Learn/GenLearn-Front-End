@@ -5,7 +5,7 @@ import {useAuth} from "@/contexts/AuthContext"
 export default function Hero() {
   const{isAuthenticated} =useAuth();
   return (
-    <section className="relative min-h-screen pt-32 pb-20 overflow-hidden">
+    <section className="relative min-h-screen pt-20 pb-20 overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 grid-pattern opacity-50" />
       <div className="absolute inset-0 dot-pattern opacity-30" />
@@ -22,11 +22,6 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="max-w-2xl">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 border border-primary-100 mb-6 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-primary-500" />
-              <span className="text-sm font-medium text-primary-700">AI-Powered Learning Revolution</span>
-            </div>
 
             {/* Headline */}
             <h1 className="text-4xl lg:text-5xl xl:text-6xl font-extrabold text-gray-900 leading-tight mb-6 animate-slide-up">
@@ -41,12 +36,17 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 mb-5 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <Link to={isAuthenticated ? "/generate":"/signup"}>
+              {
+                isAuthenticated? null: (
+                  <Link to={isAuthenticated ? "/generate":"/signup"}>
                 <Button size="lg">
                   Start Free
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
+                )
+              }
+              
               <Link to={isAuthenticated ? "/generate":"/login"}>
                 <Button variant="secondary" size="lg">
                   <Upload className="w-5 h-5" />
