@@ -84,13 +84,15 @@ function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
-              <Route path="/course-details/:id" element={<CourseDetails />} />
-              <Route path="/course/:id" element={<CourseContent />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/manage-account" element={<ManageAccount />} />
-              <Route path="/courses" element={<Courses />} />
+              
             </Route>
             {/* These render without Header/Footer */}
+            
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/course/:id" element={<CourseContent />} />
+            <Route path="/course-details/:id" element={<CourseDetails />} />
             <Route path="/forgot-Password" element={<ForgotPassword />} />
             <Route path="/reset-Password" element={<ResetPassword />} />
             <Route path="/signup" element={<SignUp />} />

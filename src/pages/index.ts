@@ -1,5 +1,5 @@
 export { default as CourseContent } from './CourseContent/main';
-export { default as CourseDetails } from './/CourseDetails/main';
+export { default as CourseDetails } from './CourseDetails/CourseDetailsPage';
 export { default as Courses } from './Courses/CoursesPage';
 export { default as ForgotPassword } from './ForgotPassword/ForgotPassword';
 export { default as Generate } from './Generate/Generate';

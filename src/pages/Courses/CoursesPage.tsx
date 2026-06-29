@@ -8,8 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-import CourseListItem from "./components/CourseListItem"
-import CourseCard from './components/CourseCard';
+import {CourseListItem,CourseCard,Header} from "./components/index"
 import {useGetAllCourses} from "@/hooks/useGetAllCources";
 import Course from '@/types/coursesModel';
 
@@ -108,7 +107,7 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       {/* Header */}
-
+      <Header/>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Page Header */}
