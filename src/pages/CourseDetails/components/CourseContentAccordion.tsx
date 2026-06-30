@@ -3,7 +3,6 @@ import { ChevronDown, CheckCircle2, Circle, Film, Award } from 'lucide-react';
 import { Button, Card } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
 import { Section  } from "@/types/coursesModel"
-import  Course  from "@/types/coursesModel"
 export type CourseSection = Section;
 
 type Props = {

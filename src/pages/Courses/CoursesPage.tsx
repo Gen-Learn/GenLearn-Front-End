@@ -8,14 +8,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-import {CourseListItem,CourseCard,Header} from "./components/index"
-import {useGetAllCourses} from "@/hooks/useGetAllCources";
+import { CourseListItem, CourseCard, Header } from "./components/index";
+import { useGetAllCourses } from "@/hooks/useGetAllCources";
+import { useGetSingleCource } from '@/hooks/useGetSingleCource';
 import Course from '@/types/coursesModel';
-
-
+import img from '@/assets/images/Cardimg.png';
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
-type DifficultyFilter = 'all' | 'beginner' | 'intermediate' | 'advanced';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
 
 type DisplayCourse = {
@@ -28,69 +27,86 @@ type DisplayCourse = {
   lectures_count: number;
   status: string;
   progress_percent: number;
-  last_lecture_title: string | null;
 };
 
+// ─── Per-course wrapper: calls the hook at the top level ───────────────────────
+function CourseCardWithDetails({
+  course,
+  formatDuration,
+  viewMode,
+}: {
+  course: Course;
+  formatDuration: (minutes: number) => string;
+  viewMode: ViewMode;
+}) {
+  const { course: singleCourse } = useGetSingleCource(course.id);
+
+  // Use reduce to count total lectures across all sections
+  const lecturesCount = useMemo(() => {
+    if (!singleCourse?.sections) return 0;
+    return singleCourse.sections.reduce(
+      (total, section) => total + (section.lectures?.length ?? 0),
+      0
+    );
+  }, [singleCourse]);
+
+  const displayCourse: DisplayCourse = {
+    id: course.id,
+    title: course.name,
+    description: course.description,
+    thumbnail: img,
+    total_duration_minutes: 0,
+    sections_count: course.numsOfSections,
+    lectures_count: lecturesCount,
+    status: course.status,
+    progress_percent: course.progress,
+  };
+
+  return viewMode === 'grid' ? (
+    <CourseCard course={displayCourse} formatDuration={formatDuration} />
+  ) : (
+    <CourseListItem course={displayCourse} formatDuration={formatDuration} />
+  );
+}
+
+// ─── Main page ─────────────────────────────────────────────────────────────────
 export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
-  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
   const { courses, loading, error } = useGetAllCourses();
 
-  const mapCourseForDisplay = (course: Course): DisplayCourse => {
-    const sections = course.sections ?? [];
-    const lectures = sections.flatMap((section) => section?.lectures ?? []);
-
-    return {
-      id: course.id,
-      title: course.name,
-      description: course.description,
-      thumbnail:
-        'https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800',
-      total_duration_minutes: 0,
-      sections_count: course.numsOfSections,
-      lectures_count: lectures.length,
-      status: course.status,
-      progress_percent: course.progress,
-      last_lecture_title: lectures.length > 0 ? lectures[lectures.length - 1].name : null,
-    };
-  };
-
   const filteredCourses = useMemo(() => {
-    const normalizedCourses = courses.filter(Boolean).map(mapCourseForDisplay);
-    let coursesCopy = [...normalizedCourses];
+    let coursesCopy = [...courses.filter(Boolean)];
 
-    // Search filter
     if (searchQuery) {
       coursesCopy = coursesCopy.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Status filter
     if (statusFilter !== 'all') {
       coursesCopy = coursesCopy.filter(c => c.status === statusFilter);
     }
 
-    // Sorting
     switch (sortBy) {
       case 'title':
-        coursesCopy.sort((a, b) => a.title.localeCompare(b.title));
+        coursesCopy.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'progress':
-        coursesCopy.sort((a, b) => b.progress_percent - a.progress_percent);
-        break;
-      case 'duration':
-        coursesCopy.sort((a, b) => a.total_duration_minutes - b.total_duration_minutes);
+        coursesCopy.sort((a, b) => b.progress - a.progress);
         break;
       case 'recent':
       default:
         coursesCopy.sort((a, b) => {
-          const statusOrder: Record<string, number> = { in_progress: 0, not_started: 1, completed: 2 };
+          const statusOrder: Record<string, number> = {
+            in_progress: 0,
+            not_started: 1,
+            completed: 2,
+          };
           return statusOrder[a.status] - statusOrder[b.status];
         });
     }
@@ -106,19 +122,15 @@ export default function CoursesPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
-      {/* Header */}
-      <Header/>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Courses</h1>
           <p className="text-gray-600">Continue learning from your generated courses</p>
         </div>
 
-        {/* Search and Filters */}
         <div className="mb-6 space-y-4">
-          {/* Search Bar */}
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -137,7 +149,7 @@ export default function CoursesPage() {
             >
               <Filter className="w-4 h-4" />
               Filters
-              {(difficultyFilter !== 'all' || statusFilter !== 'all') && (
+              {statusFilter !== 'all' && (
                 <span className="w-2 h-2 rounded-full bg-primary-500" />
               )}
             </Button>
@@ -157,10 +169,8 @@ export default function CoursesPage() {
             </div>
           </div>
 
-          {/* Filter Panel */}
           {showFilters && (
             <div className="flex flex-wrap gap-4 p-4 bg-white rounded-2xl border border-gray-200">
-              {/* Status Filter */}
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700">Status:</span>
                 <div className="flex gap-2">
@@ -174,13 +184,14 @@ export default function CoursesPage() {
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      {status === 'all' ? 'All' : status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {status === 'all'
+                        ? 'All'
+                        : status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Sort */}
               <div className="flex items-center gap-2 ml-auto">
                 <span className="text-sm font-medium text-gray-700">Sort by:</span>
                 <select
@@ -198,38 +209,28 @@ export default function CoursesPage() {
           )}
         </div>
 
-        {/* Results Count */}
         <p className="text-sm text-gray-500 mb-4">
           {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
         </p>
 
-        {/* Courses Grid/List */}
         {filteredCourses.length === 0 ? (
           <div className="text-center py-16">
             <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No courses found</h3>
             <p className="text-gray-500 mb-6">Try adjusting your filters or search query</p>
-            <Link to ="/generate" data-nav="upload">
+            <Link to="/generate" data-nav="upload">
               <Button>Upload a new PDF</Button>
             </Link>
           </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                formatDuration={formatDuration}
-              />
-            ))}
-          </div>
         ) : (
-          <div className="space-y-4">
+          // ↓ viewMode passed down; CourseCardWithDetails renders the right variant
+          <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredCourses.map((course) => (
-              <CourseListItem
+              <CourseCardWithDetails
                 key={course.id}
                 course={course}
                 formatDuration={formatDuration}
+                viewMode={viewMode}
               />
             ))}
           </div>

@@ -36,17 +36,13 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 mb-5 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              {
-                isAuthenticated? null: (
-                  <Link to={isAuthenticated ? "/generate":"/signup"}>
+              
+              <Link to={isAuthenticated ? "/courses":"/signup"}>
                 <Button size="lg">
-                  Start Free
+                  {isAuthenticated ? "Start Learning" : "Start Free"}
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-                )
-              }
-              
               <Link to={isAuthenticated ? "/generate":"/login"}>
                 <Button variant="secondary" size="lg">
                   <Upload className="w-5 h-5" />

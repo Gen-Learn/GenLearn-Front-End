@@ -8,8 +8,6 @@ import  Course from "@/types/coursesModel"
 
 type Props = {
   course: Course;
-  totalLectures?: number;
-  totalQuizzes?: number;
 };
 
 const statusLabels: Record<string, string> = {
@@ -24,13 +22,17 @@ const statusColors: Record<string, string> = {
   completed: 'bg-green-100 text-green-700',
 };
 
-export default function CourseHeroCard({ course, totalLectures, totalQuizzes }: Props) {
+export default function CourseHeroCard({ course}: Props) {
   const status = course.status ?? 'not_started';
   const courseName = course.name || 'Untitled Course';
   const courseDescription = course.description || 'No description available';
   const courseProgress = course.progress ?? 0;
-  const numsOfSections = course.numsOfSections ?? 0;
-
+  const numsOfSections = course.sections.length ;
+  const totalLectures = course.sections.reduce((acc,section)=>{
+    if(section.lectures) acc++;
+    return acc;
+  },0)
+  const totalQuizzes =   numsOfSections + totalLectures;
   return (
     <Card className="!p-0 overflow-hidden mb-8">
       <div className="flex flex-col lg:flex-row">

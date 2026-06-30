@@ -17,17 +17,9 @@ type props ={
     lectures_count: number | 4,
     status:string | null,
     progress_percent: number | 4,
-    last_lecture_title: string | null,
   
 }
 export default function CourseListItem({ course, formatDuration }: { course: props; formatDuration: (m: number) => string }) {
-  const difficultyColors = {
-    beginner: 'bg-green-100 text-green-700',
-    intermediate: 'bg-amber-100 text-amber-700',
-    advanced: 'bg-red-100 text-red-700',
-  };
-
-
   const statusLabels = {
     not_started: 'Not Started',
     in_progress: 'In Progress',
@@ -89,11 +81,6 @@ export default function CourseListItem({ course, formatDuration }: { course: pro
             </span>
           </div>
 
-          {course.last_lecture_title && (
-            <p className="text-xs text-gray-500 mt-2">
-              Last viewed: {course.last_lecture_title}
-            </p>
-          )}
         </div>
       </Card>
     </Link>

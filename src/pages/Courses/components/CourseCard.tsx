@@ -12,30 +12,22 @@ type props ={
     title: string| "Quantum Physics Fundamentals",
     description: string|null,
     thumbnail: string| "https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800",
-
     total_duration_minutes: number,
     sections_count: number | 4,
     lectures_count: number | 4,
     status:string | "In Progress",
     progress_percent: number | 4,
-    last_lecture_title: string | null,
   
 }
 
 
 export default function CourseCard({ course, formatDuration }: { course: props; formatDuration: (m: number) => string }) {
-  const difficultyColors: Record<string, string> = {
-    beginner: 'bg-green-100 text-green-700',
-    intermediate: 'bg-amber-100 text-amber-700',
-    advanced: 'bg-red-100 text-red-700',
-  };
 
   const statusLabels: Record<string, string> = {
     not_started: 'Not Started',
     in_progress: 'In Progress',
     completed: 'Completed',
   };
-
   return (
     <Link to={`/course-details/${course.id}`} data-nav="course" className="group">
       <Card className="!p-0 overflow-hidden hover:shadow-soft-lg transition-all">
@@ -90,12 +82,6 @@ export default function CourseCard({ course, formatDuration }: { course: props; 
             </div>
           )}
 
-          {/* Last viewed */}
-          {course.last_lecture_title && (
-            <p className="text-xs text-gray-500 truncate">
-              Last: {course.last_lecture_title}
-            </p>
-          )}
         </div>
       </Card>
     </Link>
