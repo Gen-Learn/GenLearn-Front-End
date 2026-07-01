@@ -9,6 +9,7 @@ type VerificationStatus = "loading" | "success" | "error" | "idle";
 
 function VerifyEmail() {
   const [searchParams] = useSearchParams();
+  console.log("Search Params:", Array.from(searchParams.entries())); // Debugging line
   const navigate = useNavigate();
   const [status, setStatus] = useState<VerificationStatus>("idle");
   const [error, setError] = useState<string | null>(null);
