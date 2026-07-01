@@ -14,9 +14,12 @@ const isRefreshRequest = (config?: AxiosRequestConfig) =>
   config?.url?.includes("/api/v1/auth/refresh");
 
 const clearAuthState = () => {
-  // Nothing in localStorage to remove — the refreshToken cookie being
-  // missing/invalid/expired IS the logged-out state. Just redirect.
-  if (window.location.pathname !== "/login") {
+  // Don't redirect if we're on a public auth page (verify-email, forgot-password, reset-password)
+  const publicPages = ["/verify-email", "/forgot-password", "/reset-password", "/signup", "/login"];
+  const isPublicPage = publicPages.some((page) => window.location.pathname.startsWith(page));
+
+  // Only redirect if we're NOT on a public page
+  if (!isPublicPage && window.location.pathname !== "/login") {
     window.location.href = "/login";
   }
 };

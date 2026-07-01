@@ -58,10 +58,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let isMounted = true;
 
     const rehydrate = async () => {
-      const currentUser = await getCurrentUser();
-      if (isMounted) {
-        setUser(currentUser);
-        setIsLoading(false);
+      try {
+        const currentUser = await getCurrentUser();
+        if (isMounted) {
+          setUser(currentUser);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        // User not authenticated - just stay logged out
+        // Don't redirect here; let the axios interceptor handle it only if needed
+        if (isMounted) {
+          setUser(null);
+          setIsLoading(false);
+        }
       }
     };
 

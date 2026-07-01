@@ -31,21 +31,40 @@ function VerifyEmail() {
 
       setStatus("loading");
       try {
+        // Call verify endpoint directly with userId and token
+        // This endpoint should NOT require authentication
         await authService.verifyEmail({ userId, token });
         setStatus("success");
         setError(null);
       } catch (err: unknown) {
         setStatus("error");
+        console.error("Email verification error:", err);
+        
         if (err instanceof Error) {
           const axiosError = err as {
-            response?: { data?: { detail?: string; message?: string } };
+            response?: { 
+              status?: number;
+              data?: { detail?: string; message?: string } 
+            };
           };
-          const errorMessage =
-            axiosError.response?.data?.message ||
-            axiosError.response?.data?.detail ||
-            err.message ||
-            "Failed to verify email. Please try again.";
-          setError(errorMessage);
+          
+          // Handle specific error cases
+          if (axiosError.response?.status === 401) {
+            // 401 during email verification might mean the endpoint requires auth
+            // This is a backend configuration issue - the verify-email endpoint should be public
+            const errorMessage =
+              axiosError.response?.data?.message ||
+              axiosError.response?.data?.detail ||
+              "Email verification failed. The link may have expired or is invalid.";
+            setError(errorMessage);
+          } else {
+            const errorMessage =
+              axiosError.response?.data?.message ||
+              axiosError.response?.data?.detail ||
+              err.message ||
+              "Failed to verify email. Please try again.";
+            setError(errorMessage);
+          }
         } else {
           setError("An unexpected error occurred. Please try again.");
         }
