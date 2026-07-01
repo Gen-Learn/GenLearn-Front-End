@@ -5,7 +5,8 @@ export interface User {
   profilePicture: string | null;
   createdAt: string | null; // ISO date string
   updatedAt: string | null; // ISO date string
-  biography:string | null;
+  biography: string | null;
+  onboardingStatus?: "pending" | "completed" | "skipped";
 }
 
 

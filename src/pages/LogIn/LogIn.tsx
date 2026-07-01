@@ -1,16 +1,23 @@
 import img from "../../assets/images/login.png";
-import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft, Zap } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft, Zap, RefreshCw } from 'lucide-react';
 import { useState ,useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
 import Button from "../../components/ui/Button.jsx";
+import authService from "../../services/authService";
+import { useOnboardingRedirect } from "../../hooks/useOnboardingRedirect";
 function Login() {
   const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  useOnboardingRedirect();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+
+  const isEmailVerificationError = error?.toLowerCase().includes("verify your email");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +30,19 @@ function Login() {
     }
   };
 
+  const handleResendVerificationEmail = async () => {
+    setResendLoading(true);
+    setResendSuccess(false);
+    try {
+      await authService.resendVerificationEmail({ email: form.email });
+      setResendSuccess(true);
+      setTimeout(() => setResendSuccess(false), 5000);
+    } catch (err) {
+      console.error("Failed to resend verification email", err);
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     
@@ -30,6 +50,7 @@ function Login() {
   useEffect(()=>{
       clearError();
     },[])
+
   return (
     <div className="min-h-screen bg-[#FAFAFC] flex">
       {/* Left Side - Illustration */}
@@ -100,8 +121,45 @@ function Login() {
 
           {/* Error message */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm">
-              {error}
+            <div className="mb-6 space-y-3">
+              <div className={`p-4 rounded-xl border text-sm ${
+                isEmailVerificationError 
+                  ? 'bg-orange-50 border-orange-100 text-orange-600' 
+                  : 'bg-red-50 border-red-100 text-red-600'
+              }`}>
+                {error}
+              </div>
+              {isEmailVerificationError && (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">
+                    Didn't receive the email? Check your spam folder or resend it.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={handleResendVerificationEmail}
+                    disabled={resendLoading}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    {resendLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-5 h-5" />
+                        Resend Verification Email
+                      </>
+                    )}
+                  </Button>
+                  {resendSuccess && (
+                    <div className="p-3 rounded-lg bg-green-50 border border-green-100 text-green-600 text-sm">
+                      ✓ Verification email sent! Check your inbox.
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

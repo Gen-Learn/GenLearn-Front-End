@@ -5,7 +5,7 @@ import {Header ,Footer} from "@/layout/index";
 import Chat from "./components/AIChat/Chat";
 import AiIcon from "./components/AiIcon/AiIcon";
 import useMediaQuery from "./hooks/useMediaQuery";
-import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login } from "@/pages/index"
+import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login, VerifyEmail, Onboarding } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
 import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './static/index';
 const Layout = () => {
@@ -95,6 +95,8 @@ function App() {
             <Route path="/course-details/:id" element={<CourseDetails />} />
             <Route path="/forgot-Password" element={<ForgotPassword />} />
             <Route path="/reset-Password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
             <Route path="/generate" element={<Generate />} />

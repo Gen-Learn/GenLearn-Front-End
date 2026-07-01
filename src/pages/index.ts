@@ -6,6 +6,8 @@ export { default as Generate } from './Generate/Generate';
 export { default as Home } from './Home/Home';
 export { default as Login } from './LogIn/LogIn';
 export { default as ManageAccount } from './ManageAccount/ManageAccount';
+export { default as Onboarding } from './Onboarding/Onboarding';
 export { default as Profile } from './profile/profile';
 export { default as ResetPassword } from './ResetPassword/ResetPassword';
 export { default as SignUp } from './SignUp/SignUp';
+export { default as VerifyEmail } from './VerifyEmail/VerifyEmail';

@@ -7,10 +7,12 @@ import {
   Statistics,
   Testimonials,
   FAQ } from "./components/index";
-  import {Header ,Footer} from "@/layout/index";
   
 import { useEffect } from "react";
+import { useOnboardingRedirect } from "../../hooks/useOnboardingRedirect";
+
 function Home() {
+  useOnboardingRedirect();
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLAnchorElement;

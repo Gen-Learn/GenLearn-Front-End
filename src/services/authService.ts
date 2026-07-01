@@ -5,8 +5,10 @@ import {
   LoginPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  VerifyEmailPayload,
+  ResendVerificationEmailPayload,
   BackendAuthResponse,
-} from "../types/authModel";
+} from "../types/authModel"
 import { getCurrentUser } from "./userService";
 
 // ── Auth Service ──────────────────────────────────────────────────────────────
@@ -45,13 +47,12 @@ const authService = {
       payload,
     );
     const resData = data.data as any;
-    const user = resData.user ?? null;
     const tokens =
       resData.tokens ??
       (resData.accessToken
         ? { accessToken: resData.accessToken, refreshToken: resData.refreshToken }
         : null);
-    const currentUser = user ?? (await getCurrentUser());
+    const currentUser =await getCurrentUser();
     return { user: currentUser ?? null, tokens };
   },
 
@@ -85,6 +86,27 @@ const authService = {
    */
   resetPassword: async (payload: ResetPasswordPayload): Promise<void> => {
     await axiosInstance.post("/api/v1/auth/reset-password", payload);
+  },
+
+  /**
+   * POST /api/v1/auth/verify-email
+   * Verifies user email using userId and token from email link
+   */
+  verifyEmail: async (payload: VerifyEmailPayload): Promise<void> => {
+    await axiosInstance.post("/api/v1/auth/verify-email", payload);
+  },
+
+  /**
+   * POST /api/v1/auth/resend-verification-email
+   * Resends verification email to user
+   */
+  resendVerificationEmail: async (
+    payload: ResendVerificationEmailPayload
+  ): Promise<void> => {
+    await axiosInstance.post(
+      "/api/v1/auth/resend-verification-email",
+      payload
+    );
   },
 };
 

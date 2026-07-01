@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
 import Button from "../../components/ui/Button.jsx";
 import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowLeft, Zap, CheckCircle } from 'lucide-react';
+import { useOnboardingRedirect } from "../../hooks/useOnboardingRedirect";
+
 function SignUp() {
   const { register, isLoading, error, clearError,setError } = useAuth();
   const navigate = useNavigate();
+  useOnboardingRedirect();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -67,7 +70,7 @@ function SignUp() {
           <p className="text-gray-600 mb-8">
             We've sent a confirmation link to <strong>{form.email}</strong>. Click the link to activate your account.
           </p>
-          <Link to="login">
+          <Link to="/login">
             <Button variant="secondary">Back to Sign In</Button>
           </Link>
         </div>
@@ -279,9 +282,9 @@ function SignUp() {
               />
               <label htmlFor="terms" className="text-sm text-gray-600">
                 I agree to the{' '}
-                <a href="#" className="text-primary-600 hover:underline">Terms of Service</a>
+                <Link to="/TermsPage" className="text-primary-600 hover:underline">Terms of Service</Link>
                 {' '}and{' '}
-                <a href="#" className="text-primary-600 hover:underline">Privacy Policy</a>
+                <Link to="/PrivacyPage" className="text-primary-600 hover:underline">Privacy Policy</Link>
               </label>
             </div>
 

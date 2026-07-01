@@ -28,6 +28,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
+  refreshUser: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -158,6 +159,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (err) {
+      console.error("Failed to refresh user:", err);
+      // Don't throw - just silently fail and keep existing user data
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -173,6 +184,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         forgotPassword,
         resetPassword,
+        refreshUser,
         clearError,
       }}
     >

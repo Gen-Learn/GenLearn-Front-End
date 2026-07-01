@@ -40,3 +40,12 @@ export interface ResetPasswordPayload {
   resetPasswordToken: string;
   newPassword: string;
 }
+
+export interface VerifyEmailPayload {
+  userId: string;
+  token: string;
+}
+
+export interface ResendVerificationEmailPayload {
+  email: string;
+}
