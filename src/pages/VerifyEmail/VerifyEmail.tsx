@@ -17,9 +17,9 @@ function VerifyEmail() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
 
-  const userId = searchParams.get("userId");
+  const userId = searchParams.get("userid");
   const token = searchParams.get("token");
-
+    console.log("userId:", userId, "token:", token); // Debugging line
   // Verify email on component mount if userId and token are present
   useEffect(() => {
     const verifyEmail = async () => {
