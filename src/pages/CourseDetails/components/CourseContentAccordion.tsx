@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ChevronDown, CheckCircle2, Circle, Film, Award } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, Film, Award, BookOpen } from 'lucide-react';
 import { Button, Card } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
 import { Section  } from "@/types/coursesModel"
+import { EmptyState } from '@/components/empty-states';
 export type CourseSection = Section;
 
 type Props = {
@@ -26,7 +27,13 @@ export default function CourseContentAccordion({ sections , id }: Props) {
   if (sections.length === 0) {
     return (
       <Card>
-        <p className="text-sm text-gray-500">No sections available yet.</p>
+        <div className="p-8">
+          <EmptyState
+            title="No course content"
+            description="This course does not have any sections yet."
+            icon={BookOpen}
+          />
+        </div>
       </Card>
     );
   }
@@ -98,7 +105,7 @@ export default function CourseContentAccordion({ sections , id }: Props) {
                         className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-100/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             {isCompleted ? (
                               <CheckCircle2 className="w-5 h-5 text-green-500" />
                             ) : (
@@ -113,7 +120,7 @@ export default function CourseContentAccordion({ sections , id }: Props) {
                         <div className="flex items-center gap-4">
                           <span className="text-xs text-gray-500">{lectureDuration}</span>
                           <Link to={`/course/${id}`} data-nav="lecture">
-                            <Button variant="ghost" size="sm" className="text-xs !px-2 !py-1">
+                            <Button variant="ghost" size="sm" className="text-xs px-2! py-1!">
                               {isCompleted ? 'Rewatch' : 'Watch'}
                             </Button>
                           </Link>
@@ -129,7 +136,7 @@ export default function CourseContentAccordion({ sections , id }: Props) {
                       } transition-colors`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           {section.quiz.passed ? (
                             <CheckCircle2 className="w-5 h-5 text-green-500" />
                           ) : (
@@ -154,7 +161,7 @@ export default function CourseContentAccordion({ sections , id }: Props) {
                           <Button
                             variant={section.quiz.passed ? 'ghost' : 'secondary'}
                             size="sm"
-                            className="text-xs !px-2 !py-1"
+                            className="text-xs px-2! py-1!"
                           >
                             {section.quiz.passed ? 'Review' : 'Solve'}
                           </Button>

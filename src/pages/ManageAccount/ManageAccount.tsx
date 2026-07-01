@@ -5,26 +5,28 @@ import DeleteAccountSection from './components/DeleteAccountSection'
 import { Link } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext'
 import {useGetUser} from "../../hooks/useGetUser"
+import { FullPageLoader } from '@/components/loading';
+import { EmptyState } from '@/components/empty-states';
+import { BookOpen } from 'lucide-react';
 export default function ManageAccount() {
 
   const {user,loading} = useGetUser();
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading account details...</h2>
-        </div>
+      <div className="min-h-screen bg-[#FAFAFC]">
+        <FullPageLoader />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Unable to load account details</h2>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[#FAFAFC]">
+        <EmptyState
+          title="Unable to load account"
+          description="Please try again later or refresh the page."
+          icon={BookOpen}
+        />
       </div>
     );
   }

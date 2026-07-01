@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import axiosInstance from "../../../services/axios";
+import { InlineLoader } from '@/components/loading';
+import { EmptyState } from '@/components/empty-states';
+import { BookOpen } from 'lucide-react';
 
 const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
@@ -117,21 +120,19 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
 
       {/* Loading overlay — sits on top, doesn't touch the video node */}
       {loading && (
-        <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
-          <div className="text-white text-center">
-            <div className="mb-4">Loading video...</div>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto" />
-          </div>
+        <div className="absolute inset-0 bg-black/75 flex items-center justify-center z-10">
+          <InlineLoader className="text-white" />
         </div>
       )}
 
       {/* Error overlay */}
       {error && !loading && (
-        <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
-          <div className="text-red-400 text-center">
-            <p>{error}</p>
-            {!lectureId && <p className="text-sm mt-2">No lecture selected</p>}
-          </div>
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-10 p-6">
+          <EmptyState
+            title="Video error"
+            description={error}
+            icon={BookOpen}
+          />
         </div>
       )}
     </div>

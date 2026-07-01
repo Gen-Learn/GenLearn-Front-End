@@ -7,12 +7,13 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
-import { Link } from 'react-router-dom';
 import { CourseListItem, CourseCard, Header } from "./components/index";
 import { useGetAllCourses } from "@/hooks/useGetAllCources";
 import { useGetSingleCource } from '@/hooks/useGetSingleCource';
 import Course from '@/types/coursesModel';
 import img from '@/assets/images/Cardimg.png';
+import { CourseGridSkeleton } from '@/components/loading';
+import { EmptyState } from '@/components/empty-states';
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
@@ -120,6 +121,21 @@ export default function CoursesPage() {
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFC]">
+        <Header />
+        <main className="max-w-7xl mx-auto px-6 py-8">
+          <EmptyState
+            title="Unable to load courses"
+            description={error}
+            icon={BookOpen}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       <Header />
@@ -213,16 +229,27 @@ export default function CoursesPage() {
           {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
         </p>
 
-        {filteredCourses.length === 0 ? (
-          <div className="text-center py-16">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No courses found</h3>
-            <p className="text-gray-500 mb-6">Try adjusting your filters or search query</p>
-            <Link to="/generate" data-nav="upload">
-              <Button>Upload a new PDF</Button>
-            </Link>
-          </div>
+        {loading ? (
+            <CourseGridSkeleton />
+        ):filteredCourses.length === 0 ? (
+          searchQuery || statusFilter !== 'all' ? (
+            <EmptyState
+              title="No results found"
+              description="Try adjusting your search or filters to find the course you're looking for."
+              icon={Search}
+            />
+          ) : (
+            <EmptyState
+              title="No courses yet"
+              description="Upload your first PDF to transform it into an interactive learning experience with AI."
+              icon={BookOpen}
+              actionLabel="Generate a course"
+              actionHref="/generate"
+              dataNav="generate"
+            />
+          )
         ) : (
+          
           // ↓ viewMode passed down; CourseCardWithDetails renders the right variant
           <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredCourses.map((course) => (

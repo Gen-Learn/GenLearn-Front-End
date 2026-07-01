@@ -3,6 +3,8 @@ import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { useGetAttemps } from "../../../hooks/useGetAttemps";
 import { useQuiz } from "../../../hooks/useGetQuiz";
 import { useSubmitQuiz } from "../../../hooks/useSubmitQuiz";
+import { QuizLoadingSkeleton } from '@/components/loading';
+import { NoQuestionsYet } from '@/components/empty-states';
 
 type QuizSectionProps = {
   quizId: string | null;
@@ -83,11 +85,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
   };
 
   if (!quizId) {
-    return (
-      <div className="rounded-2xl border border-dashed border-purple-200 bg-purple-50 p-6 text-center text-sm text-purple-700">
-        No quiz is available for this lecture yet.
-      </div>
-    );
+    return <NoQuestionsYet />;
   }
 
   return (
@@ -115,10 +113,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
 
       {loading && (
         <div className="flex min-h-55 items-center justify-center rounded-xl bg-white/70">
-          <div className="text-center text-sm text-gray-500">
-            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-b-2 border-purple-600" />
-            Loading quiz...
-          </div>
+          <QuizLoadingSkeleton />
         </div>
       )}
 

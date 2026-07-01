@@ -1,7 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { useGetSingleCource } from '../../hooks/useGetSingleCource';
 import { CourseNavbar,CourseHeroCard ,CourseContentAccordion} from './components/index';
+import { FullPageLoader } from '@/components/loading';
+import { EmptyState } from '@/components/empty-states';
 
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,12 +23,14 @@ export default function CourseDetailsPage() {
           Back to Courses
         </Link>
 
-        {loading && (
-          <div className="text-center py-20 text-gray-500">Loading course details...</div>
-        )}
+        {loading && <FullPageLoader />}
 
         {!loading && (error || !course) && (
-          <div className="text-center py-20 text-red-600">{error || 'Course not found'}</div>
+          <EmptyState
+            title="Course not found"
+            description={error ?? 'We could not find the course you requested.'}
+            icon={BookOpen}
+          />
         )}
 
         {!loading && course && (
