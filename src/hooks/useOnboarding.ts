@@ -20,6 +20,7 @@ export const useOnboardingQuestions = (): UseOnboardingQuestionsReturn => {
       try {
         const response = await onboardingService.getQuestions();
         setQuestions(response.data.questions);
+        console.log("Fetched onboarding questions:", response.data.questions);
       } catch (err: unknown) {
         if (err instanceof Error) {
           const axiosError = err as {

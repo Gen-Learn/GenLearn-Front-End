@@ -1,26 +1,54 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router";
 import { Loader2, ArrowLeft, CheckCircle, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useAuth } from "../../contexts/AuthContext";
 import { useOnboardingQuestions } from "../../hooks/useOnboarding";
 import onboardingService from "../../services/onboardingService";
-import { OnboardingFormData } from "../../types/onboardingModel";
+import { OnboardingFormData, OnboardingQuestion } from "../../types/onboardingModel";
+
+const EMPTY_FORM_DATA: Partial<OnboardingFormData> = {
+  userType: "",
+  fieldOfStudy: "",
+  medicalField: "",
+  researchField: "",
+  engineeringField: "",
+  interests: [],
+  learningGoal: "",
+  experienceLevel: "",
+  preferredLearningStyle: [],
+  weeklyLearningGoal: "",
+};
+
+// Conditional field-of-study questions keyed by the userType option
+// that reveals them. Used to clear stale answers when userType changes.
+const USER_TYPE_DEPENDENT_FIELDS = [
+  "fieldOfStudy",
+  "medicalField",
+  "researchField",
+  "engineeringField",
+];
+
+// Explicit ordering guarantee: userType must always render first,
+// followed immediately by whichever conditional field-of-study question
+// matches it (fieldOfStudy / medicalField / researchField / engineeringField),
+// and only then the rest of the questions (interests, learningGoal, etc).
+// This is enforced in code rather than relying on the backend always
+// returning questions in that exact order.
+const QUESTION_ORDER_RANK: Record<string, number> = {
+  userType: 0,
+  fieldOfStudy: 1,
+  medicalField: 1,
+  researchField: 1,
+  engineeringField: 1,
+};
 
 function Onboarding() {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
   const { questions, isLoading, error } = useOnboardingQuestions();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<OnboardingFormData>>({
-    occupation: "",
-    interests: [],
-    learningGoal: "",
-    experienceLevel: "",
-    preferredLearningStyle: [],
-    weeklyLearningGoal: "",
-  });
+  const [formData, setFormData] = useState<Partial<OnboardingFormData>>(EMPTY_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [expandedOptions, setExpandedOptions] = useState<Record<number, boolean>>({});
@@ -32,18 +60,64 @@ function Onboarding() {
     }
   }, [user?.onboardingStatus, navigate, user]);
 
-  const currentQuestion = questions[currentStep];
-  const progress = ((currentStep + 1) / questions.length) * 100;
+  // Only show questions whose showIf condition (if any) matches the
+  // current answers, then order them so userType -> matched conditional
+  // field question -> everything else, regardless of the raw API order.
+  const visibleQuestions: OnboardingQuestion[] = useMemo(() => {
+    const filtered = questions.filter((q) => {
+      if (!q.showIf) return true;
+      const dependentValue = formData[q.showIf.questionId as keyof OnboardingFormData];
+      return dependentValue === q.showIf.value;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const rankA = QUESTION_ORDER_RANK[a.id] ?? 2;
+      const rankB = QUESTION_ORDER_RANK[b.id] ?? 2;
+      if (rankA !== rankB) return rankA - rankB;
+      // Same rank: preserve the order the backend originally returned them in.
+      return questions.indexOf(a) - questions.indexOf(b);
+    });
+  }, [questions, formData]);
+
+  // Keep currentStep in bounds if the visible list shrinks
+  // (e.g. user changed userType, removing a previously-visible question).
+  useEffect(() => {
+    if (visibleQuestions.length === 0) return;
+    if (currentStep > visibleQuestions.length - 1) {
+      setCurrentStep(visibleQuestions.length - 1);
+    }
+  }, [visibleQuestions, currentStep]);
+
+  const currentQuestion = visibleQuestions[currentStep];
+  const progress = visibleQuestions.length
+    ? ((currentStep + 1) / visibleQuestions.length) * 100
+    : 0;
 
   const handleSingleSelect = (value: string) => {
+    if (!currentQuestion) return;
     const questionId = currentQuestion.id as keyof OnboardingFormData;
-    setFormData((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
+
+    setFormData((prev) => {
+      const next: Partial<OnboardingFormData> = {
+        ...prev,
+        [questionId]: value,
+      };
+
+      // If the userType answer changes, clear any previously selected
+      // conditional field-of-study answer so a stale value never gets
+      // submitted alongside a mismatched userType.
+      if (questionId === "userType") {
+        USER_TYPE_DEPENDENT_FIELDS.forEach((field) => {
+          (next as Record<string, string | string[]>)[field] = "";
+        });
+      }
+
+      return next;
+    });
   };
 
   const handleMultiSelect = (value: string) => {
+    if (!currentQuestion) return;
     const questionId = currentQuestion.id as keyof OnboardingFormData;
     const currentValues = (formData[questionId] as string[]) || [];
     const isSelected = currentValues.includes(value);
@@ -57,7 +131,7 @@ function Onboarding() {
   };
 
   const handleNext = () => {
-    if (currentStep < questions.length - 1) {
+    if (currentStep < visibleQuestions.length - 1) {
       setCurrentStep((prev) => prev + 1);
       setSubmitError(null);
     }
@@ -100,10 +174,18 @@ function Onboarding() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await onboardingService.submitOnboarding({
-        skipped: false,
-        ...formData,
+      // Only send fields that are actually relevant (i.e. currently visible),
+      // so a stale conditional answer from an earlier userType choice
+      // never leaks into the payload.
+      const visibleIds = new Set(visibleQuestions.map((q) => q.id));
+      const payload: Record<string, unknown> = { skipped: false };
+      Object.entries(formData).forEach(([key, value]) => {
+        if (visibleIds.has(key)) {
+          payload[key] = value;
+        }
       });
+
+      await onboardingService.submitOnboarding(payload as OnboardingFormData & { skipped: boolean });
       // Refresh user data to update onboardingStatus in context
       await refreshUser();
       // Force navigation and clear any redirect hooks
@@ -183,7 +265,7 @@ function Onboarding() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">
-              Question {currentStep + 1} of {questions.length}
+              Question {currentStep + 1} of {visibleQuestions.length}
             </span>
             <span className="text-sm font-medium text-primary-600">{Math.round(progress)}%</span>
           </div>
@@ -324,7 +406,7 @@ function Onboarding() {
               Previous
             </Button>
 
-            {currentStep === questions.length - 1 ? (
+            {currentStep === visibleQuestions.length - 1 ? (
               <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? (
                   <>
