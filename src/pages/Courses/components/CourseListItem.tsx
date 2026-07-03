@@ -12,7 +12,7 @@ type props ={
     title: string| "Quantum Physics Fundamentals",
     description: string|null,
     thumbnail: string| "https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=800",
-    total_duration_minutes: number,
+    courseDurationInMinutes: number,
     sections_count: number | 4,
     lectures_count: number | 4,
     status:string | null,
@@ -64,7 +64,7 @@ export default function CourseListItem({ course, formatDuration }: { course: pro
             <span>{course.sections_count} sections</span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              {formatDuration(course.total_duration_minutes)}
+              {formatDuration(course.courseDurationInMinutes)}
             </span>
           </div>
 

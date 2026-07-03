@@ -1,192 +1,307 @@
-import { useState, useRef, useEffect } from "react";
-import { IoSend } from "react-icons/io5";
-import { MdOutlineRefresh } from "react-icons/md";
-import { LuLogOut } from "react-icons/lu";
-import aiIcons from "../../assets/images/ai.png";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import { useState, useRef, useEffect } from 'react';
+import {
+  X,
+  Send,
+  MessageCircle,
+  Sparkles,
+  Bot,
+  User,
+  Maximize2,
+  Minimize2,
+  Trash2,
+} from 'lucide-react';
+import { Button } from '../ui';
+
 interface Message {
   id: string;
-  role: "user" | "assistant";
-  text: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
 }
 
-type props = {
-  className?: string;
-  setChatOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  chatOpen?: boolean;
+interface ChatContext {
+  course?: string;
+  section?: string;
+  lecture?: string;
+}
+
+// Mock responses for demonstration
+const mockResponses: Record<string, string> = {
+  explain: "I'd be happy to explain that concept! Quantum tunneling is a phenomenon where particles can pass through barriers that would be impossible to cross in classical physics. This happens because particles have wave-like properties - their wave function doesn't suddenly stop at a barrier, but instead decays exponentially through it. If the barrier is thin enough, there's a non-zero probability of finding the particle on the other side.",
+  summary: "Here's a quick summary of this lecture:\n\n• Quantum tunneling allows particles to pass through energy barriers\n• The probability depends on barrier width and height\n• Applications include scanning tunneling microscopes and nuclear fusion\n• This is a purely quantum effect with no classical analog",
+  example: "Great question! Here's a practical example:\n\n**Scanning Tunneling Microscope (STM)**\n\nAn STM uses quantum tunneling to image surfaces at the atomic level. A sharp metal tip is brought very close to a surface. Electrons tunnel between the tip and surface, creating a measurable current. By scanning the tip and measuring this tunneling current, scientists can create images of individual atoms!\n\nThis wouldn't be possible without quantum tunneling - classically, the electrons couldn't cross the gap.",
+  quiz: "I can help you understand the quiz concepts, but I won't give you the direct answers.\n\nFor this quiz, focus on understanding:\n\n1. The definition of quantum tunneling\n2. How the tunneling probability relates to barrier properties\n3. Real-world applications\n\nWould you like me to explain any of these concepts in more detail?",
+  default: "I'm your AI learning assistant! I can help you with:\n\n• Explaining difficult concepts from your current lecture\n• Summarizing course sections\n• Providing real-world examples\n• Preparing for quizzes (without giving answers)\n• Answering follow-up questions\n\nWhat would you like to know?",
 };
-export default function Chat({ className, setChatOpen, chatOpen }: props) {
-  
+
+export default function AIChatbot() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      role: "assistant",
-      text: "Hi I am Nerdy! How can I help you? Ask all the questions you want.",
+      id: '1',
+      role: 'assistant',
+      content: "Hi! I'm your AI learning assistant. I can help you understand concepts from your course, summarize sections, provide examples, and prepare for quizzes. What would you like to learn about?",
+      timestamp: new Date(),
     },
   ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  // Context (would be dynamic in real implementation)
+  const context: ChatContext = {
+    course: 'Quantum Physics Fundamentals',
+    section: 'Wave-Particle Duality',
+    lecture: 'Quantum Tunneling Explained',
+  };
+
+  // Auto-scroll to bottom
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
-  const handleSend = async () => {
-    const trimmed = input.trim();
-    if (!trimmed || loading) return;
+  // Focus input when opening
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
 
-    const userMsg: Message = {
+  const generateResponse = (userMessage: string): string => {
+    const lowerMessage = userMessage.toLowerCase();
+
+    if (lowerMessage.includes('explain') || lowerMessage.includes('what is')) {
+      return mockResponses.explain;
+    }
+    if (lowerMessage.includes('summary') || lowerMessage.includes('summarize')) {
+      return mockResponses.summary;
+    }
+    if (lowerMessage.includes('example') || lowerMessage.includes('application')) {
+      return mockResponses.example;
+    }
+    if (lowerMessage.includes('quiz') || lowerMessage.includes('test')) {
+      return mockResponses.quiz;
+    }
+
+    return mockResponses.default;
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
       id: Date.now().toString(),
-      role: "user",
-      text: trimmed,
+      role: 'user',
+      content: inputValue.trim(),
+      timestamp: new Date(),
     };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
 
-    try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system:
-            "You are Nerdy, a friendly and knowledgeable AI assistant. Be concise and helpful.",
-          messages: [...messages, userMsg].map((m) => ({
-            role: m.role,
-            content: m.text,
-          })),
-        }),
-      });
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
 
-      const data = await response.json();
-      const reply =
-        data.content?.[0]?.text ?? "Sorry, I couldn't understand that.";
+    // Simulate AI response delay
+    setTimeout(() => {
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: generateResponse(userMessage.content),
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsTyping(false);
+    }, 1000 + Math.random() * 1000);
+  };
 
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now().toString(), role: "assistant", text: reply },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          role: "assistant",
-          text: "Oops! Something went wrong.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  const handleReset = () => {
+  const clearChat = () => {
     setMessages([
       {
-        id: "1",
-        role: "assistant",
-        text: "Hi I am Nerdy! How can I help you? Ask all the questions you want.",
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: "Chat cleared. How can I help you learn?",
+        timestamp: new Date(),
       },
     ]);
   };
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    });
-  }, []);
+
+  const quickActions = [
+    { label: 'Explain this concept', action: 'explain' },
+    { label: 'Summarize lecture', action: 'summary' },
+    { label: 'Give me an example', action: 'example' },
+    { label: 'Help with quiz', action: 'quiz' },
+  ];
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-glow-lg hover:shadow-glow hover:scale-110 transition-all flex items-center justify-center z-50 group"
+      >
+        <MessageCircle className="w-7 h-7" />
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+        <span className="absolute -top-10 right-0 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+          AI Assistant
+        </span>
+      </button>
+    );
+  }
+
   return (
     <div
-      data-aos="fade-right"
-      className={`flex items-center justify-center h-screen bg-gray-100 ${className}`}
+      className={`fixed z-50 bg-white rounded-3xl shadow-glass-lg border border-gray-100 flex flex-col transition-all duration-300 ${
+        isExpanded
+          ? 'inset-4 lg:inset-8'
+          : 'bottom-6 right-6 w-96 h-[32rem]'
+      }`}
     >
-      <div className=" w-full h-full flex flex-col  overflow-hidden shadow-lg bg-[#D9B7E1]">
-        {/* Header */}
-        <div className="bg-[#8b65b5] px-4 py-3 flex items-center gap-3">
-          <img src={aiIcons} alt="Nerdy" className="w-6 h-6" />
-          <div className="flex-1">
-            <p className="text-white font-medium text-sm">Nerdy</p>
-            <p className="text-purple-200 text-xs">Powered by AI</p>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
+          <div>
+            <h3 className="font-bold text-gray-900">AI Assistant</h3>
+            <p className="text-xs text-gray-500">
+              {context.course && (
+                <span className="truncate block max-w-[200px]">
+                  {context.course}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
           <button
-            onClick={handleReset}
-            className="text-purple-200 hover:text-white transition-colors"
+            onClick={clearChat}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+            title="Clear chat"
           >
-            <MdOutlineRefresh size={20} />
+            <Trash2 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setChatOpen?.(false)}
-            className="text-purple-200 hover:text-white transition-colors"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
           >
-            <LuLogOut size={18} />
+            {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
+      </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {messages.map((msg) =>
-            msg.role === "assistant" ? (
-              <div key={msg.id} className="flex items-start gap-2">
-                <img
-                  src={aiIcons}
-                  alt="Nerdy"
-                  className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm shrink-0"
-                />
-                <div>
-                  <p className="text-purple-900 text-xs mb-1 font-medium">
-                    Nerdy
-                  </p>
-                  <div className="bg-purple-100 rounded-tl-none rounded-2xl px-3 py-2 max-w-50">
-                    <p className="text-purple-900 text-sm">{msg.text}</p>
-                  </div>
-                </div>
+      {/* Context Banner */}
+      {context.lecture && (
+        <div className="px-4 py-2 bg-primary-50 border-b border-primary-100">
+          <p className="text-xs text-primary-700">
+            <strong>Current:</strong> {context.lecture}
+          </p>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}
+          >
+            {message.role === 'assistant' && (
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-white" />
               </div>
-            ) : (
-              <div key={msg.id} className="flex justify-end">
-                <div className="bg-purple-700 rounded-tr-none rounded-2xl px-3 py-2 max-w-50">
-                  <p className="text-white text-sm">{msg.text}</p>
-                </div>
+            )}
+            <div
+              className={`max-w-[80%] rounded-2xl p-3 ${
+                message.role === 'user'
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            </div>
+            {message.role === 'user' && (
+              <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-gray-600" />
               </div>
-            ),
-          )}
-          {loading && (
-            <div className="flex items-start gap-2">
-              <img
-                src={aiIcons}
-                alt="Nerdy"
-                className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white text-sm shrink-0"
-              />
-              <div className="bg-purple-100 rounded-2xl rounded-tl-none px-3 py-2">
-                <p className="text-purple-400 text-sm animate-pulse">
-                  Thinking...
-                </p>
+            )}
+          </div>
+        ))}
+
+        {/* Typing indicator */}
+        {isTyping && (
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center flex-shrink-0">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div className="bg-gray-100 rounded-2xl p-3">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
+          </div>
+        )}
 
-        {/* Input */}
-        <div className="px-3 py-3 flex items-center gap-2">
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Quick Actions */}
+      {messages.length <= 2 && (
+        <div className="px-4 pb-2">
+          <div className="flex flex-wrap gap-2">
+            {quickActions.map((action) => (
+              <button
+                key={action.action}
+                onClick={() => {
+                  setInputValue(action.label);
+                  inputRef.current?.focus();
+                }}
+                className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="p-4 border-t border-gray-100">
+        <div className="flex gap-2">
           <input
-            className="flex-1 bg-purple-200 rounded-full px-4 py-2 text-sm text-purple-900 placeholder-purple-500 outline-none focus:ring-2 focus:ring-purple-600"
-            placeholder="Type your Message here ...."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            disabled={loading}
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask me anything..."
+            className="flex-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20 text-sm"
           />
-          <button
-            onClick={handleSend}
-            disabled={loading || !input.trim()}
-            className="w-10 h-10 rounded-full bg-purple-700 flex items-center justify-center text-white hover:bg-purple-800 transition-colors disabled:opacity-50"
+          <Button
+            onClick={handleSendMessage}
+            disabled={!inputValue.trim() || isTyping}
+            size="sm"
+            className="!rounded-xl"
           >
-            <IoSend size={16} />
-          </button>
+            <Send className="w-4 h-4" />
+          </Button>
         </div>
       </div>
     </div>

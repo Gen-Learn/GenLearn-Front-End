@@ -1,10 +1,7 @@
-import { BrowserRouter as Router, Routes, Route,Outlet } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route,Outlet, useLocation } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
 import {Header ,Footer} from "@/layout/index";
-import Chat from "./components/AIChat/Chat";
-import AiIcon from "./components/AiIcon/AiIcon";
-import useMediaQuery from "./hooks/useMediaQuery";
+import AIChatbot from "./components/AIChat/Chat";
 import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login, VerifyEmail, Onboarding } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
 import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './static/index';
@@ -17,116 +14,61 @@ const Layout = () => {
     </div>
   );
 };
-function App() {
-  const [chatOpen, setChatOpen] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 767px)");
+function AppContent() {
+  const location = useLocation();
+
+  const showChatbot = [
+    "dashboard",
+    "courses",
+    "course",
+    "lecture",
+    "quiz",
+    "profile",
+  ].some(
+    (path) =>
+      location.pathname === `/${path}` ||
+      location.pathname.startsWith(`/${path}/`)
+  );
 
   return (
-    <Router>
-      <ScrollToTop/>
+    <>
+      <ScrollToTop />
+
       <div className="relative min-h-screen overflow-hidden">
-        {/* Overlay */}
-        <div
-          onClick={() => setChatOpen(false)}
-          className={`
-            fixed inset-0 z-40 bg-black/40 backdrop-blur-sm
-            transition-all duration-300
-            ${
-              chatOpen
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            }
-          `}
-        />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/manage-account" element={<ManageAccount />} />
+          </Route>
 
-        {/* Chat Sidebar */}
-        <div
-          className={`
-            fixed left-0 top-0 z-50 h-screen
-            bg-white/90 backdrop-blur-xl
-            border-r border-gray-200
-            shadow-2xl
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/course/:id" element={<CourseContent />} />
+          <Route path="/course-details/:id" element={<CourseDetails />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/generate" element={<Generate />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
 
-            transition-all duration-500 ease-out
-
-            ${
-              isMobile
-                ? `w-full ${
-                    chatOpen ? "translate-x-0" : "-translate-x-full"
-                  }`
-                : `w-[420px] ${
-                    chatOpen ? "translate-x-0" : "-translate-x-full"
-                  }`
-            }
-          `}
-        >
-          <Chat
-            chatOpen={chatOpen}
-            setChatOpen={setChatOpen}
-            className="h-full"
-          />
-        </div>
-
-        {/* Main Content */}
-        <div
-          className={`
-            min-h-screen
-            transition-all duration-500 ease-out
-            ${
-              !isMobile && chatOpen
-                ? "ml-[420px] scale-[0.98]"
-                : "ml-0 scale-100"
-            }
-          `}
-        >
-          
-
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/manage-account" element={<ManageAccount />} />
-              
-            </Route>
-            {/* These render without Header/Footer */}
-            
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/course/:id" element={<CourseContent />} />
-            <Route path="/course-details/:id" element={<CourseDetails />} />
-            <Route path="/forgot-Password" element={<ForgotPassword />} />
-            <Route path="/reset-Password" element={<ResetPassword />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/generate" element={<Generate />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-          </Routes>
-
-          
-        </div>
-
-        {/* Floating AI Button */}
-        {!chatOpen && (
-          <div
-            className="
-              fixed bottom-6 right-6 z-50
-
-            "
-          >
-            <AiIcon
-              setChatOpen={setChatOpen}
-              chatOpen={chatOpen}
-            />
-          </div>
-        )}
+        {showChatbot && <AIChatbot />}
       </div>
-    </Router>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}

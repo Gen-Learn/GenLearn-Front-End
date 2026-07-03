@@ -25,7 +25,7 @@ type DisplayCourse = {
   title: string;
   description: string;
   thumbnail: string;
-  total_duration_minutes: number;
+  courseDurationInMinutes: number;
   sections_count: number;
   lectures_count: number;
   status: string;
@@ -58,7 +58,7 @@ function CourseCardWithDetails({
     title: course.name,
     description: course.description,
     thumbnail: img,
-    total_duration_minutes: 0,
+    courseDurationInMinutes: course.courseDurationInMinutes,
     sections_count: course.numsOfSections,
     lectures_count: lecturesCount,
     status: course.status,

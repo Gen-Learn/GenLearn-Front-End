@@ -46,8 +46,6 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
 
     socket.on("connect", () => {
       console.log("[Socket] Connected to generation server");
-      // Only source of truth for the initial join — removes the duplicate emit
-      // that used to fire right after `io()` as well.
       if (currentJobId) {
         socket!.emit("joinJob", { jobId: currentJobId });
       }

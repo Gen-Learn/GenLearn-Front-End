@@ -4,6 +4,7 @@ export default interface Course {
   description: string;
   numsOfSections: number;
   status: string;
+  courseDurationInMinutes: number;
   progress: number;
   createdAt: string;
   updatedAt: string;
