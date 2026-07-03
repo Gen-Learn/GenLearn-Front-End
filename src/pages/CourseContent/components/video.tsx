@@ -82,14 +82,6 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
         });
 
         const url = URL.createObjectURL(response.data);
-        console.log("Headers:", response.headers);
-        console.log("Blob Type:", response.data.type);
-        console.log("Blob Size:", response.data.size);
-        console.log(
-          "Content-Range:",
-          response.headers["content-range"]
-        );
-
         playerRef.current.src({
           src: url,
           type: "video/mp4",

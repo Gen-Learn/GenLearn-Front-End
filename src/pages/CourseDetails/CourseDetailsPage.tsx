@@ -1,17 +1,17 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { useGetSingleCource } from '../../hooks/useGetSingleCource';
-import { CourseNavbar,CourseHeroCard ,CourseContentAccordion} from './components/index';
+import { Header,CourseHeroCard ,CourseContentAccordion} from './components/index';
 import { FullPageLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { course, loading, error } = useGetSingleCource(id || '');
-
+  console.log("CourseDetailsPage - course:", course);
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
-      <CourseNavbar />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Link

@@ -6,10 +6,6 @@ const axiosInstance = axios.create({
   withCredentials: true, // sends/receives httpOnly accessToken + refreshToken cookies
 });
 
-// No request interceptor attaching `Authorization: Bearer <token>` — there is
-// no token in JS to attach. The browser sends the accessToken cookie on every
-// request to this baseURL automatically because of `withCredentials: true`.
-
 const isRefreshRequest = (config?: AxiosRequestConfig) =>
   config?.url?.includes("/api/v1/auth/refresh");
 
@@ -66,8 +62,6 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Server reads the refreshToken cookie and responds with a fresh
-        // accessToken cookie via Set-Cookie. Nothing in the body to store.
         await axiosInstance.post("/api/v1/auth/refresh");
         processQueue(null);
         return axiosInstance(originalRequest);

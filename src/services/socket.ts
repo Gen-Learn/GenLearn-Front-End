@@ -26,26 +26,28 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
   currentCallbacks = callbacks;
   currentJobId = jobId;
 
-  if (!socket || !socket.connected) {
-    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+  const isNewSocket = !socket;
+
+  if (!socket) {
     const apiBase = (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost:3000";
     const url = `${apiBase.replace(/\/+$/, "")}/generation`;
-    const socketPath = "/socket.io";
 
     console.log("[Socket] Initializing connection to:", url);
 
     socket = io(url, {
-      path: socketPath,
-      transports: ["websocket"],
-      auth: token ? { token } : undefined,
+      path: "/socket.io",
+      transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
+      withCredentials: true,
     });
 
     socket.on("connect", () => {
       console.log("[Socket] Connected to generation server");
+      // Only source of truth for the initial join — removes the duplicate emit
+      // that used to fire right after `io()` as well.
       if (currentJobId) {
         socket!.emit("joinJob", { jobId: currentJobId });
       }
@@ -58,34 +60,37 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
     socket.on("disconnect", (reason) => {
       console.log("[Socket] Disconnected:", reason);
     });
+
+    socket.io.on("reconnect_attempt", (attempt) => {
+      console.log("[Socket] Reconnect attempt:", attempt);
+    });
   }
 
-  console.log(`[Socket] Joining job: ${jobId}`);
-  socket.emit("joinJob", { jobId });
+  // If we're reusing an already-connected socket for a *new* job, join immediately.
+  // If it's a fresh socket, the "connect" handler above will do the join once it's live.
+  if (!isNewSocket && socket.connected) {
+    console.log(`[Socket] Joining job: ${jobId}`);
+    socket.emit("joinJob", { jobId });
+  }
 
+  // Re-bind job-specific listeners so stale closures from a previous job don't linger
   socket.off("joinedJob");
   socket.off("jobCompleted");
   socket.off("jobFailed");
 
   socket.on("joinedJob", (payload: JobEventPayload) => {
     console.log("[Socket] joinedJob event:", payload);
-    if (currentCallbacks?.onJoined) {
-      currentCallbacks.onJoined(payload);
-    }
+    currentCallbacks?.onJoined?.(payload);
   });
 
   socket.on("jobCompleted", (payload: JobEventPayload) => {
     console.log("[Socket] jobCompleted event:", payload);
-    if (currentCallbacks?.onCompleted) {
-      currentCallbacks.onCompleted(payload);
-    }
+    currentCallbacks?.onCompleted?.(payload);
   });
 
   socket.on("jobFailed", (payload: JobEventPayload) => {
     console.log("[Socket] jobFailed event:", payload);
-    if (currentCallbacks?.onFailed) {
-      currentCallbacks.onFailed(payload);
-    }
+    currentCallbacks?.onFailed?.(payload);
   });
 
   return socket;

@@ -112,14 +112,18 @@ export default function Header() {
               // Avoid flashing "Sign In" before the session check resolves
               <div className="w-24 h-9" />
             ) : isAuthenticated ? (
-              <ul className="flex justify-between items-center gap-2">
+              <ul className="flex justify-between items-center gap-1">
+                <li className="flex justify-center text-base items-center gap-2 px-4 py-2 rounded-xl text-[#8864b5] hover:bg-[#f1e1f7] transition-colors duration-300">
+                  <span>0</span>
+                  <Flame className="w-5 h-5" />
+                </li>
                 <li className="relative">
                   <button
                     type="button"
                     onClick={toggleNotifications}
                     className="flex justify-center items-center text-2xl gap-2 px-4 py-2 rounded-xl text-gray-600 hover:bg-[#f1e1f7] hover:text-[#8864b5] transition-colors duration-300"
                   >
-                    <Bell className="w-5 h-5" />
+                    <Bell className="w-5 h-5 text-gray-600" />
                     {unreadCount > 0 && (
                       <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-5 min-w-[1.25rem] rounded-full bg-[#d946ef] text-white text-[0.65rem] font-semibold px-1">
                         {unreadCount}
@@ -129,17 +133,17 @@ export default function Header() {
 
                   {notificationsOpen && <Alert notifications={notifications} />}
                 </li>
-
-                <li className="flex justify-center text-base items-center gap-2 px-4 py-2 rounded-xl text-[#8864b5] hover:bg-[#f1e1f7] transition-colors duration-300">
-                  <span>0</span>
-                  <Flame className="w-5 h-5" />
-                </li>
-
                 <li
                   onClick={toggleAvatarMenu}
-                  className="relative flex justify-center items-center gap-2 px-4 py-2 rounded-xl text-gray-600 hover:bg-[#f1e1f7] hover:text-[#8864b5] transition-colors duration-300 cursor-pointer"
+                  className="relative flex justify-center items-center gap-2 px-4 py-2 rounded-xl text-gray-600  hover:text-[#8864b5] transition-colors duration-300 cursor-pointer"
                 >
-                  <CircleUser className="w-6 h-6" />
+                  <Link
+                    to="/profile"
+                    data-nav="profile"
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-semibold hover:scale-105 transition-transform"
+                  >
+                    JP
+                  </Link>
                   {avatarMenuOpen && (
                     <div className="absolute top-11 right-0 bg-white shadow-lg rounded-md py-2 w-48 z-50">
                       <Link

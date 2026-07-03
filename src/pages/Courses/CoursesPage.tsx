@@ -5,6 +5,7 @@ import {
   Grid,
   List,
   BookOpen,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
 import { CourseListItem, CourseCard, Header } from "./components/index";
@@ -14,6 +15,7 @@ import Course from '@/types/coursesModel';
 import img from '@/assets/images/Cardimg.png';
 import { CourseGridSkeleton } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
+import { Link } from 'react-router-dom';
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
@@ -139,10 +141,21 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       <Header />
-
+      
       <main className="max-w-7xl mx-auto px-6 py-8">
+        
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Courses</h1>
+          <div className="flex  gap-4 mb-2 justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Courses</h1>
+            <Link
+            to="/"
+            data-nav="home"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 "
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+          </div>
           <p className="text-gray-600">Continue learning from your generated courses</p>
         </div>
 

@@ -56,10 +56,11 @@ function Onboarding() {
   // Redirect if user is not in pending onboarding status
   useEffect(() => {
     if (user && user.onboardingStatus !== "pending") {
+      console.log("User onboarding status is not pending, redirecting to home.",user);
       navigate("/");
     }
   }, [user?.onboardingStatus, navigate, user]);
-
+    console.log("User onboarding status:", user?.onboardingStatus);
   // Only show questions whose showIf condition (if any) matches the
   // current answers, then order them so userType -> matched conditional
   // field question -> everything else, regardless of the raw API order.

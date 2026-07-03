@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Upload as UploadIcon,
   FileText,
@@ -14,153 +14,27 @@ import {
 } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../../services/axios';
-import { buildGeneratedFileUrl } from '../../services/generateService';
-import { connectToGenerationSocket, disconnectSocket } from '../../services/socket';
-import { useNotification } from '@/contexts/NotificationContext';
-
-type ProcessingStage = 'idle' | 'uploading' | 'generating' | 'complete' | 'failed';
-
-/**
- * Submits the file to /api/v1/generate via axiosInstance so it inherits
- * the base URL and Authorization interceptor automatically.
- */
-async function submitToGenerateEndpoint(
-  files: File[],
-  onProgress: (pct: number) => void
-): Promise<any> {
-  const formData = new FormData();
-  files.forEach((file) => formData.append('file', file));
-
-  const { data } = await axiosInstance.post('/api/v1/generate', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (e) => {
-      if (e.total) onProgress(Math.round((e.loaded / e.total) * 95));
-    },
-  });
-
-  onProgress(100);
-  return data;
-}
+import handleGenerate from './utils/handleGenerate';
 
 export default function UploadPage() {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [processingStage, setProcessingStage] = useState<ProcessingStage>('idle');
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [jobStatus, setJobStatus] = useState<string | null>(null);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
+  const {
+    resetUpload,
+    retryUpload,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleFileSelect,
+    isDragOver,
+    file,
+    processingStage,
+    uploadProgress,
+    jobStatus,
+    downloadUrl,
+    error,
+    connectionStatus
+  }=handleGenerate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addNotification } = useNotification();
 
-  // Real-time job updates via WebSocket (socket.io)
-  useEffect(() => {
-    if (!jobId) return;
-
-    const socket = connectToGenerationSocket(jobId, {
-      onJoined: (payload: any) => {
-        const status = payload?.status || payload?.jobStatus;
-        if (status) setJobStatus(String(status).toLowerCase());
-      },
-      onCompleted: (payload: any) => {
-        setJobStatus('completed');
-        if (payload?.downloadUrl) setDownloadUrl(payload.downloadUrl);
-        else if (payload?.fileName) setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
-
-        addNotification({
-          title: 'Generation complete',
-          message: 'Your course generation is finished and ready to download.',
-          courseId: payload?.downloadUrl,
-        });
-
-        setProcessingStage('complete');
-      },
-      onFailed: (payload: any) => {
-        setJobStatus('failed');
-        if (payload?.message) setError(String(payload.message));
-        setProcessingStage('failed');
-      },
-    });
-
-    return () => {
-      disconnectSocket();
-    };
-  }, [jobId, addNotification]);
-
-  const getErrorMessage = (err: unknown) => {
-    if (err instanceof Error) return err.message;
-    return 'An unexpected error occurred.';
-  };
-
-  const handleGenerateCourse = useCallback(async (selectedFile: File) => {
-    setFile(selectedFile);
-    setError(null);
-    setDownloadUrl(null);
-    setJobStatus(null);
-    setJobId(null);
-    setUploadProgress(0);
-    setProcessingStage('uploading');
-
-    try {
-      const data = await submitToGenerateEndpoint([selectedFile], setUploadProgress);
-
-      // Response shape: { statusCode: 202, data: { jobId, status, resourceId } }
-      const responseData = data?.data ?? data;
-      const id = responseData?.jobId;
-      const status = responseData?.status;
-
-      if (!id) throw new Error('No job ID returned from the server.');
-
-      setJobId(id.toString());
-      setJobStatus(status ? status.toString().toLowerCase() : 'pending');
-      setProcessingStage('generating');
-    } catch (err) {
-      setError(getErrorMessage(err));
-      setProcessingStage('failed');
-    }
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type === 'application/pdf') {
-      handleGenerateCourse(droppedFile);
-    }
-  }, [handleGenerateCourse]);
-
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) handleGenerateCourse(selectedFile);
-    e.target.value = '';
-  }, [handleGenerateCourse]);
-
-  const resetUpload = () => {
-    setFile(null);
-    setProcessingStage('idle');
-    setUploadProgress(0);
-    setJobId(null);
-    setJobStatus(null);
-    setDownloadUrl(null);
-    setError(null);
-  };
-
-  const retryUpload = () => {
-    if (file) handleGenerateCourse(file);
-  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFC] relative overflow-hidden">
@@ -326,28 +200,40 @@ export default function UploadPage() {
               </div>
 
               <div className="px-8 py-4 bg-white border-t border-gray-100">
-                {processingStage === 'uploading' ? (
-                  <>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Upload Progress</span>
-                      <span className="text-lg font-bold text-primary-600">{uploadProgress}%</span>
+                  {processingStage === 'uploading' ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Upload Progress</span>
+                        <span className="text-lg font-bold text-primary-600">{uploadProgress}%</span>
+                      </div>
+                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">Status</span>
+                      <div className="flex items-center gap-2">
+                        {connectionStatus === 'reconnecting' && (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                            Reconnecting…
+                          </span>
+                        )}
+                        {connectionStatus === 'error' && (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
+                            Connection lost
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
+                          {jobStatus ? jobStatus.charAt(0).toUpperCase() + jobStatus.slice(1) : 'Pending'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Status</span>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
-                      {jobStatus ? jobStatus.charAt(0).toUpperCase() + jobStatus.slice(1) : 'Pending'}
-                    </span>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
             </Card>
           </div>
         )}
