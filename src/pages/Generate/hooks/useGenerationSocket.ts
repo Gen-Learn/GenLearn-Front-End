@@ -5,18 +5,32 @@ import {
   JobEventPayload,
 } from '@/services/socket';
 
-export type SocketConnectionStatus =
+// Single source of truth for "what's happening right now" — covers both
+// the socket transport state and the job's processing stage, since the UI
+// only ever needs to render one status at a time, never both independently.
+export type SocketStatus =
   | 'idle'
   | 'connecting'
   | 'connected'
   | 'reconnecting'
-  | 'error';
+  | 'error'
+  | 'extracting'
+  | 'generating'
+  | 'rendering'
+  | 'completed';
+
+const JOB_STATUS_TO_STAGE: Record<string, SocketStatus> = {
+  extracting: 'extracting',
+  generating: 'generating',
+  rendering: 'rendering',
+};
 
 interface UseGenerationSocketArgs {
   jobId: string | null;
   onJoined?: (payload: JobEventPayload) => void;
   onCompleted?: (payload: JobEventPayload) => void;
   onFailed?: (payload: JobEventPayload) => void;
+  onStatusUpdate?: (payload: JobEventPayload) => void;
 }
 
 export function useGenerationSocket({
@@ -24,48 +38,53 @@ export function useGenerationSocket({
   onJoined,
   onCompleted,
   onFailed,
+  onStatusUpdate,
 }: UseGenerationSocketArgs) {
-  const [connectionStatus, setConnectionStatus] = useState<SocketConnectionStatus>('idle');
+  const [status, setStatus] = useState<SocketStatus>('idle');
 
-  // Keep latest callbacks in refs so the effect only re-runs when jobId changes,
-  // not on every render of the parent component.
-  const onJoinedRef = useRef(onJoined);
-  const onCompletedRef = useRef(onCompleted);
-  const onFailedRef = useRef(onFailed);
-
-  useEffect(() => { onJoinedRef.current = onJoined; }, [onJoined]);
-  useEffect(() => { onCompletedRef.current = onCompleted; }, [onCompleted]);
-  useEffect(() => { onFailedRef.current = onFailed; }, [onFailed]);
+  // Keep latest callbacks available inside the socket handlers without
+  // having to re-run the connection effect every time a parent re-renders.
+  const callbacksRef = useRef({ onJoined, onCompleted, onFailed, onStatusUpdate });
+  useEffect(() => {
+    callbacksRef.current = { onJoined, onCompleted, onFailed, onStatusUpdate };
+  }, [onJoined, onCompleted, onFailed, onStatusUpdate]);
 
   useEffect(() => {
     if (!jobId) {
-      setConnectionStatus('idle');
+      setStatus('idle');
       return;
     }
 
-    setConnectionStatus('connecting');
+    setStatus('connecting');
 
     const socket = connectToGenerationSocket(jobId, {
       onJoined: (payload) => {
-        setConnectionStatus('connected');
-        onJoinedRef.current?.(payload);
+        setStatus('connected');
+        callbacksRef.current.onJoined?.(payload);
+      },
+      jobStatusUpdated: (payload) => {
+        const jobStatus = payload.status?.toLowerCase() ?? '';
+        setStatus(JOB_STATUS_TO_STAGE[jobStatus] ?? 'generating');
+        callbacksRef.current.onStatusUpdate?.(payload);
       },
       onCompleted: (payload) => {
-        onCompletedRef.current?.(payload);
+        setStatus('completed');
+        callbacksRef.current.onCompleted?.(payload);
       },
       onFailed: (payload) => {
-        onFailedRef.current?.(payload);
+        setStatus('error');
+        callbacksRef.current.onFailed?.(payload);
       },
     });
 
     if (!socket) {
-      setConnectionStatus('error');
+      setStatus('error');
       return;
     }
 
-    const handleConnect = () => setConnectionStatus('connected');
-    const handleDisconnect = () => setConnectionStatus('reconnecting');
-    const handleError = () => setConnectionStatus('error');
+    const handleConnect = () => setStatus('connected');
+    const handleDisconnect = () => setStatus('reconnecting');
+    const handleError = () => setStatus('error');
 
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
@@ -76,9 +95,9 @@ export function useGenerationSocket({
       socket.off('disconnect', handleDisconnect);
       socket.off('connect_error', handleError);
       disconnectSocket();
-      setConnectionStatus('idle');
+      setStatus('idle');
     };
   }, [jobId]);
 
-  return { connectionStatus };
+  return { status };
 }

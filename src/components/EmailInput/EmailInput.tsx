@@ -4,7 +4,7 @@ import {
   validateEmail,
   isDisposableEmail,
   isCommonEmailProvider,
-} from "../../utils/emailValidation";
+} from "../../pages/SignUp/utils/emailValidation";
 
 interface EmailInputProps {
   value: string;

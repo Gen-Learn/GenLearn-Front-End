@@ -11,6 +11,7 @@ export type JobEventPayload = {
 };
 
 type Callbacks = {
+  jobStatusUpdated?: (payload: JobEventPayload) => void;
   onJoined?: (payload: JobEventPayload) => void;
   onCompleted?: (payload: JobEventPayload) => void;
   onFailed?: (payload: JobEventPayload) => void;
@@ -77,17 +78,16 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
   socket.off("jobFailed");
 
   socket.on("joinedJob", (payload: JobEventPayload) => {
-    console.log("[Socket] joinedJob event:", payload);
     currentCallbacks?.onJoined?.(payload);
   });
-
+  socket.on("jobStatusUpdated", (payload: JobEventPayload) => {
+    currentCallbacks?.jobStatusUpdated?.(payload);
+  });
   socket.on("jobCompleted", (payload: JobEventPayload) => {
-    console.log("[Socket] jobCompleted event:", payload);
     currentCallbacks?.onCompleted?.(payload);
   });
 
   socket.on("jobFailed", (payload: JobEventPayload) => {
-    console.log("[Socket] jobFailed event:", payload);
     currentCallbacks?.onFailed?.(payload);
   });
 

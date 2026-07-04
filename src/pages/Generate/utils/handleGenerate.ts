@@ -1,17 +1,23 @@
 import { useState, useCallback } from 'react';
 import { submitGenerateJob, buildGeneratedFileUrl } from '@/services/generateService';
 import { useNotification } from '@/contexts/NotificationContext';
-import { useGenerationSocket } from '../hooks/useGenerationSocket';
+import { useGenerationSocket, type SocketStatus } from '../hooks/useGenerationSocket';
 
-type ProcessingStage = 'idle' | 'uploading' | 'generating' | 'complete' | 'failed';
+// Local phase before a jobId exists — the socket hook takes over
+// (and drives `processingStage`) as soon as a jobId is assigned.
+type UploadPhase = 'idle' | 'uploading' | 'error';
+
+// The single unified status the whole page renders off of.
+export type ProcessingStage = UploadPhase | SocketStatus;
 
 const handleGenerate = () => {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [courseName, setCourseName] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [processingStage, setProcessingStage] = useState<ProcessingStage>('idle');
+  const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [jobId, setJobId] = useState<string | null>(null);
-  const [jobStatus, setJobStatus] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,59 +28,54 @@ const handleGenerate = () => {
     return 'An unexpected error occurred.';
   };
 
-  // All websocket wiring now lives in one place instead of a useEffect in the page component.
-  const { connectionStatus } = useGenerationSocket({
+  // All websocket wiring lives here. Once jobId is set, the hook's `status`
+  // becomes the single source of truth for processingStage — no separate
+  // connectionStatus/jobStatus states to keep in sync.
+  const { status: socketStatus } = useGenerationSocket({
     jobId,
-    onJoined: (payload) => {
-      const status = payload?.status || payload?.jobStatus;
-      if (status) setJobStatus(String(status).toLowerCase());
-    },
     onCompleted: (payload) => {
-      setJobStatus('completed');
       if (payload?.downloadUrl) {
         setDownloadUrl(payload.downloadUrl);
       } else if (payload?.fileName) {
         setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
       }
-
+      setCourseId(payload?.courseId || null);
+      setCourseName(payload?.courseName || null);
       addNotification({
         title: 'Generation complete',
         message: 'Your course generation is finished and ready to download.',
-        courseId: payload?.downloadUrl,
+        courseId: payload?.courseId,
       });
-
-      setProcessingStage('complete');
     },
     onFailed: (payload) => {
-      setJobStatus('failed');
       if (payload?.message) setError(String(payload.message));
-      setProcessingStage('failed');
     },
   });
 
+  // Before a jobId exists, we're in the local upload phase.
+  // Once a jobId is set, the socket's status drives everything.
+  const processingStage: ProcessingStage = jobId ? socketStatus : uploadPhase;
+
+  // **********************************************************************Handle job generation
   const handleGenerateCourse = useCallback(async (selectedFile: File) => {
     setFile(selectedFile);
     setError(null);
     setDownloadUrl(null);
-    setJobStatus(null);
     setJobId(null);
     setUploadProgress(0);
-    setProcessingStage('uploading');
+    setUploadPhase('uploading');
 
     try {
       const data = await submitGenerateJob([selectedFile], setUploadProgress);
       const responseData = data?.data ?? data;
       const id = responseData?.jobId;
-      const status = responseData?.status;
 
       if (!id) throw new Error('No job ID returned from the server.');
 
       setJobId(id.toString());
-      setJobStatus(status ? status.toString().toLowerCase() : 'pending');
-      setProcessingStage('generating');
     } catch (err) {
       setError(getErrorMessage(err));
-      setProcessingStage('failed');
+      setUploadPhase('error');
     }
   }, []);
 
@@ -105,10 +106,9 @@ const handleGenerate = () => {
 
   const resetUpload = () => {
     setFile(null);
-    setProcessingStage('idle');
+    setUploadPhase('idle');
     setUploadProgress(0);
     setJobId(null);
-    setJobStatus(null);
     setDownloadUrl(null);
     setError(null);
   };
@@ -129,10 +129,10 @@ const handleGenerate = () => {
     processingStage,
     uploadProgress,
     jobId,
-    jobStatus,
     downloadUrl,
     error,
-    connectionStatus, // NEW — expose to the page for UI feedback
+    courseId,
+    courseName,
   };
 };
 
