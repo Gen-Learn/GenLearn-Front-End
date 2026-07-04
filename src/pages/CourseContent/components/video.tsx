@@ -17,9 +17,9 @@ type VideoPlayerProps = {
 export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerRef = useRef<any>(null);
-  const blobUrlRef = useRef<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [vUrl, setVideoUrl] = useState<string | null>(null);
 
   // Effect 1: Initialize Video.js ONCE on mount, never recreate it
   useEffect(() => {
@@ -41,10 +41,6 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
       if (playerRef.current && !playerRef.current.isDisposed()) {
         playerRef.current.dispose();
         playerRef.current = null;
-      }
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-        blobUrlRef.current = null;
       }
     };
   }, []); // <-- empty deps: runs once
@@ -69,21 +65,15 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
         playerRef.current.pause();
         playerRef.current.src([]);
 
-        // Revoke previous blob URL
-        if (blobUrlRef.current) {
-          URL.revokeObjectURL(blobUrlRef.current);
-          blobUrlRef.current = null;
-        }
 
-        const videoUrl = `${domain}/api/v1/lectures/${lectureId}/stream`;
-        const response = await axiosInstance.get(videoUrl, {
-          responseType: "blob",
-          signal: controller.signal,
-        });
+        const videoUrl = `${domain}/api/v1/lectures/${lectureId}/stream-url`;
+        const response = await axiosInstance.get(videoUrl);
+        const data= JSON.parse(JSON.stringify(response.data));
+        
+        setVideoUrl(data.url);
 
-        const url = URL.createObjectURL(response.data);
         playerRef.current.src({
-          src: url,
+          src: vUrl,
           type: "video/mp4",
         });
       } catch (err: any) {
@@ -101,7 +91,7 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
     return () => {
       controller.abort();
     };
-  }, [lectureId]);
+  }, [lectureId ,vUrl]);
 
   return (
     <div className="relative">

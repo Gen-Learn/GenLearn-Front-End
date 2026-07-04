@@ -222,7 +222,7 @@ export default function CourseContent() {
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    {formatDuration(typeof selectedLecture?.duration === "number" ? selectedLecture.duration : Number(selectedLecture?.duration) || 0)}
+                    {formatDuration(typeof selectedLecture?.durationInMinutes === "number" ? selectedLecture.durationInMinutes : Number(selectedLecture?.durationInMinutes) || 0)}
                   </span>
                   <Badge variant={selectedLecture?.completed ? "success" : "gray"}>
                     {selectedLecture?.completed ? "Completed" : "In Progress"}

@@ -4,6 +4,7 @@ import { Button, Card } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
 import { Section  } from "@/types/coursesModel"
 import { EmptyState } from '@/components/empty-states';
+import { formatDuration } from '../utils/formatDuration';
 export type CourseSection = Section;
 
 type Props = {
@@ -96,7 +97,7 @@ export default function CourseContentAccordion({ sections , courseId }: Props) {
                 <div className="border-t border-gray-100 bg-gray-50/50">
                   {section.lectures.map((lecture) => {
                     const lectureTitle = lecture.title || lecture.name || 'Untitled Lecture';
-                    const lectureDuration = lecture.duration || '0m';
+                    const lectureDuration = formatDuration(typeof lecture?.durationInMinutes === "number" ? lecture.durationInMinutes : Number(lecture?.durationInMinutes) || 0) || '0m';
                     const isCompleted = lecture.completed ?? false;
 
                     return (

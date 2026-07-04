@@ -31,6 +31,7 @@ export interface Lecture {
   url: string;
   duration?: string;
   completed?: boolean;
+  durationInMinutes?: number;
   scripts: Script[];
   quizzes?: QuizReference[];
 }

@@ -3,6 +3,7 @@ import { ArrowLeft, Award, CheckCircle2, ChevronDown, Circle, Film } from "lucid
 import { Badge, LinearProgress } from "@/components/ui";
 import { Lecture, Section } from "@/types/coursesModel";
 import Course from "@/types/coursesModel";
+import {formatDuration} from "../utils/formatDuration";
 type SelectedItem =
   | { type: "lecture"; id: string | null }
   | { type: "lectureQuiz"; id: string | null }
@@ -105,7 +106,7 @@ export default function CourseSidebar({
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{lecture.name}</p>
-                          <p className="text-xs text-gray-500">{lecture.duration ? lecture.duration : "00:00"}</p>
+                          <p className="text-xs text-gray-500">{formatDuration(typeof lecture?.durationInMinutes === "number" ? lecture.durationInMinutes : Number(lecture?.durationInMinutes) || 0)}</p>
                         </div>
                         <Film className={`w-4 h-4 ${isCurrent ? "text-primary-400" : "text-gray-300"}`} />
                       </button>

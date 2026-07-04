@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Link } from 'react-router-dom';
-
+import {useGetSingleCource} from "@/hooks/useGetSingleCource"
 type OnCompleteProps = {
   courseName?: string;
   courseId?: string;
@@ -13,6 +13,8 @@ type OnCompleteProps = {
   resetUpload: () => void;
 };
 export default function OnComplete({ courseName, courseId, downloadUrl, resetUpload }: OnCompleteProps) {
+  const { course } = useGetSingleCource(courseId || '');
+
   return (
     <div className="max-w-2xl mx-auto text-center">
             <div className="mb-8 relative inline-block">
@@ -58,7 +60,7 @@ export default function OnComplete({ courseName, courseId, downloadUrl, resetUpl
                     </Button>
                   </Link>
                 ) : (
-                  <Link to={`/course/${courseId}`} data-nav="course">
+                  <Link to={`/course/${courseId}/section/${course?.sections?.[0]?.id}/lecture/${course?.sections?.[0]?.lectures?.[0]?.id}`} data-nav="course">
                     <Button size="sm">
                       Start Course <ChevronRight className="w-4 h-4" />
                     </Button>
