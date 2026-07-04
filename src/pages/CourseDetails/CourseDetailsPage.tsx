@@ -1,10 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { useGetSingleCource } from '../../hooks/useGetSingleCource';
-import { Header,CourseHeroCard ,CourseContentAccordion} from './components/index';
+import { CourseHeroCard ,CourseContentAccordion} from './components/index';
 import { FullPageLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
-
+import {Header } from '@/layout/index';
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { course, loading, error } = useGetSingleCource(id || '');

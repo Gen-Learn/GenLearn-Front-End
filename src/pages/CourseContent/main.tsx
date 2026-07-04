@@ -8,7 +8,7 @@ import { CourseSidebar, ContentPlayerArea, LectureTabs} from "./components";
 import { Award, ChevronRight, Clock, BookOpen, Menu, X } from "lucide-react";
 import { FullPageLoader } from "@/components/loading";
 import { EmptyState } from "@/components/empty-states";
-
+import { Footer } from "@/layout//index";
 type TabKey = "transcript" | "notes" | "materials";
 
 type SelectedItem =
@@ -228,7 +228,7 @@ export default function CourseContent() {
                     {selectedLecture?.completed ? "Completed" : "In Progress"}
                   </Badge>
                 </div>
-                {!selectedLecture?.completed && !showQuiz && (
+                {!selectedLecture?.completed && !showQuiz && selectedLecture?.quizzes?.[0]?.id && (
                   <Button
                     variant="secondary"
                     size="sm"

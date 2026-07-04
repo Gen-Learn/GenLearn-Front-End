@@ -29,7 +29,7 @@ export default function CourseHeroCard({ course}: Props) {
   const courseProgress = course.progress ?? 0;
   const numsOfSections = course.sections.length ;
   const totalLectures = course.sections.reduce((acc,section)=>{
-    if(section.lectures) acc++;
+    if(section.lectures) acc= acc + section.lectures.length;
     return acc;
   },0)
   const totalQuizzes =   numsOfSections + totalLectures;

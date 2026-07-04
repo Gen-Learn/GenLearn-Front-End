@@ -1,4 +1,4 @@
-export { default as Header } from '@/layout/Header';
+export { default as Header } from '@/layout/mainHeader';
 export { default as Hero } from './Hero';
 export { default as TrustedBy } from './TrustedBy';
 export { default as HowItWorks } from './HowItWorks';

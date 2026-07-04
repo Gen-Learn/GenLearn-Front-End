@@ -21,7 +21,7 @@ const handleGenerate = () => {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { addNotification } = useNotification();
+  const { addNotification, setCourseID } = useNotification();
 
   const getErrorMessage = (err: unknown) => {
     if (err instanceof Error) return err.message;
@@ -41,6 +41,7 @@ const handleGenerate = () => {
       }
       setCourseId(payload?.courseId || null);
       setCourseName(payload?.courseName || null);
+      setCourseID(payload?.courseId || null);
       addNotification({
         title: 'Generation complete',
         message: 'Your course generation is finished and ready to download.',

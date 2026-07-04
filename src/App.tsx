@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route,Outlet, useLocation } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
-import {Header ,Footer} from "@/layout/index";
+import {MainHeader ,Footer} from "@/layout/index";
 import AIChatbot from "./components/AIChat/Chat";
 import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login, VerifyEmail, Onboarding } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
@@ -8,7 +8,7 @@ import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './
 const Layout = () => {
   return (
     <div>
-      <Header />
+      <MainHeader />
       <Outlet />
       <Footer />
     </div>

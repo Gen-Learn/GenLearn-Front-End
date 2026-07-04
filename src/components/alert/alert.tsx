@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useGetSingleCource } from "@/hooks/useGetSingleCource"
 type Notification = {
   id: string;
   title: string;
@@ -13,6 +14,7 @@ type Props = {
   notifications: Notification[];
   onMarkAllRead?: () => void;
   onViewAll?: () => void;
+  courseID: string | null;
 };
 
 const iconMap: Record<
@@ -49,9 +51,9 @@ const BellIcon = () => (
   </svg>
 );
 
-export default function NotificationPanel({ notifications, onMarkAllRead, onViewAll }: Props) {
+export default function NotificationPanel({ notifications, onMarkAllRead, onViewAll, courseID }: Props) {
   const [items, setItems] = useState<Notification[]>(notifications);
-
+  const { course } = useGetSingleCource(courseID || '');
   const unreadCount = items.filter((n) => !n.read).length;
 
   const handleMarkAllRead = () => {
@@ -106,7 +108,7 @@ export default function NotificationPanel({ notifications, onMarkAllRead, onView
             const { icon, bgClass, textClass } = iconMap[notification.type ?? "social"];
             return (
               <Link
-              to ="/courses"
+             to={`/course/${courseID}/section/${course?.sections[0].id}/lecture/${course?.sections[0].lectures[0].id}`}
                 key={notification.id}
                 role="button"
                 tabIndex={0}

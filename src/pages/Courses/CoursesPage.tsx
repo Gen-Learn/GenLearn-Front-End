@@ -8,7 +8,8 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
-import { CourseListItem, CourseCard, Header } from "./components/index";
+import { CourseListItem, CourseCard } from "./components/index";
+import { Header } from '@/layout/index';
 import { useGetAllCourses } from "@/hooks/useGetAllCources";
 import { useGetSingleCource } from '@/hooks/useGetSingleCource';
 import Course from '@/types/coursesModel';

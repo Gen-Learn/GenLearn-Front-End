@@ -18,16 +18,18 @@ type Notification = {
 interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
+  courseID: string | null;
   addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void;
   markAllRead: () => void;
   clearNotifications: () => void;
+  setCourseID: (courseId: string | null) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-
+  const [courseID, setCourseID] = useState<string | null>(null);
   const unreadCount = useMemo(
     () => notifications.filter((notification) => !notification.read).length,
     [notifications]
@@ -58,9 +60,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       value={{
         notifications,
         unreadCount,
+        courseID,
         addNotification,
         markAllRead,
         clearNotifications,
+        setCourseID
       }}
     >
       {children}
