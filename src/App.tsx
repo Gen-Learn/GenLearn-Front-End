@@ -43,7 +43,7 @@ function AppContent() {
 
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/course/:id" element={<CourseContent />} />
+          <Route path="/course/:courseId/section/:sectionId/lecture/:lectureId" element={<CourseContent />} />
           <Route path="/course-details/:id" element={<CourseDetails />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />

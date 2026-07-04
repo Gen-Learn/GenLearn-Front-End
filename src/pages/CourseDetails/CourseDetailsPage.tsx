@@ -36,7 +36,7 @@ export default function CourseDetailsPage() {
         {!loading && course && (
           <>
             <CourseHeroCard course={course} />
-            <CourseContentAccordion sections={course.sections || []} id={course.id} />
+            <CourseContentAccordion sections={course.sections || []} courseId={course.id} />
           </>
         )}
       </main>

@@ -95,7 +95,7 @@ export default function CourseHeroCard({ course}: Props) {
             />
           </div>
 
-          <Link to={`/course/${course.id}`} data-nav="lecture">
+          <Link to={`/course/${course?.id}/section/${course?.sections?.[0]?.id}/lecture/${course?.sections?.[0]?.lectures?.[0]?.id}`} data-nav="lecture">
             <Button size="lg" className="w-full sm:w-auto">
               <Play className="w-5 h-5" />
               {status === 'not_started' ? 'Start Course' : 'Continue Learning'}

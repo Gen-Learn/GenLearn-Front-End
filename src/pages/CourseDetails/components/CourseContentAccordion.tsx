@@ -8,10 +8,10 @@ export type CourseSection = Section;
 
 type Props = {
   sections: Section[];
-  id:string;
+  courseId:string;
 };
 
-export default function CourseContentAccordion({ sections , id }: Props) {
+export default function CourseContentAccordion({ sections , courseId }: Props) {
   const [expandedSections, setExpandedSections] = useState<string[]>(
     sections[0] ? [sections[0].id] : []
   );
@@ -119,7 +119,7 @@ export default function CourseContentAccordion({ sections , id }: Props) {
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="text-xs text-gray-500">{lectureDuration}</span>
-                          <Link to={`/course/${id}`} data-nav="lecture">
+                          <Link to={`/course/${courseId}/section/${section.id}/lecture/${lecture.id}`} data-nav="lecture">
                             <Button variant="ghost" size="sm" className="text-xs px-2! py-1!">
                               {isCompleted ? 'Rewatch' : 'Watch'}
                             </Button>

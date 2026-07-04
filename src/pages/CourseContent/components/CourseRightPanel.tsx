@@ -1,4 +1,4 @@
-import { Award, Circle } from "lucide-react";
+import { Circle } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import { Lecture, Section } from "@/types/coursesModel";
 

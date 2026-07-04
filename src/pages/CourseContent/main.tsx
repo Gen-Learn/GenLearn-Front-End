@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Button, Badge, Card, LinearProgress } from "@/components/ui";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button, Badge } from "@/components/ui";
 import { useGetSingleCource } from "../../hooks/useGetSingleCource";
 import { Lecture } from "@/types/coursesModel";
 import { formatDuration } from "./utils/formatDuration";
-import { CourseSidebar, ContentPlayerArea, LectureTabs, CourseRightPanel } from "./components";
+import { CourseSidebar, ContentPlayerArea, LectureTabs} from "./components";
 import { Award, ChevronRight, Clock, BookOpen, Menu, X } from "lucide-react";
 import { FullPageLoader } from "@/components/loading";
 import { EmptyState } from "@/components/empty-states";
@@ -18,9 +18,8 @@ type SelectedItem =
   | null;
 
 export default function CourseContent() {
-  const { id: CourceId } = useParams<{ id: string }>();
-  const courseId = CourceId || "";
-  const { course, loading, error } = useGetSingleCource(courseId);
+  const { courseId, sectionId, lectureId } = useParams<{ courseId: string; sectionId: string; lectureId: string }>();
+  const { course, loading, error } = useGetSingleCource(courseId ?? "");
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
@@ -31,20 +30,37 @@ export default function CourseContent() {
 
   // Sidebar is an overlay drawer below `lg`, static column at `lg` and up.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
-    if (!course) return;
+  if (!course) return;
 
-    setExpandedSections(course.sections.map((section) => section.id));
+  setExpandedSections(course.sections.map((section) => section.id));
 
-    if (!selectedLecture) {
-      const firstLecture = course.sections?.[0]?.lectures?.[0] ?? null;
-      setSelectedLecture(firstLecture);
-      if (firstLecture) {
-        setSelectedItem({ type: "lecture", id: firstLecture.id });
-      }
+  // Try to resolve the lecture from the URL param first
+  if (lectureId) {
+    const matchedLecture = course.sections
+      .flatMap((section) => section.lectures)
+      .find((lecture) => lecture.id === lectureId);
+
+    if (matchedLecture && matchedLecture.id !== selectedLecture?.id) {
+      setSelectedLecture(matchedLecture);
+      setSelectedItem({ type: "lecture", id: matchedLecture.id });
+      setQuizId(null);
+      setShowQuiz(false);
+      setActiveTab("transcript");
+      return;
     }
-  }, [course, selectedLecture]);
+  }
+
+  // Fallback: no valid lectureId in the URL, select the first lecture
+  if (!selectedLecture) {
+    const firstLecture = course.sections?.[0]?.lectures?.[0] ?? null;
+    setSelectedLecture(firstLecture);
+    if (firstLecture) {
+      setSelectedItem({ type: "lecture", id: firstLecture.id });
+    }
+  }
+}, [course, lectureId]);
 
   useEffect(() => {
     setShowQuiz(Boolean(quizId));
@@ -64,14 +80,14 @@ export default function CourseContent() {
   };
 
   const handleSelectLecture = (lecture: Lecture) => {
-    setSelectedLecture(lecture);
-    setQuizId(null);
-    setShowQuiz(false);
-    setActiveTab("transcript");
-    setSelectedItem({ type: "lecture", id: lecture.id });
-    // Close the drawer on mobile once a lecture is picked, so the video is visible.
-    setIsSidebarOpen(false);
-  };
+  setSelectedLecture(lecture);
+  setQuizId(null);
+  setShowQuiz(false);
+  setActiveTab("transcript");
+  setSelectedItem({ type: "lecture", id: lecture.id });
+  setIsSidebarOpen(false);
+  navigate(`/course/${course?.id}/section/${currentSection?.id}/lecture/${lecture.id}`, { replace: true });
+};
 
   const handleSelectLectureQuiz = (quizIdValue: string, lectureId: string) => {
     const lecture = course?.sections
