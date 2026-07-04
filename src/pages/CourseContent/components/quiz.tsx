@@ -89,7 +89,10 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
   }
 
   return (
-    <div className="rounded-2xl border border-purple-100 bg-linear-to-br from-purple-50 via-white to-violet-50 p-5 sm:p-6">
+    // max-h + overflow-y-auto: the quiz can be taller than the video-sized
+    // container it's swapped into, this lets it scroll internally instead
+    // of clipping or forcing the whole page layout to stretch.
+    <div className="rounded-2xl border border-purple-100 bg-linear-to-br from-purple-50 via-white to-violet-50 p-4 sm:p-6 max-h-[75vh] sm:max-h-[640px] overflow-y-auto">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">
@@ -103,7 +106,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
         {onBackToVideo && (
           <button
             onClick={onBackToVideo}
-            className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white px-3 py-2 text-sm font-medium text-purple-700 transition hover:bg-purple-100"
+            className="inline-flex items-center gap-2 self-start rounded-full border border-purple-200 bg-white px-3 py-2 text-sm font-medium text-purple-700 transition hover:bg-purple-100 sm:self-auto"
           >
             <FaArrowLeft />
             Back to video
@@ -112,7 +115,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
       </div>
 
       {loading && (
-        <div className="flex min-h-55 items-center justify-center rounded-xl bg-white/70">
+        <div className="flex min-h-[220px] sm:min-h-[280px] items-center justify-center rounded-xl bg-white/70">
           <QuizLoadingSkeleton />
         </div>
       )}
@@ -130,11 +133,11 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
       )}
 
       {!loading && !error && quiz && view === "prompt" && latestAttempt && (
-        <div className="rounded-2xl border border-purple-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-purple-200 bg-white p-4 sm:p-5 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">
             Previous attempt found
           </p>
-          <h4 className="mt-2 text-lg font-semibold text-gray-900">
+          <h4 className="mt-2 text-base sm:text-lg font-semibold text-gray-900 break-words">
             Your latest score: {latestAttempt.score}/{latestAttempt.totalQuestions} ({latestAttempt.percentage}%)
           </h4>
           <p className="mt-2 text-sm text-gray-600">
@@ -160,7 +163,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
 
       {!loading && !error && quiz && view === "quiz" && (
         <>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-purple-100 bg-white/80 px-4 py-3 text-sm text-gray-600">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3 rounded-xl border border-purple-100 bg-white/80 px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">
             <span>{quiz.questions.length} questions</span>
             <span>{answeredCount} answered</span>
             <span>
@@ -170,8 +173,8 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
 
           {currentQuestion && (
             <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-gray-800">
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <p className="text-sm font-semibold text-gray-800 break-words">
                   {currentQuestionIndex + 1}. {currentQuestion.question}
                 </p>
               </div>
@@ -183,19 +186,18 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
                     <button
                       key={option.id}
                       onClick={() => handleSelectAnswerWithReset(currentQuestion.id, option.id)}
-                      className={`flex w-full items-center justify-start rounded-xl border px-3 py-3 text-left text-sm transition ${
+                      className={`flex w-full items-start gap-2 rounded-xl border px-3 py-3 text-left text-sm transition ${
                         isSelected
                           ? "border-purple-500 bg-purple-50 text-purple-800"
                           : "border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/70"
                       }`}
                     >
-                        {isSelected ? (
-                        <span className="mr-2 mt-0.5 h-2.5 w-2.5 rounded-full border border-current bg-current" />
-                      ) : (
-                        <span className="mr-2 mt-0.5 h-2.5 w-2.5 rounded-full border border-current " />
-                      )}
-                      
-                      <span>{option.optionText}</span>
+                      <span
+                        className={`mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full border border-current ${
+                          isSelected ? "bg-current" : ""
+                        }`}
+                      />
+                      <span className="break-words">{option.optionText}</span>
                     </button>
                   );
                 })}
@@ -204,7 +206,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
           )}
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
@@ -246,13 +248,13 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
       )}
 
       {!loading && !error && quiz && view === "review" && latestAttempt && currentReviewAnswer && (
-        <div className="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-emerald-200 bg-white p-4 sm:p-5 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">
                 Review your submission
               </p>
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-900">
                 Score: {latestAttempt.score}/{latestAttempt.totalQuestions}
               </h4>
             </div>
@@ -261,21 +263,21 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
             </div>
           </div>
 
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs sm:text-sm text-gray-600">
             <span>Question {reviewAnswerIndex + 1} of {latestAttempt.answers.length}</span>
             <span>Attempt {latestAttempt.attemptNumber}</span>
           </div>
 
           <div className="rounded-xl border border-gray-200 p-4">
-            <p className="text-sm font-semibold text-gray-800">{currentReviewAnswer.question}</p>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="text-sm font-semibold text-gray-800 break-words">{currentReviewAnswer.question}</p>
+            <p className="mt-2 text-sm text-gray-600 break-words">
               Your answer: {currentReviewAnswer.selectedOptionText || "Not answered"}
             </p>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-600 break-words">
               Correct answer: {currentReviewAnswer.correctOption?.optionText || "Not available"}
             </p>
             {currentReviewAnswer.explanation && (
-              <p className="mt-3 text-sm text-purple-700">{currentReviewAnswer.explanation}</p>
+              <p className="mt-3 text-sm text-purple-700 break-words">{currentReviewAnswer.explanation}</p>
             )}
             <p className={`mt-3 text-sm font-medium ${currentReviewAnswer.isCorrect ? "text-emerald-600" : "text-red-600"}`}>
               {currentReviewAnswer.isCorrect ? "Correct" : "Incorrect"}
@@ -283,7 +285,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
           </div>
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={goToPreviousReviewAnswer}
                 disabled={reviewAnswerIndex === 0}

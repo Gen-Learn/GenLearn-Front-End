@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card } from "@/components/ui";
 import { Lecture } from "@/types/coursesModel";
 import VideoPlayer from "./video";
@@ -28,40 +27,43 @@ export default function ContentPlayerArea({
   loading,
   error,
 }: Props) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
 
   return (
-    <div className="relative bg-black aspect-video  overflow-hidden">
-      {!loading && !error && selectedLecture && !showQuiz ? (
-        <VideoPlayer lectureId={selectedLecture.id} courseId={courseId} onEnded={onVideoEnded} />
-      ) : null}
+    <>
+      {/* Video box: aspect-ratio + overflow-hidden only apply here, so the
+          quiz below is never boxed into a 16:9 shape. */}
+      <div className="relative bg-black aspect-video overflow-hidden">
+        {!loading && !error && selectedLecture && !showQuiz ? (
+          <VideoPlayer lectureId={selectedLecture.id} courseId={courseId} onEnded={onVideoEnded} />
+        ) : null}
 
-      {loading ? (
-        <div className="absolute inset-0 z-10 bg-black/90 flex items-center justify-center p-8">
-          <VideoPlayerSkeleton />
-        </div>
-      ) : null}
+        {loading ? (
+          <div className="absolute inset-0 z-10 bg-black/90 flex items-center justify-center p-8">
+            <VideoPlayerSkeleton />
+          </div>
+        ) : null}
 
-      {error && !loading ? (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
-          <EmptyState
-            title="Video load failed"
-            description={error}
-            icon={BookOpen}
-          />
-        </div>
-      ) : null}
+        {error && !loading ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
+            <EmptyState
+              title="Video load failed"
+              description={error}
+              icon={BookOpen}
+            />
+          </div>
+        ) : null}
+      </div>
 
       {!loading && !error && selectedLecture && showQuiz ? (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-8">
-          <Card className="max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 z-40  flex items-center justify-center p-4 sm:p-8">
+          <div className="fixed w-full h-full bg-black/80 backdrop-blur-sm" onClick={onCloseQuiz}></div>
+          <Card className="w-full max-w-2xl max-h-[85vh] overflow-y-auto z-50">
+            <div className="p-4 sm:p-6">
               <QuizSection quizId={quizId} onBackToVideo={onCloseQuiz} />
             </div>
           </Card>
         </div>
       ) : null}
-    </div>
+    </>
   );
 }

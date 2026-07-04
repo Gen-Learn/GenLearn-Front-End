@@ -5,7 +5,7 @@ import { useGetSingleCource } from "../../hooks/useGetSingleCource";
 import { Lecture } from "@/types/coursesModel";
 import { formatDuration } from "./utils/formatDuration";
 import { CourseSidebar, ContentPlayerArea, LectureTabs, CourseRightPanel } from "./components";
-import { Award, ChevronRight, Clock, BookOpen } from "lucide-react";
+import { Award, ChevronRight, Clock, BookOpen, Menu, X } from "lucide-react";
 import { FullPageLoader } from "@/components/loading";
 import { EmptyState } from "@/components/empty-states";
 
@@ -28,6 +28,9 @@ export default function CourseContent() {
   const [showQuiz, setShowQuiz] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("transcript");
   const [notesByLecture, setNotesByLecture] = useState<Record<string, string>>({});
+
+  // Sidebar is an overlay drawer below `lg`, static column at `lg` and up.
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!course) return;
@@ -66,6 +69,8 @@ export default function CourseContent() {
     setShowQuiz(false);
     setActiveTab("transcript");
     setSelectedItem({ type: "lecture", id: lecture.id });
+    // Close the drawer on mobile once a lecture is picked, so the video is visible.
+    setIsSidebarOpen(false);
   };
 
   const handleSelectLectureQuiz = (quizIdValue: string, lectureId: string) => {
@@ -79,11 +84,13 @@ export default function CourseContent() {
     }
 
     setQuizId(quizIdValue);
+    setIsSidebarOpen(false);
   };
 
   const handleSelectSectionQuiz = (sectionQuizId: string, sectionId: string) => {
     setSelectedItem({ type: "sectionQuiz", id: sectionId });
     setQuizId(sectionQuizId);
+    setIsSidebarOpen(false);
   };
 
   const handleCloseQuiz = () => {
@@ -124,19 +131,50 @@ export default function CourseContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFC] flex">
-      <CourseSidebar
-        course={course}
-        currentLectureId={selectedLecture?.id ?? ""}
-        expandedSections={expandedSections}
-        selectedItem={selectedItem}
-        onToggleSection={handleToggleSection}
-        onSelectLecture={handleSelectLecture}
-        onSelectLectureQuiz={handleSelectLectureQuiz}
-        onSelectSectionQuiz={handleSelectSectionQuiz}
-      />
+    <div className="min-h-screen bg-[#FAFAFC] flex flex-col lg:flex-row relative">
+      {/* Mobile top bar: sidebar toggle */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-30">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="flex items-center gap-2 text-sm font-medium text-gray-700"
+        >
+          <Menu className="w-5 h-5" />
+          Course Content
+        </button>
+      </div>
 
-      <main className="flex-1 flex flex-col">
+      {/* Sidebar: overlay drawer on mobile/tablet, static column on lg+ */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] transform transition-transform duration-300 lg:static lg:z-auto lg:w-auto lg:max-w-none lg:transform-none lg:flex-shrink-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
+        <div className="h-full flex flex-col bg-white">
+          <div className="lg:hidden flex items-center justify-end p-3 border-b border-gray-100">
+            <button onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+          <CourseSidebar
+            course={course}
+            currentLectureId={selectedLecture?.id ?? ""}
+            expandedSections={expandedSections}
+            selectedItem={selectedItem}
+            onToggleSection={handleToggleSection}
+            onSelectLecture={handleSelectLecture}
+            onSelectLectureQuiz={handleSelectLectureQuiz}
+            onSelectSectionQuiz={handleSelectSectionQuiz}
+          />
+        </div>
+      </div>
+
+      <main className="flex-1 flex flex-col min-w-0">
         <ContentPlayerArea
           courseId={courseId}
           selectedLecture={selectedLecture}
@@ -153,16 +191,18 @@ export default function CourseContent() {
           error={error}
         />
 
-        <div className="flex-1 flex">
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 bg-white">
+        <div className="flex-1 flex flex-col xl:flex-row">
+          <div className="flex-1 min-w-0 overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-100 bg-white">
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                <span>{currentSection?.title ?? currentSection?.name ?? "Section"}</span>
-                <ChevronRight className="w-4 h-4" />
+                <span className="truncate">{currentSection?.title ?? currentSection?.name ?? "Section"}</span>
+                <ChevronRight className="w-4 h-4 flex-shrink-0" />
                 <span>Lecture</span>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{selectedLecture?.title ?? selectedLecture?.name ?? "Select a lecture"}</h1>
-              <div className="flex items-center gap-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 break-words">
+                {selectedLecture?.title ?? selectedLecture?.name ?? "Select a lecture"}
+              </h1>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
@@ -199,22 +239,6 @@ export default function CourseContent() {
               onSaveNotes={handleSaveNotes}
             />
           </div>
-
-          <CourseRightPanel
-            selectedLecture={selectedLecture}
-            currentSection={currentSection}
-            onTakeLectureQuiz={() => {
-              if (!selectedLecture?.quizzes?.[0]?.id) return;
-              setQuizId(selectedLecture.quizzes[0].id);
-              setSelectedItem({ type: "lectureQuiz", id: selectedLecture.id });
-            }}
-            onStartSectionQuiz={() => {
-              if (!currentSection?.quizzes?.[0]?.id) return;
-              setQuizId(currentSection.quizzes[0].id);
-              setSelectedItem({ type: "sectionQuiz", id: currentSection.id });
-            }}
-            isQuizActive={Boolean(quizId)}
-          />
         </div>
       </main>
     </div>
