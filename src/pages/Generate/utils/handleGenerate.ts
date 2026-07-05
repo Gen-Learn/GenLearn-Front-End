@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { submitGenerateJob, buildGeneratedFileUrl } from '@/services/generateService';
 import { useNotification } from '@/contexts/NotificationContext';
-import { useGenerationSocket, type SocketStatus } from '../hooks/useGenerationSocket';
+import { useGenerationSocket, type SocketStatus } from '@/hooks/useGenerationSocket';
 
 // Local phase before a jobId exists — the socket hook takes over
 // (and drives `processingStage`) as soon as a jobId is assigned.

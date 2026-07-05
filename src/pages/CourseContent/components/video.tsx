@@ -19,7 +19,6 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
   const playerRef = useRef<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [vUrl, setVideoUrl] = useState<string | null>(null);
 
   // Effect 1: Initialize Video.js ONCE on mount, never recreate it
   useEffect(() => {
@@ -34,6 +33,23 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
 
     playerRef.current.on("ended", () => {
       onEnded?.();
+    });
+
+    // A new load starting means any previous error is now stale — clear it
+    // so the overlay doesn't linger once a real source starts loading.
+    playerRef.current.on("loadstart", () => {
+      setError(null);
+    });
+
+    playerRef.current.on("error", () => {
+      const mediaError = playerRef.current?.error();
+      console.error("Video.js media error:", mediaError);
+      setError(
+        mediaError?.code === 4
+          ? "The video URL returned an invalid or inaccessible file."
+          : "Failed to load video. Please try again."
+      );
+      setLoading(false);
     });
 
     // Cleanup only on full component unmount
@@ -61,25 +77,29 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
         setLoading(true);
         setError(null);
 
-        // Pause and clear current source while loading
-        playerRef.current.pause();
-        playerRef.current.src([]);
-
-
         const videoUrl = `${domain}/api/v1/lectures/${lectureId}/stream-url`;
-        const response = await axiosInstance.get(videoUrl);
-        const data= JSON.parse(JSON.stringify(response.data));
-        
-        setVideoUrl(data.url);
+        const response = await axiosInstance.get(videoUrl, {
+          signal: controller.signal,
+        });
+        const data = response.data;
 
-        playerRef.current.src({
-          src: vUrl,
-          type: "video/mp4",
+        if (!data?.url) {
+          throw new Error("Stream URL missing from response.");
+        }
+
+        // No need to pause()/src([]) first — Video.js swaps sources cleanly
+        // on its own, and clearing with an empty array was firing a false
+        // "no compatible source" error before the real URL even loaded.
+        playerRef.current.ready(() => {
+          playerRef.current.src({
+            src: data.url,
+            type: "video/mp4",
+          });
         });
       } catch (err: any) {
         if (err.name === "CanceledError" || err.name === "AbortError") return;
         console.error("Failed to fetch video:", err);
-        setError("Failed to load video. Please try again.");
+        setError(err.message || "Failed to load video. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -87,27 +107,23 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
 
     fetchVideo();
 
-    // Cancel in-flight request if lectureId changes mid-fetch
     return () => {
       controller.abort();
     };
-  }, [lectureId ,vUrl]);
+  }, [lectureId]);
 
   return (
     <div className="relative">
-      {/* Always keep this mounted — Video.js owns this node */}
       <div data-vjs-player>
         <video ref={videoRef} className="video-js vjs-big-play-centered" />
       </div>
 
-      {/* Loading overlay — sits on top, doesn't touch the video node */}
       {loading && (
         <div className="absolute inset-0 bg-black/75 flex items-center justify-center z-10">
           <InlineLoader className="text-white" />
         </div>
       )}
 
-      {/* Error overlay */}
       {error && !loading && (
         <div className="absolute inset-0 bg-black flex items-center justify-center z-10 p-6">
           <EmptyState

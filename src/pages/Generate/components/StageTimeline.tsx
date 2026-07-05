@@ -5,8 +5,9 @@ import {
   Sparkles,
   CheckCircle2,
   Loader2,
+  Video,
+  FileQuestion,
 } from 'lucide-react';
-
 type ProcessingStage =
   | 'idle'
   | 'connecting'
@@ -14,9 +15,11 @@ type ProcessingStage =
   | 'reconnecting'
   | 'error'
   | 'completed'
-  | 'rendering'
-  | 'generating'
   | 'extracting'
+  | 'structuring'
+  | 'generating_videos'
+  | 'generating_quizzes'
+  | 'finalizing'
   | 'uploading';
 
 type Stage = {
@@ -34,8 +37,10 @@ interface StageInfo {
 const stages: StageInfo[] = [
   { id: 'uploading', label: 'Uploading', description: 'Securing your document...', icon: UploadIcon },
   { id: 'extracting', label: 'Extracting Content', description: 'AI is reading your document...', icon: FileText },
-  { id: 'generating', label: 'Generating Structure', description: 'Building course outline...', icon: Brain },
-  { id: 'rendering', label: 'Rendering Content', description: 'Creating final course materials...', icon: Sparkles },
+  { id: 'structuring', label: 'Generating Structure', description: 'Building course outline...', icon: Brain },
+  { id: 'generating_videos', label: 'Creating Videos', description: 'AI is generating video lectures...', icon: Video },
+  { id: 'generating_quizzes', label: 'Generating Quizzes', description: 'Creating intelligent quizzes...', icon: FileQuestion },
+  { id: 'finalizing', label: 'Finalizing Course', description: 'Putting everything together...', icon: Sparkles },
   { id: 'completed', label: 'Complete', description: 'Your course is ready!', icon: CheckCircle2 },
 ];
 

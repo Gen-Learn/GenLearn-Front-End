@@ -15,14 +15,23 @@ export type SocketStatus =
   | 'reconnecting'
   | 'error'
   | 'extracting'
-  | 'generating'
-  | 'rendering'
+  | 'structuring'
+  | 'generating_videos'
+  | 'generating_quizzes'
+  | 'finalizing'
   | 'completed';
 
+// Maps the backend's actual `jobStatusUpdated` status strings to our UI stages.
+// Confirmed from live socket payloads: extracting -> generation -> creating -> finalizing -> (jobCompleted event)
+// NOTE: the backend only emits one "creating" status covering both video and
+// quiz generation — there's no distinct signal for `generating_quizzes` yet.
+// It's mapped to `generating_videos` here so the timeline still advances;
+// `generating_quizzes` will be skipped until the backend adds a separate status.
 const JOB_STATUS_TO_STAGE: Record<string, SocketStatus> = {
   extracting: 'extracting',
-  generating: 'generating',
-  rendering: 'rendering',
+  generation: 'structuring',
+  creating: 'generating_videos',
+  finalizing: 'finalizing',
 };
 
 interface UseGenerationSocketArgs {
@@ -64,7 +73,12 @@ export function useGenerationSocket({
       },
       jobStatusUpdated: (payload) => {
         const jobStatus = payload.status?.toLowerCase() ?? '';
-        setStatus(JOB_STATUS_TO_STAGE[jobStatus] ?? 'generating');
+        console.log('[Socket] Job status updated:', jobStatus, payload);
+        // Guard against the "completed" status string that can arrive on the
+        // last jobStatusUpdated tick before the dedicated jobCompleted event —
+        // we let the jobCompleted handler below own that transition instead.
+        if (jobStatus === 'completed') return;
+        setStatus(JOB_STATUS_TO_STAGE[jobStatus] ?? 'structuring');
         callbacksRef.current.onStatusUpdate?.(payload);
       },
       onCompleted: (payload) => {

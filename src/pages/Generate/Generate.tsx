@@ -6,6 +6,8 @@ import {
   Sparkles,
   CheckCircle2,
   Loader2,
+  Video,
+  FileQuestion,
 } from 'lucide-react';
 import { Card } from '@/components/ui';
 import handleGenerate from './utils/handleGenerate';
@@ -18,9 +20,11 @@ type ProcessingStage =
   | 'reconnecting'
   | 'error'
   | 'completed'
-  | 'rendering'
-  | 'generating'
   | 'extracting'
+  | 'structuring'
+  | 'generating_videos'
+  | 'generating_quizzes'
+  | 'finalizing'
   | 'uploading';
 
 interface StageInfo {
@@ -30,12 +34,19 @@ interface StageInfo {
   icon: typeof UploadIcon;
 }
 
-// Ordered to match the backend's actual job lifecycle.
+// Ordered to match the backend's actual job lifecycle:
+// uploading -> extracting -> structuring -> generating_videos -> generating_quizzes -> finalizing -> completed
+// NOTE: the backend currently only emits ONE "creating" status for both video
+// and quiz generation, so `generating_quizzes` won't be reached by real socket
+// data yet — see useGenerationSocket.ts. Kept as a separate stage here in case
+// the backend splits the status later; otherwise consider collapsing these two.
 const stages: StageInfo[] = [
   { id: 'uploading', label: 'Uploading', description: 'Securing your document...', icon: UploadIcon },
   { id: 'extracting', label: 'Extracting Content', description: 'AI is reading your document...', icon: FileText },
-  { id: 'generating', label: 'Generating Structure', description: 'Building course outline...', icon: Brain },
-  { id: 'rendering', label: 'Rendering Content', description: 'Creating final course materials...', icon: Sparkles },
+  { id: 'structuring', label: 'Generating Structure', description: 'Building course outline...', icon: Brain },
+  { id: 'generating_videos', label: 'Creating Videos', description: 'AI is generating video lectures...', icon: Video },
+  { id: 'generating_quizzes', label: 'Generating Quizzes', description: 'Creating intelligent quizzes...', icon: FileQuestion },
+  { id: 'finalizing', label: 'Finalizing Course', description: 'Putting everything together...', icon: Sparkles },
   { id: 'completed', label: 'Complete', description: 'Your course is ready!', icon: CheckCircle2 },
 ];
 
@@ -43,7 +54,7 @@ const STAGE_ORDER = stages.map((s) => s.id);
 
 // Transport states that mean "connecting to the socket", not yet a real job stage.
 // While in one of these, we still show the "in progress" screen but treat the
-// timeline as sitting at 'generating' until a real stage status arrives.
+// timeline as sitting at 'uploading' until a real stage status arrives.
 const TRANSPORT_STATES: ProcessingStage[] = ['connecting', 'connected', 'reconnecting'];
 
 export default function UploadPage() {
@@ -68,13 +79,13 @@ export default function UploadPage() {
   // processingStage IS the active stage now — no separate jobStatus to
   // reconcile against. We only need to map transport states (connecting/
   // connected/reconnecting) onto a sensible timeline position, since those
-  // aren't one of the 5 stages shown in the timeline.
-const activeStageId: ProcessingStage =
-  processingStage === 'completed'
-    ? 'completed'
-    : (STAGE_ORDER as string[]).includes(processingStage)
-    ? processingStage
-    : 'uploading'; // connecting/connected/reconnecting/idle -> no real stage yet, don't fast-forward
+  // aren't one of the real stages shown in the timeline.
+  const activeStageId: ProcessingStage =
+    processingStage === 'completed'
+      ? 'completed'
+      : (STAGE_ORDER as string[]).includes(processingStage)
+      ? processingStage
+      : 'uploading'; // connecting/connected/reconnecting/idle -> no real stage yet, don't fast-forward
 
   const activeIndex = STAGE_ORDER.indexOf(activeStageId);
   const isJobDone = processingStage === 'completed';
@@ -84,8 +95,10 @@ const activeStageId: ProcessingStage =
   const isInProgress =
     processingStage === 'uploading' ||
     processingStage === 'extracting' ||
-    processingStage === 'generating' ||
-    processingStage === 'rendering' ||
+    processingStage === 'structuring' ||
+    processingStage === 'generating_videos' ||
+    processingStage === 'generating_quizzes' ||
+    processingStage === 'finalizing' ||
     TRANSPORT_STATES.includes(processingStage);
 
   return (
@@ -144,8 +157,10 @@ const activeStageId: ProcessingStage =
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow-lg animate-pulse">
                       {activeStageId === 'uploading' && <UploadIcon className="w-10 h-10 text-white" />}
                       {activeStageId === 'extracting' && <FileText className="w-10 h-10 text-white" />}
-                      {activeStageId === 'generating' && <Brain className="w-10 h-10 text-white" />}
-                      {activeStageId === 'rendering' && <Sparkles className="w-10 h-10 text-white" />}
+                      {activeStageId === 'structuring' && <Brain className="w-10 h-10 text-white" />}
+                      {activeStageId === 'generating_videos' && <Video className="w-10 h-10 text-white" />}
+                      {activeStageId === 'generating_quizzes' && <FileQuestion className="w-10 h-10 text-white" />}
+                      {activeStageId === 'finalizing' && <Sparkles className="w-10 h-10 text-white" />}
                       {activeStageId === 'completed' && <CheckCircle2 className="w-10 h-10 text-white" />}
                     </div>
                   </div>
