@@ -58,7 +58,7 @@ export const useQuiz = (quizId: string, attempts: QuizAttempt[]) => {
   const totalQuestions = quiz?.questions?.length ?? 0;
   const isLastQuestion = totalQuestions > 0 && currentQuestionIndex === totalQuestions - 1;
   const allQuestionsAnswered = totalQuestions > 0 && answeredCount === totalQuestions;
-  const latestAttempt = attempts[attempts.length - 1] ?? null;
+  const latestAttempt = attempts[0] ?? null;
   const currentReviewAnswer = latestAttempt?.answers?.[reviewAnswerIndex] ?? null;
   const isLastReviewAnswer =
     !!latestAttempt && reviewAnswerIndex === latestAttempt.answers.length - 1;

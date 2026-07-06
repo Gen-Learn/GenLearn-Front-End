@@ -24,7 +24,6 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
     reviewAnswerIndex,
     answeredCount,
     currentQuestion,
-    totalQuestions,
     isLastQuestion,
     allQuestionsAnswered,
     latestAttempt,
