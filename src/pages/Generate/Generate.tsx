@@ -12,45 +12,8 @@ import {
 import { Card } from '@/components/ui';
 import handleGenerate from './utils/handleGenerate';
 import { OnComplete, OnFailed, StageTimeline, OnIdle, Header } from './components/index';
+import { stages, STAGE_ORDER, type ProcessingStage } from './utils/stages';
 
-type ProcessingStage =
-  | 'idle'
-  | 'connecting'
-  | 'connected'
-  | 'reconnecting'
-  | 'error'
-  | 'completed'
-  | 'extracting'
-  | 'structuring'
-  | 'generating_videos'
-  | 'generating_quizzes'
-  | 'finalizing'
-  | 'uploading';
-
-interface StageInfo {
-  id: ProcessingStage;
-  label: string;
-  description: string;
-  icon: typeof UploadIcon;
-}
-
-// Ordered to match the backend's actual job lifecycle:
-// uploading -> extracting -> structuring -> generating_videos -> generating_quizzes -> finalizing -> completed
-// NOTE: the backend currently only emits ONE "creating" status for both video
-// and quiz generation, so `generating_quizzes` won't be reached by real socket
-// data yet — see useGenerationSocket.ts. Kept as a separate stage here in case
-// the backend splits the status later; otherwise consider collapsing these two.
-const stages: StageInfo[] = [
-  { id: 'uploading', label: 'Uploading', description: 'Securing your document...', icon: UploadIcon },
-  { id: 'extracting', label: 'Extracting Content', description: 'AI is reading your document...', icon: FileText },
-  { id: 'structuring', label: 'Generating Structure', description: 'Building course outline...', icon: Brain },
-  { id: 'generating_videos', label: 'Creating Videos', description: 'AI is generating video lectures...', icon: Video },
-  { id: 'generating_quizzes', label: 'Generating Quizzes', description: 'Creating intelligent quizzes...', icon: FileQuestion },
-  { id: 'finalizing', label: 'Finalizing Course', description: 'Putting everything together...', icon: Sparkles },
-  { id: 'completed', label: 'Complete', description: 'Your course is ready!', icon: CheckCircle2 },
-];
-
-const STAGE_ORDER = stages.map((s) => s.id);
 
 // Transport states that mean "connecting to the socket", not yet a real job stage.
 // While in one of these, we still show the "in progress" screen but treat the
@@ -68,8 +31,6 @@ export default function UploadPage() {
     isDragOver,
     file,
     processingStage,
-    uploadProgress,
-    downloadUrl,
     error,
     courseId,
     courseName,
@@ -81,11 +42,8 @@ export default function UploadPage() {
   // connected/reconnecting) onto a sensible timeline position, since those
   // aren't one of the real stages shown in the timeline.
   const activeStageId: ProcessingStage =
-    processingStage === 'completed'
-      ? 'completed'
-      : (STAGE_ORDER as string[]).includes(processingStage)
-      ? processingStage
-      : 'uploading'; // connecting/connected/reconnecting/idle -> no real stage yet, don't fast-forward
+    processingStage === 'completed'? 'completed' : 
+      (STAGE_ORDER as string[]).includes(processingStage)? processingStage : 'uploading'; // connecting/connected/reconnecting/idle -> no real stage yet, don't fast-forward
 
   const activeIndex = STAGE_ORDER.indexOf(activeStageId);
   const isJobDone = processingStage === 'completed';
@@ -96,8 +54,7 @@ export default function UploadPage() {
     processingStage === 'uploading' ||
     processingStage === 'extracting' ||
     processingStage === 'structuring' ||
-    processingStage === 'generating_videos' ||
-    processingStage === 'generating_quizzes' ||
+    processingStage === 'creating' ||
     processingStage === 'finalizing' ||
     TRANSPORT_STATES.includes(processingStage);
 
@@ -158,25 +115,11 @@ export default function UploadPage() {
                       {activeStageId === 'uploading' && <UploadIcon className="w-10 h-10 text-white" />}
                       {activeStageId === 'extracting' && <FileText className="w-10 h-10 text-white" />}
                       {activeStageId === 'structuring' && <Brain className="w-10 h-10 text-white" />}
-                      {activeStageId === 'generating_videos' && <Video className="w-10 h-10 text-white" />}
-                      {activeStageId === 'generating_quizzes' && <FileQuestion className="w-10 h-10 text-white" />}
+                      {activeStageId === 'creating' && <Video className="w-10 h-10 text-white" />}
                       {activeStageId === 'finalizing' && <Sparkles className="w-10 h-10 text-white" />}
                       {activeStageId === 'completed' && <CheckCircle2 className="w-10 h-10 text-white" />}
                     </div>
                   </div>
-
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-3 h-3 rounded-full bg-primary-400 animate-float"
-                      style={{
-                        top: `${50 + 40 * Math.cos((i * Math.PI * 2) / 8)}%`,
-                        left: `${50 + 40 * Math.sin((i * Math.PI * 2) / 8)}%`,
-                        animationDelay: `${i * 0.2}s`,
-                        opacity: 0.6,
-                      }}
-                    />
-                  ))}
                 </div>
 
                 <div className="text-center">
@@ -195,37 +138,6 @@ export default function UploadPage() {
                         "AI is building your course — we'll notify you the moment it's ready."}
                   </p>
                 </div>
-              </div>
-
-              <div className="px-8 py-4 bg-white border-t border-gray-100">
-                {processingStage === 'uploading' ? (
-                  <>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Upload Progress</span>
-                      <span className="text-lg font-bold text-primary-600">{uploadProgress}%</span>
-                    </div>
-                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Status</span>
-                    <div className="flex items-center gap-2">
-                      {processingStage === 'reconnecting' && (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                          Reconnecting…
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
-                        {processingStage.charAt(0).toUpperCase() + processingStage.slice(1)}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             </Card>
 
@@ -254,7 +166,6 @@ export default function UploadPage() {
           <OnComplete
             courseName={courseName ?? undefined}
             courseId={courseId ?? undefined}
-            downloadUrl={downloadUrl ?? undefined}
             resetUpload={resetUpload}
           />
         )}

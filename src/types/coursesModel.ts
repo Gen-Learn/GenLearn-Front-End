@@ -9,6 +9,7 @@ export default interface Course {
   createdAt: string;
   updatedAt: string;
   sections: Section[];
+  imageUrl?: string;
 }
 
 export interface QuizReference {

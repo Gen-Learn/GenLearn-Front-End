@@ -3,7 +3,7 @@ import { Button, Card, Badge, LinearProgress, CircularProgress } from '@/compone
 import { Link } from 'react-router-dom';
 import img from '@/assets/images/Cardimg.png';
 import  Course from "@/types/coursesModel"
-
+import { useGetCoursesImages } from '@/hooks/useGetCoursesImages';
 
 
 type Props = {
@@ -24,6 +24,7 @@ const statusColors: Record<string, string> = {
 
 export default function CourseHeroCard({ course}: Props) {
   const status = course.status ?? 'not_started';
+  const { courseImages,loadingImages } = useGetCoursesImages();
   const courseName = course.name || 'Untitled Course';
   const courseDescription = course.description || 'No description available';
   const courseProgress = course.progress ?? 0;
@@ -38,20 +39,12 @@ export default function CourseHeroCard({ course}: Props) {
       <div className="flex flex-col lg:flex-row">
         <div className="lg:w-96 flex-shrink-0">
           <div className="relative aspect-video lg:aspect-auto lg:h-full">
-            <img src={img} alt={courseName} className="w-full h-full object-cover" />
+            {loadingImages ? (
+              <img src={img} alt={courseName} className="w-full h-full object-cover" />
+            ) : (
+              <img src={courseImages[course.id]} alt={courseName} className="w-full h-full object-cover" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r" />
-            <div className="absolute bottom-4 left-4 lg:bottom-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2">
-              <div className="relative">
-                <CircularProgress
-                  value={courseProgress}
-                  size={80}
-                  strokeWidth={6}
-                  showValue
-                  colorClass={status === 'completed' ? 'text-green-500' : 'text-white'}
-                />
-                <div className="absolute inset-0 rounded-full bg-black/20 backdrop-blur-sm -z-10" />
-              </div>
-            </div>
           </div>
         </div>
 

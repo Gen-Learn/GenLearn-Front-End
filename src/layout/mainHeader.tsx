@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import Alert from '@/components/alert/alert';
 import { useLocation } from "react-router-dom";
-
+import image from '@/assets/images/logoOld.png';
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -75,9 +75,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-shadow">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+            <img src={image} alt="GenLearn Logo" className="w-15 h-15" />
             <span className="text-xl font-bold text-gray-900">GenLearn</span>
           </Link>
 

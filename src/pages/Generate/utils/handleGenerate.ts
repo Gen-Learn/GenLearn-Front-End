@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { submitGenerateJob, buildGeneratedFileUrl } from '@/services/generateService';
+import { submitGenerateJob } from '@/services/generateService';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useGenerationSocket, type SocketStatus } from '@/hooks/useGenerationSocket';
 
@@ -12,13 +12,11 @@ export type ProcessingStage = UploadPhase | SocketStatus;
 
 const handleGenerate = () => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [courseId, setCourseId] = useState<string | null>(null);
+  const [courseId, setCourseid] = useState<string | null>(null);
   const [courseName, setCourseName] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [jobId, setJobId] = useState<string | null>(null);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { addNotification, setCourseID } = useNotification();
@@ -34,14 +32,9 @@ const handleGenerate = () => {
   const { status: socketStatus } = useGenerationSocket({
     jobId,
     onCompleted: (payload) => {
-      if (payload?.downloadUrl) {
-        setDownloadUrl(payload.downloadUrl);
-      } else if (payload?.fileName) {
-        setDownloadUrl(buildGeneratedFileUrl(String(payload.fileName)));
-      }
-      setCourseId(payload?.courseId || null);
       setCourseName(payload?.courseName || null);
       setCourseID(payload?.courseId || null);
+      setCourseid(payload?.courseId || null);
       addNotification({
         title: 'Generation complete',
         message: 'Your course generation is finished and ready to download.',
@@ -61,13 +54,11 @@ const handleGenerate = () => {
   const handleGenerateCourse = useCallback(async (selectedFile: File) => {
     setFile(selectedFile);
     setError(null);
-    setDownloadUrl(null);
     setJobId(null);
-    setUploadProgress(0);
     setUploadPhase('uploading');
 
     try {
-      const data = await submitGenerateJob([selectedFile], setUploadProgress);
+      const data = await submitGenerateJob([selectedFile]);
       const responseData = data?.data ?? data;
       const id = responseData?.jobId;
 
@@ -108,9 +99,7 @@ const handleGenerate = () => {
   const resetUpload = () => {
     setFile(null);
     setUploadPhase('idle');
-    setUploadProgress(0);
     setJobId(null);
-    setDownloadUrl(null);
     setError(null);
   };
 
@@ -128,9 +117,7 @@ const handleGenerate = () => {
     isDragOver,
     file,
     processingStage,
-    uploadProgress,
     jobId,
-    downloadUrl,
     error,
     courseId,
     courseName,

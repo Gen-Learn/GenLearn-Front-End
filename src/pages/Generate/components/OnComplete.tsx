@@ -12,7 +12,7 @@ type OnCompleteProps = {
   downloadUrl?: string;
   resetUpload: () => void;
 };
-export default function OnComplete({ courseName, courseId, downloadUrl, resetUpload }: OnCompleteProps) {
+export default function OnComplete({ courseName, courseId, resetUpload }: OnCompleteProps) {
   const { course } = useGetSingleCource(courseId || '');
 
   return (
@@ -53,19 +53,11 @@ export default function OnComplete({ courseName, courseId, downloadUrl, resetUpl
               </div>
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                 <span className="text-sm text-gray-500">Ready to start learning</span>
-                {downloadUrl ? (
-                  <Link to={downloadUrl} target="_blank" rel="noreferrer">
-                    <Button size="sm">
-                      Open Course <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                ) : (
                   <Link to={`/course/${courseId}/section/${course?.sections?.[0]?.id}/lecture/${course?.sections?.[0]?.lectures?.[0]?.id}`} data-nav="course">
                     <Button size="sm">
                       Start Course <ChevronRight className="w-4 h-4" />
                     </Button>
                   </Link>
-                )}
               </div>
             </div>
 

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Link } from 'react-router-dom';
-
+import image from '@/assets/images/logoOld.png';
 
 export default function Header() {
   return (
@@ -20,9 +20,7 @@ export default function Header() {
             </Link>
           </div>
           <Link to="/landing" data-nav="landing" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+            <img src={image} alt="GenLearn Logo" className="w-15 h-15" />
             <span className="text-xl font-bold text-gray-900">GenLearn</span>
           </Link>
           <div className="w-20" />

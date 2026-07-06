@@ -16,8 +16,7 @@ export type SocketStatus =
   | 'error'
   | 'extracting'
   | 'structuring'
-  | 'generating_videos'
-  | 'generating_quizzes'
+  | 'creating'
   | 'finalizing'
   | 'completed';
 
@@ -30,7 +29,7 @@ export type SocketStatus =
 const JOB_STATUS_TO_STAGE: Record<string, SocketStatus> = {
   extracting: 'extracting',
   generation: 'structuring',
-  creating: 'generating_videos',
+  creating: 'creating',
   finalizing: 'finalizing',
 };
 
@@ -73,7 +72,6 @@ export function useGenerationSocket({
       },
       jobStatusUpdated: (payload) => {
         const jobStatus = payload.status?.toLowerCase() ?? '';
-        console.log('[Socket] Job status updated:', jobStatus, payload);
         // Guard against the "completed" status string that can arrive on the
         // last jobStatusUpdated tick before the dedicated jobCompleted event —
         // we let the jobCompleted handler below own that transition instead.
@@ -82,7 +80,7 @@ export function useGenerationSocket({
         callbacksRef.current.onStatusUpdate?.(payload);
       },
       onCompleted: (payload) => {
-        setStatus('completed');
+        setStatus('completed');    
         callbacksRef.current.onCompleted?.(payload);
       },
       onFailed: (payload) => {

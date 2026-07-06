@@ -5,13 +5,13 @@ import Alert from '@/components/alert/alert';
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useAuth } from '@/contexts/AuthContext';
-
+import image from '@/assets/images/logoOld.png';
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const { notifications, unreadCount, markAllRead, courseID } = useNotification();
-    const { isAuthenticated, isLoading, logout } = useAuth();
+    const { logout } = useAuth();
     const toggleNotifications = () => {
     setNotificationsOpen((prev) => {
       const next = !prev;
@@ -45,9 +45,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" data-nav="courses" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <img src={image} alt="GenLearn Logo" className="w-15 h-15" />
           <span className="text-xl font-bold text-gray-900">GenLearn</span>
         </Link>
         <div className="flex items-center gap-3">

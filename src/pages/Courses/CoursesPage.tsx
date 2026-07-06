@@ -17,6 +17,7 @@ import img from '@/assets/images/Cardimg.png';
 import { CourseGridSkeleton } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { Link } from 'react-router-dom';
+import {useGetCoursesImages} from "@/hooks/useGetCoursesImages"
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
@@ -37,10 +38,12 @@ type DisplayCourse = {
 function CourseCardWithDetails({
   course,
   formatDuration,
+  courseImage,
   viewMode,
 }: {
   course: Course;
   formatDuration: (minutes: number) => string;
+  courseImage: string;
   viewMode: ViewMode;
 }) {
   const { course: singleCourse } = useGetSingleCource(course.id);
@@ -53,12 +56,11 @@ function CourseCardWithDetails({
       0
     );
   }, [singleCourse]);
-
   const displayCourse: DisplayCourse = {
     id: course.id,
     title: course.name,
     description: course.description,
-    thumbnail: img,
+    thumbnail: courseImage ,
     courseDurationInMinutes: course.courseDurationInMinutes,
     sections_count: course.numsOfSections,
     lectures_count: lecturesCount,
@@ -81,7 +83,9 @@ export default function CoursesPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
   const { courses, loading, error } = useGetAllCourses();
-
+  const { courseImages,loadingImages } = useGetCoursesImages();
+  console.log("courseImages", courseImages);
+  console.log("loadingImages", loadingImages);
   const filteredCourses = useMemo(() => {
     let coursesCopy = [...courses.filter(Boolean)];
 
@@ -117,6 +121,7 @@ export default function CoursesPage() {
 
     return coursesCopy;
   }, [courses, searchQuery, statusFilter, sortBy]);
+
 
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
@@ -243,7 +248,7 @@ export default function CoursesPage() {
           {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
         </p>
 
-        {loading ? (
+        {loading || loadingImages? (
             <CourseGridSkeleton />
         ):filteredCourses.length === 0 ? (
           searchQuery || statusFilter !== 'all' ? (
@@ -272,6 +277,7 @@ export default function CoursesPage() {
                 course={course}
                 formatDuration={formatDuration}
                 viewMode={viewMode}
+                courseImage={courseImages[course.id]}
               />
             ))}
           </div>

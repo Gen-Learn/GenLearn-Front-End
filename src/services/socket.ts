@@ -78,17 +78,23 @@ export const connectToGenerationSocket = (jobId: string, callbacks: Callbacks = 
   socket.off("jobFailed");
 
   socket.on("joinedJob", (payload: JobEventPayload) => {
+    console.log('[Socket] on Joined:', payload.status?.toLowerCase(), payload);
     currentCallbacks?.onJoined?.(payload);
+
   });
   socket.on("jobStatusUpdated", (payload: JobEventPayload) => {
     currentCallbacks?.jobStatusUpdated?.(payload);
+    console.log('[Socket] Job status updated:',  payload.status?.toLowerCase(), payload);
+    
   });
   socket.on("jobCompleted", (payload: JobEventPayload) => {
     currentCallbacks?.onCompleted?.(payload);
+    console.log('[Socket] on Completed:', payload.status?.toLowerCase(), payload);
   });
 
   socket.on("jobFailed", (payload: JobEventPayload) => {
     currentCallbacks?.onFailed?.(payload);
+    console.log('[Socket] on Failed:', payload.status?.toLowerCase(), payload);
   });
 
   return socket;

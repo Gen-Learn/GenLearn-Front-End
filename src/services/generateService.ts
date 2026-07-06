@@ -3,8 +3,7 @@ import axiosInstance from "./axios";
 import {GenerateJobResponse} from "../types/generation";
 
 export const submitGenerateJob = async (
-  files: File[],
-  onProgress: (pct: number) => void
+  files: File[]
 ): Promise<GenerateJobResponse> => {
   const formData = new FormData();
   files.forEach((file) => {
@@ -15,11 +14,7 @@ export const submitGenerateJob = async (
     headers: {
       "Content-Type": undefined, 
     },
-    onUploadProgress: (e) => {
-      if (e.total) onProgress(Math.round((e.loaded / e.total) * 95));
-    },
   });
-  onProgress(100);
   return data as GenerateJobResponse;
 };
 

@@ -10,6 +10,7 @@ export const useGetAllCourses = () => {
         const fetchCources = async() =>{
             try {
                 const response = await getCourses();
+                
                 setCourses(response.data.data.courses);
             }
             catch (error) {
