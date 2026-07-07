@@ -146,7 +146,7 @@ export default function AIChatbot() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-glow-lg hover:shadow-glow hover:scale-110 transition-all flex items-center justify-center z-50 group"
+        className="fixed bottom-6 left-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-glow-lg hover:shadow-glow hover:scale-110 transition-all flex items-center justify-center z-50 group"
       >
         <MessageCircle className="w-7 h-7" />
         <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
@@ -162,7 +162,7 @@ export default function AIChatbot() {
       className={`fixed z-50 bg-white rounded-3xl shadow-glass-lg border border-gray-100 flex flex-col transition-all duration-300 ${
         isExpanded
           ? 'inset-4 lg:inset-8'
-          : 'bottom-6 right-6 w-96 h-[32rem]'
+          : 'bottom-6 left-6 w-96 h-[32rem]'
       }`}
     >
       {/* Header */}

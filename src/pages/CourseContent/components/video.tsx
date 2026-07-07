@@ -5,24 +5,26 @@ import axiosInstance from "../../../services/axios";
 import { InlineLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { BookOpen } from 'lucide-react';
-
+import aos from "aos";
 const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 type VideoPlayerProps = {
   lectureId?: string;
-  courseId?: string;
+  videoPlayerRef?: React.RefObject<HTMLVideoElement>;
+  onTimeUpdate?: (time: number) => void;
   onEnded?: () => void;
 };
 
-export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+export default function VideoPlayer({ lectureId, videoPlayerRef, onTimeUpdate, onEnded }: VideoPlayerProps) {
+
   const playerRef = useRef<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
   // Effect 1: Initialize Video.js ONCE on mount, never recreate it
   useEffect(() => {
-    const videoElement = videoRef.current;
+    const videoElement = playerRef.current;
     if (!videoElement) return;
 
     playerRef.current = videojs(videoElement, {
@@ -30,9 +32,16 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
       fluid: true,
       sources: [],
     });
-
+    if (videoPlayerRef) {
+    videoPlayerRef.current = playerRef.current;
+    }
+    aos.init();
     playerRef.current.on("ended", () => {
       onEnded?.();
+    });
+    playerRef.current.on("timeupdate", () => {
+
+    onTimeUpdate?.(playerRef.current.currentTime());
     });
 
     // A new load starting means any previous error is now stale — clear it
@@ -115,7 +124,7 @@ export default function VideoPlayer({ lectureId, courseId, onEnded }: VideoPlaye
   return (
     <div className="relative">
       <div data-vjs-player>
-        <video ref={videoRef} className="video-js vjs-big-play-centered" />
+        <video ref={playerRef} className="video-js vjs-big-play-centered" />
       </div>
 
       {loading && (

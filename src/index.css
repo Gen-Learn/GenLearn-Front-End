@@ -23,6 +23,20 @@ body {
   background-color: var(--background);
   color: var(--text-primary);
 }
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.5s ease-out both;
+}
 
 code {
   font-family:

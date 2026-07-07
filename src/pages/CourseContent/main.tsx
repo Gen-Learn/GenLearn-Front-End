@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Badge } from "@/components/ui";
 import { useGetSingleCource } from "../../hooks/useGetSingleCource";
+import { useGetLecture } from "../../hooks/useGetLecture";
 import { Lecture } from "@/types/coursesModel";
 import { formatDuration } from "./utils/formatDuration";
-import { CourseSidebar, ContentPlayerArea, LectureTabs} from "./components";
+import { CourseSidebar, ContentPlayerArea, LectureTabs } from "./components";
 import { Award, ChevronRight, Clock, BookOpen, Menu, X } from "lucide-react";
 import { FullPageLoader } from "@/components/loading";
 import { EmptyState } from "@/components/empty-states";
+
 type TabKey = "transcript" | "notes" | "materials";
 
 type SelectedItem =
@@ -17,7 +19,7 @@ type SelectedItem =
   | null;
 
 export default function CourseContent() {
-  const { courseId, sectionId, lectureId } = useParams<{ courseId: string; sectionId: string; lectureId: string }>();
+  const { courseId, lectureId } = useParams<{ courseId: string; lectureId: string }>();
   const { course, loading, error } = useGetSingleCource(courseId ?? "");
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -26,44 +28,62 @@ export default function CourseContent() {
   const [showQuiz, setShowQuiz] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("transcript");
   const [notesByLecture, setNotesByLecture] = useState<Record<string, string>>({});
-
-  // Sidebar is an overlay drawer below `lg`, static column at `lg` and up.
+  const [currentTime, setCurrentTime] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Fetch full lecture detail (including transcript scripts) for whichever
+  // lecture is currently selected. The course object doesn't carry scripts.
+  const { lecture: lectureDetails } = useGetLecture(selectedLecture?.id ?? "") as {
+    lecture: Lecture | null;
+  };
+  // Tracks video playback position so the transcript can highlight the
+  // active segment and support click-to-seek.
+  const videoPlayerRef = useRef<any>(null);
+  
+
+
   const navigate = useNavigate();
+
   useEffect(() => {
-  if (!course) return;
+    if (!course) return;
 
-  setExpandedSections(course.sections.map((section) => section.id));
+    setExpandedSections(course.sections.map((section) => section.id));
 
-  // Try to resolve the lecture from the URL param first
-  if (lectureId) {
-    const matchedLecture = course.sections
-      .flatMap((section) => section.lectures)
-      .find((lecture) => lecture.id === lectureId);
+    // Try to resolve the lecture from the URL param first
+    if (lectureId) {
+      const matchedLecture = course.sections
+        .flatMap((section) => section.lectures)
+        .find((lecture) => lecture.id === lectureId);
 
-    if (matchedLecture && matchedLecture.id !== selectedLecture?.id) {
-      setSelectedLecture(matchedLecture);
-      setSelectedItem({ type: "lecture", id: matchedLecture.id });
-      setQuizId(null);
-      setShowQuiz(false);
-      setActiveTab("transcript");
-      return;
+      if (matchedLecture && matchedLecture.id !== selectedLecture?.id) {
+        setSelectedLecture(matchedLecture);
+        setSelectedItem({ type: "lecture", id: matchedLecture.id });
+        setQuizId(null);
+        setShowQuiz(false);
+        setActiveTab("transcript");
+        return;
+      }
     }
-  }
 
-  // Fallback: no valid lectureId in the URL, select the first lecture
-  if (!selectedLecture) {
-    const firstLecture = course.sections?.[0]?.lectures?.[0] ?? null;
-    setSelectedLecture(firstLecture);
-    if (firstLecture) {
-      setSelectedItem({ type: "lecture", id: firstLecture.id });
+    // Fallback: no valid lectureId in the URL, select the first lecture
+    if (!selectedLecture) {
+      const firstLecture = course.sections?.[0]?.lectures?.[0] ?? null;
+      setSelectedLecture(firstLecture);
+      if (firstLecture) {
+        setSelectedItem({ type: "lecture", id: firstLecture.id });
+      }
     }
-  }
-}, [course, lectureId]);
+  }, [course, lectureId]);
 
   useEffect(() => {
     setShowQuiz(Boolean(quizId));
   }, [quizId]);
+
+  // Reset playback position tracking whenever the selected lecture changes,
+  // so a stale timestamp from the previous lecture doesn't briefly
+  // highlight the wrong transcript segment in the new one.
+  useEffect(() => {
+    setCurrentTime(0);
+  }, [selectedLecture?.id]);
 
   const currentSection = useMemo(() => {
     if (!course || !selectedLecture) return null;
@@ -79,14 +99,14 @@ export default function CourseContent() {
   };
 
   const handleSelectLecture = (lecture: Lecture) => {
-  setSelectedLecture(lecture);
-  setQuizId(null);
-  setShowQuiz(false);
-  setActiveTab("transcript");
-  setSelectedItem({ type: "lecture", id: lecture.id });
-  setIsSidebarOpen(false);
-  navigate(`/course/${course?.id}/section/${currentSection?.id}/lecture/${lecture.id}`, { replace: true });
-};
+    setSelectedLecture(lecture);
+    setQuizId(null);
+    setShowQuiz(false);
+    setActiveTab("transcript");
+    setSelectedItem({ type: "lecture", id: lecture.id });
+    setIsSidebarOpen(false);
+    navigate(`/course/${course?.id}/section/${currentSection?.id}/lecture/${lecture.id}`, { replace: true });
+  };
 
   const handleSelectLectureQuiz = (quizIdValue: string, lectureId: string) => {
     const lecture = course?.sections
@@ -195,6 +215,8 @@ export default function CourseContent() {
           selectedLecture={selectedLecture}
           quizId={quizId}
           showQuiz={showQuiz}
+          videoPlayerRef={videoPlayerRef}
+          onTimeUpdate={setCurrentTime}
           onVideoEnded={() => {
             if (selectedLecture?.quizzes?.[0]?.id) {
               setQuizId(selectedLecture.quizzes[0].id);
@@ -246,12 +268,13 @@ export default function CourseContent() {
             </div>
 
             <LectureTabs
-              selectedLecture={selectedLecture}
+              selectedLecture={lectureDetails}
               activeTab={activeTab}
               onChangeTab={setActiveTab}
               notes={currentNotes}
               onNotesChange={handleNotesChange}
               onSaveNotes={handleSaveNotes}
+              currentTime={currentTime}
             />
           </div>
         </div>

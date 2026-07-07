@@ -9,8 +9,10 @@ import { BookOpen } from 'lucide-react';
 type Props = {
   courseId?: string;
   selectedLecture?: Lecture | null;
+  videoPlayerRef?: React.RefObject<HTMLVideoElement>;
   quizId: string | null;
   showQuiz: boolean;
+  onTimeUpdate?: (time: number) => void;
   onVideoEnded: () => void;
   onCloseQuiz: () => void;
   loading: boolean;
@@ -24,6 +26,8 @@ export default function ContentPlayerArea({
   showQuiz,
   onVideoEnded,
   onCloseQuiz,
+  videoPlayerRef,
+  onTimeUpdate,
   loading,
   error,
 }: Props) {
@@ -34,7 +38,7 @@ export default function ContentPlayerArea({
           quiz below is never boxed into a 16:9 shape. */}
       <div className="relative bg-black aspect-video overflow-hidden">
         {!loading && !error && selectedLecture && !showQuiz ? (
-          <VideoPlayer lectureId={selectedLecture.id} courseId={courseId} onEnded={onVideoEnded} />
+          <VideoPlayer lectureId={selectedLecture.id} onEnded={onVideoEnded} videoPlayerRef={videoPlayerRef} onTimeUpdate={onTimeUpdate} />
         ) : null}
 
         {loading ? (
