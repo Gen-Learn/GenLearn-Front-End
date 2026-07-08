@@ -10,8 +10,11 @@ import {
   Minimize2,
   Trash2,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '../ui';
-
+import { sendChatbotResponse } from '../../services/chatbotService';
+import { useParams } from 'react-router-dom';
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -19,20 +22,6 @@ interface Message {
   timestamp: Date;
 }
 
-interface ChatContext {
-  course?: string;
-  section?: string;
-  lecture?: string;
-}
-
-// Mock responses for demonstration
-const mockResponses: Record<string, string> = {
-  explain: "I'd be happy to explain that concept! Quantum tunneling is a phenomenon where particles can pass through barriers that would be impossible to cross in classical physics. This happens because particles have wave-like properties - their wave function doesn't suddenly stop at a barrier, but instead decays exponentially through it. If the barrier is thin enough, there's a non-zero probability of finding the particle on the other side.",
-  summary: "Here's a quick summary of this lecture:\n\n• Quantum tunneling allows particles to pass through energy barriers\n• The probability depends on barrier width and height\n• Applications include scanning tunneling microscopes and nuclear fusion\n• This is a purely quantum effect with no classical analog",
-  example: "Great question! Here's a practical example:\n\n**Scanning Tunneling Microscope (STM)**\n\nAn STM uses quantum tunneling to image surfaces at the atomic level. A sharp metal tip is brought very close to a surface. Electrons tunnel between the tip and surface, creating a measurable current. By scanning the tip and measuring this tunneling current, scientists can create images of individual atoms!\n\nThis wouldn't be possible without quantum tunneling - classically, the electrons couldn't cross the gap.",
-  quiz: "I can help you understand the quiz concepts, but I won't give you the direct answers.\n\nFor this quiz, focus on understanding:\n\n1. The definition of quantum tunneling\n2. How the tunneling probability relates to barrier properties\n3. Real-world applications\n\nWould you like me to explain any of these concepts in more detail?",
-  default: "I'm your AI learning assistant! I can help you with:\n\n• Explaining difficult concepts from your current lecture\n• Summarizing course sections\n• Providing real-world examples\n• Preparing for quizzes (without giving answers)\n• Answering follow-up questions\n\nWhat would you like to know?",
-};
 
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,18 +34,12 @@ export default function AIChatbot() {
       timestamp: new Date(),
     },
   ]);
+  const {course} =useParams()
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Context (would be dynamic in real implementation)
-  const context: ChatContext = {
-    course: 'Quantum Physics Fundamentals',
-    section: 'Wave-Particle Duality',
-    lecture: 'Quantum Tunneling Explained',
-  };
-
+  const [notificat,setNotificat] =useState<boolean>(true)
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -71,25 +54,6 @@ export default function AIChatbot() {
     }
   }, [isOpen]);
 
-  const generateResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-
-    if (lowerMessage.includes('explain') || lowerMessage.includes('what is')) {
-      return mockResponses.explain;
-    }
-    if (lowerMessage.includes('summary') || lowerMessage.includes('summarize')) {
-      return mockResponses.summary;
-    }
-    if (lowerMessage.includes('example') || lowerMessage.includes('application')) {
-      return mockResponses.example;
-    }
-    if (lowerMessage.includes('quiz') || lowerMessage.includes('test')) {
-      return mockResponses.quiz;
-    }
-
-    return mockResponses.default;
-  };
-
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
@@ -100,21 +64,37 @@ export default function AIChatbot() {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
+    try {
+      const history = nextMessages.map(({ role, content }) => ({ role, content }));
+      const responseText = await sendChatbotResponse({
+        messages: history,
+        courseId: course || undefined,
+      });
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: generateResponse(userMessage.content),
+        content: responseText || 'I could not generate a response right now.',
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      const assistantMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: 'Sorry, I could not reach the chatbot service right now.',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -145,11 +125,15 @@ export default function AIChatbot() {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {setIsOpen(true);setNotificat(false)}}
         className="fixed bottom-6 left-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-glow-lg hover:shadow-glow hover:scale-110 transition-all flex items-center justify-center z-50 group"
       >
         <MessageCircle className="w-7 h-7" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+        {notificat &&
+        (<span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+
+        )}
+          
         <span className="absolute -top-10 right-0 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
           AI Assistant
         </span>
@@ -174,11 +158,9 @@ export default function AIChatbot() {
           <div>
             <h3 className="font-bold text-gray-900">AI Assistant</h3>
             <p className="text-xs text-gray-500">
-              {context.course && (
                 <span className="truncate block max-w-[200px]">
-                  {context.course}
+                    Always here to help you
                 </span>
-              )}
             </p>
           </div>
         </div>
@@ -205,15 +187,6 @@ export default function AIChatbot() {
         </div>
       </div>
 
-      {/* Context Banner */}
-      {context.lecture && (
-        <div className="px-4 py-2 bg-primary-50 border-b border-primary-100">
-          <p className="text-xs text-primary-700">
-            <strong>Current:</strong> {context.lecture}
-          </p>
-        </div>
-      )}
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
@@ -233,7 +206,13 @@ export default function AIChatbot() {
                   : 'bg-gray-100 text-gray-800'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              {message.role === 'assistant' ? (
+                <div className="text-sm prose prose-sm max-w-none prose-headings:mb-2 prose-p:my-1 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:text-inherit">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              )}
             </div>
             {message.role === 'user' && (
               <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
