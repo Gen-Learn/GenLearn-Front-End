@@ -5,9 +5,12 @@ import { CourseHeroCard ,CourseContentAccordion} from './components/index';
 import { FullPageLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import {Header } from '@/layout/index';
+import { CourseDetailsSkeleton } from '@/components/loading';
+import { useGetCoursesImages } from '@/hooks/useGetCoursesImages';
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { course, loading, error } = useGetSingleCource(id || '');
+  const { courseImages,loadingImages } = useGetCoursesImages();
   console.log("CourseDetailsPage - course:", course);
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
@@ -23,7 +26,7 @@ export default function CourseDetailsPage() {
           Back to Courses
         </Link>
 
-        {loading && <FullPageLoader />}
+        {(loading || loadingImages) && <CourseDetailsSkeleton />}
 
         {!loading && (error || !course) && (
           <EmptyState
@@ -33,10 +36,10 @@ export default function CourseDetailsPage() {
           />
         )}
 
-        {!loading && course && (
+        {!loading && !loadingImages && course && (
           <>
-            <CourseHeroCard course={course} />
-            <CourseContentAccordion sections={course.sections || []} courseId={course.id} />
+            <CourseHeroCard course={course} courseImages={courseImages} />
+            <CourseContentAccordion sections={course.sections || []} courseId={course.id}  />
           </>
         )}
       </main>

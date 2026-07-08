@@ -5,7 +5,83 @@ export function Skeleton({ className = '' }: { className?: string }) {
     <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
   );
 }
+export function CourseHeroCardSkeleton() {
+  return (
+    <Card className="!p-0 overflow-hidden mb-8">
+      <div className="flex flex-col lg:flex-row">
+        <div className="lg:w-96 flex-shrink-0">
+          <Skeleton className="aspect-video lg:aspect-auto lg:h-full w-full" />
+        </div>
 
+        <div className="flex-1 p-6 lg:p-8">
+          <Skeleton className="h-6 w-24 rounded-full mb-4" />
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          <div className="space-y-2 mb-6">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+
+          <div className="flex flex-wrap gap-6 mb-6">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-24" />
+          </div>
+
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+
+          <Skeleton className="h-11 w-full sm:w-40 rounded-xl" />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+export function CourseContentAccordionSkeleton({ sections = 3 }: { sections?: number }) {
+  return (
+    <Card>
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+        <Skeleton className="h-6 w-40" />
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {Array.from({ length: sections }).map((_, i) => (
+          <div key={i} className="border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="w-full flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-10 h-10 rounded-xl" />
+                <div>
+                  <Skeleton className="h-4 w-40 mb-2" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+              </div>
+              <Skeleton className="w-5 h-5 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+export function CourseDetailsSkeleton() {
+  return (
+    <>
+      <CourseHeroCardSkeleton />
+      <CourseContentAccordionSkeleton />
+    </>
+  );
+}
 export function CourseCardSkeleton() {
   return (
     <Card className="!p-0 overflow-hidden">

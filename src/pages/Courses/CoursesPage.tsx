@@ -84,8 +84,6 @@ export default function CoursesPage() {
   const [showFilters, setShowFilters] = useState(false);
   const { courses, loading, error } = useGetAllCourses();
   const { courseImages,loadingImages } = useGetCoursesImages();
-  console.log("courseImages", courseImages);
-  console.log("loadingImages", loadingImages);
   const filteredCourses = useMemo(() => {
     let coursesCopy = [...courses.filter(Boolean)];
 

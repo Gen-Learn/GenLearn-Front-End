@@ -11,4 +11,5 @@ export {
   CardSkeleton,
   FullPageLoader,
   InlineLoader,
+  CourseDetailsSkeleton
 } from './LoadingStates';

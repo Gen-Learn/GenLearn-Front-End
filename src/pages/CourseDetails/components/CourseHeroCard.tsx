@@ -3,11 +3,14 @@ import { Button, Card, Badge, LinearProgress, CircularProgress } from '@/compone
 import { Link } from 'react-router-dom';
 import img from '@/assets/images/Cardimg.png';
 import  Course from "@/types/coursesModel"
-import { useGetCoursesImages } from '@/hooks/useGetCoursesImages';
 
+interface CourseImageMap {
+  [courseId: string]: string; // courseId -> object URL
+}
 
 type Props = {
   course: Course;
+  courseImages: CourseImageMap
 };
 
 const statusLabels: Record<string, string> = {
@@ -22,9 +25,9 @@ const statusColors: Record<string, string> = {
   completed: 'bg-green-100 text-green-700',
 };
 
-export default function CourseHeroCard({ course}: Props) {
+export default function CourseHeroCard({ course ,courseImages}: Props) {
   const status = course.status ?? 'not_started';
-  const { courseImages,loadingImages } = useGetCoursesImages();
+  
   const courseName = course.name || 'Untitled Course';
   const courseDescription = course.description || 'No description available';
   const courseProgress = course.progress ?? 0;
@@ -39,11 +42,7 @@ export default function CourseHeroCard({ course}: Props) {
       <div className="flex flex-col lg:flex-row">
         <div className="lg:w-96 flex-shrink-0">
           <div className="relative aspect-video lg:aspect-auto lg:h-full">
-            {loadingImages ? (
-              <img src={img} alt={courseName} className="w-full h-full object-cover" />
-            ) : (
               <img src={courseImages[course.id]} alt={courseName} className="w-full h-full object-cover" />
-            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
         </div>
