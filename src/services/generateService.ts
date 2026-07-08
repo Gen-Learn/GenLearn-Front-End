@@ -10,7 +10,7 @@ export const submitGenerateJob = async (
     formData.append("file", file); // field name backend expects
   });
 
-  const { data } = await axiosInstance.post("/api/v1/generate", formData, {
+  const { data } = await axiosInstance.post("/api/v1/generate/test", formData, {
     headers: {
       "Content-Type": undefined, 
     },
