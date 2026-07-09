@@ -275,7 +275,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
             <p className="mt-2 text-sm text-gray-600 break-words">
               Correct answer: {currentReviewAnswer.correctOption?.optionText || "Not available"}
             </p>
-            {currentReviewAnswer.explanation && (
+            {currentReviewAnswer.isCorrect === false && currentReviewAnswer.explanation && (
               <p className="mt-3 text-sm text-purple-700 break-words">{currentReviewAnswer.explanation}</p>
             )}
             <p className={`mt-3 text-sm font-medium ${currentReviewAnswer.isCorrect ? "text-emerald-600" : "text-red-600"}`}>
