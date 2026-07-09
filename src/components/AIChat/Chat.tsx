@@ -21,9 +21,11 @@ interface Message {
   content: string;
   timestamp: Date;
 }
+type params ={
+  courseId:string;
+}
 
-
-export default function AIChatbot() {
+export default function AIChatbot({courseId}:params) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -34,7 +36,6 @@ export default function AIChatbot() {
       timestamp: new Date(),
     },
   ]);
-  const {course} =useParams()
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -73,7 +74,7 @@ export default function AIChatbot() {
       const history = nextMessages.map(({ role, content }) => ({ role, content }));
       const responseText = await sendChatbotResponse({
         messages: history,
-        courseId: course || undefined,
+        courseId: courseId ,
       });
 
       const assistantMessage: Message = {

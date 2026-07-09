@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route,Outlet, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Outlet, useLocation,matchPath  } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
 import {MainHeader ,Footer} from "@/layout/index";
 import AIChatbot from "./components/AIChat/Chat";
@@ -16,7 +16,10 @@ const Layout = () => {
 };
 function AppContent() {
   const location = useLocation();
-
+  const match =matchPath(
+  "/course/:courseId/section/:sectionId/lecture/:lectureId",
+  location.pathname);
+  const courseId = match?.params.courseId;
   const showChatbot = [
     "dashboard",
     "courses",
@@ -59,7 +62,7 @@ function AppContent() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
-        {showChatbot && <AIChatbot />}
+        {showChatbot && <AIChatbot courseId={courseId || ""}/>}
       </div>
     </>
   );
