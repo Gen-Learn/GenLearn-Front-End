@@ -1,10 +1,10 @@
 import { BookOpen, Play, Award, Film } from 'lucide-react';
 import { Button, Card, Badge, LinearProgress, CircularProgress } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-import  Course from "@/types/coursesModel"
+import Course from "@/types/coursesModel"
 
 interface CourseImageMap {
-  [courseId: string]: string; // courseId -> object URL
+  [ courseId: string ]: string; // courseId -> object URL
 }
 
 type Props = {
@@ -24,31 +24,32 @@ const statusColors: Record<string, string> = {
   completed: 'bg-green-100 text-green-700',
 };
 
-export default function CourseHeroCard({ course ,courseImages}: Props) {
-  const status = course.status ?? 'not_started';
-  
+export default function CourseHeroCard({ course, courseImages }: Props) {
+  const status = course.percentage > 0 && course.percentage < 100 ? 'in_progress' :
+    course.percentage === 100 ?
+      'completed' : 'not_started';
   const courseName = course.name || 'Untitled Course';
   const courseDescription = course.description || 'No description available';
-  const courseProgress = course.progress ?? 0;
-  const numsOfSections = course.sections.length ;
-  const totalLectures = course.sections.reduce((acc,section)=>{
-    if(section.lectures) acc= acc + section.lectures.length;
+  const courseProgress = course.percentage ?? 0;
+  const numsOfSections = course.sections.length;
+  const totalLectures = course.sections.reduce((acc, section) => {
+    if (section.lectures) acc = acc + section.lectures.length;
     return acc;
-  },0)
-  const totalQuizzes =   numsOfSections + totalLectures -1;
+  }, 0)
+  const totalQuizzes = numsOfSections + totalLectures - 1;
   return (
     <Card className="!p-0 overflow-hidden mb-8">
       <div className="flex flex-col lg:flex-row">
         <div className="lg:w-96 flex-shrink-0">
           <div className="relative aspect-video lg:aspect-auto lg:h-full">
-              <img src={courseImages[course.id]} alt={courseName} className="w-full h-full object-cover" />
+            <img src={courseImages[ course.id ]} alt={courseName} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
         </div>
 
         <div className="flex-1 p-6 lg:p-8">
           <div className="flex flex-wrap gap-2 mb-4">
-            <Badge className={statusColors[status]}>{statusLabels[status] ?? status}</Badge>
+            <Badge className={statusColors[ status ]}>{statusLabels[ status ] ?? status}</Badge>
           </div>
 
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">{courseName}</h1>
@@ -86,7 +87,7 @@ export default function CourseHeroCard({ course ,courseImages}: Props) {
             />
           </div>
 
-          <Link to={`/course/${course?.id}/section/${course?.sections?.[0]?.id}/lecture/${course?.sections?.[0]?.lectures?.[0]?.id}`} data-nav="lecture">
+          <Link to={`/course/${course?.id}/section/${course?.sections?.[ 0 ]?.id}/lecture/${course?.sections?.[ 0 ]?.lectures?.[ 0 ]?.id}`} data-nav="lecture">
             <Button size="lg" className="w-full sm:w-auto">
               <Play className="w-5 h-5" />
               {status === 'not_started' ? 'Start Course' : 'Continue Learning'}

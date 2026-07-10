@@ -244,11 +244,11 @@ export default function CourseContent() {
                     <Clock className="w-4 h-4" />
                     {formatDuration(typeof selectedLecture?.durationInMinutes === "number" ? selectedLecture.durationInMinutes : Number(selectedLecture?.durationInMinutes) || 0)}
                   </span>
-                  <Badge variant={selectedLecture?.completed ? "success" : "gray"}>
-                    {selectedLecture?.completed ? "Completed" : "In Progress"}
+                  <Badge variant={selectedLecture?.done ? "success" : "gray"}>
+                    {selectedLecture?.done ? "Completed" : "In Progress"}
                   </Badge>
                 </div>
-                {!selectedLecture?.completed && !showQuiz && selectedLecture?.quizzes?.[ 0 ]?.id && (
+                {!selectedLecture?.done && !showQuiz && selectedLecture?.quizzes?.[ 0 ]?.id && (
                   <Button
                     variant="secondary"
                     size="sm"

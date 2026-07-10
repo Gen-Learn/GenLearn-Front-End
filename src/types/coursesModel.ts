@@ -10,6 +10,8 @@ export default interface Course {
   updatedAt: string;
   sections: Section[];
   imageUrl?: string;
+  percentage: number;
+  done: boolean;
 }
 
 export interface QuizReference {
@@ -31,7 +33,7 @@ export interface Lecture {
   title?: string;
   url: string;
   duration?: string;
-  completed?: boolean;
+  done?: boolean;
   durationInMinutes?: number;
   scripts: Script[];
   quizzes?: QuizReference[];
@@ -49,4 +51,8 @@ export interface Script {
   id: string;
   language: string;
   content: string;
+}
+export interface UpdateLectureStateResponse {
+  message: string;
+  courseDone: boolean;
 }

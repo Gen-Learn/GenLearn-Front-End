@@ -36,7 +36,7 @@ export default function CourseSidebar({
     0
   );
   const completedLectures = course.sections.reduce(
-    (acc :number, section:Section) => acc + (section.lectures?.filter((lecture) => lecture.completed).length || 0),
+    (acc :number, section:Section) => acc + (section.lectures?.filter((lecture) => lecture.done).length || 0),
     0
   );
 
@@ -59,7 +59,7 @@ export default function CourseSidebar({
 
       <div className="flex-1 overflow-y-auto">
         {course.sections.map((section :Section, sIndex :number) => {
-          const sectionCompletedLectures = section.lectures.filter((lecture) => lecture.completed).length;
+          const sectionCompletedLectures = section.lectures.filter((lecture) => lecture.done).length;
           const isExpanded = expandedSections.includes(section.id);
           const sectionQuizId = section.quizzes?.[0]?.id || undefined;
 
@@ -98,7 +98,7 @@ export default function CourseSidebar({
                         }`}
                       >
                         <div className="flex-shrink-0">
-                          {lecture.completed ? (
+                          {lecture.done ? (
                             <CheckCircle2 className="w-5 h-5 text-green-500" />
                           ) : (
                             <Circle className={`w-5 h-5 ${isCurrent ? "text-primary-300" : "text-gray-200"}`} />

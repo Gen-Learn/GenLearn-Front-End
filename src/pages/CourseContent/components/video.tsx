@@ -6,6 +6,8 @@ import { InlineLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { BookOpen } from 'lucide-react';
 import aos from "aos";
+import { useUpdateLectureState } from "@/hooks/mutations/useUpdateLectureState";
+
 const domain = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 type VideoPlayerProps = {
@@ -18,9 +20,19 @@ type VideoPlayerProps = {
 export default function VideoPlayer({ lectureId, videoPlayerRef, onTimeUpdate, onEnded }: VideoPlayerProps) {
 
   const playerRef = useRef<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ loading, setLoading ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
 
+  const { mutate: markLectureComplete } = useUpdateLectureState({
+    onSuccess: (data) => {
+      if (data.courseDone) {
+        // e.g. trigger a "course complete" toast/modal here
+      }
+    },
+    onError: (err) => {
+      console.error("Failed to mark lecture complete:", err);
+    },
+  });
 
   // Effect 1: Initialize Video.js ONCE on mount, never recreate it
   useEffect(() => {
@@ -33,15 +45,18 @@ export default function VideoPlayer({ lectureId, videoPlayerRef, onTimeUpdate, o
       sources: [],
     });
     if (videoPlayerRef) {
-    videoPlayerRef.current = playerRef.current;
+      videoPlayerRef.current = playerRef.current;
     }
     aos.init();
     playerRef.current.on("ended", () => {
+      if (lectureId) {
+        markLectureComplete(lectureId);
+      }
       onEnded?.();
     });
     playerRef.current.on("timeupdate", () => {
 
-    onTimeUpdate?.(playerRef.current.currentTime());
+      onTimeUpdate?.(playerRef.current.currentTime());
     });
 
     // A new load starting means any previous error is now stale — clear it
@@ -119,7 +134,7 @@ export default function VideoPlayer({ lectureId, videoPlayerRef, onTimeUpdate, o
     return () => {
       controller.abort();
     };
-  }, [lectureId]);
+  }, [ lectureId ]);
 
   return (
     <div className="relative">

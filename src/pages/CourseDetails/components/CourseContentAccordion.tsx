@@ -54,7 +54,7 @@ export default function CourseContentAccordion({ sections , courseId }: Props) {
         {sections.map((section, sIndex) => {
           const isExpanded = expandedSections.includes(section.id);
           const sectionTitle = section.title || section.name || `Section ${sIndex + 1}`;
-          const completedInSection = section.lectures.filter((l) => l.completed ?? false).length;
+          const completedInSection = section.lectures.filter((l) => l.done ?? false).length;
           const sectionProgress = section.lectures.length
             ? Math.round((completedInSection / section.lectures.length) * 100)
             : 0;
@@ -98,7 +98,7 @@ export default function CourseContentAccordion({ sections , courseId }: Props) {
                   {section.lectures.map((lecture) => {
                     const lectureTitle = lecture.title || lecture.name || 'Untitled Lecture';
                     const lectureDuration = formatDuration(typeof lecture?.durationInMinutes === "number" ? lecture.durationInMinutes : Number(lecture?.durationInMinutes) || 0) || '0m';
-                    const isCompleted = lecture.completed ?? false;
+                    const isCompleted = lecture.done ?? false;
 
                     return (
                       <div

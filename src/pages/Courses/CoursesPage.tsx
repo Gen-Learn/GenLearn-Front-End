@@ -64,7 +64,7 @@ function CourseCardWithDetails({
     sections_count: course.numsOfSections,
     lectures_count: lecturesCount,
     status: course.status,
-    progress_percent: course.progress,
+    progress_percent: course.percentage,
   };
 
   return viewMode === 'grid' ? (
