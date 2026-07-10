@@ -4,7 +4,7 @@ import { MainHeader, Footer } from "@/layout/index";
 import AIChatbot from "./components/AIChat/Chat";
 import { Profile, CourseContent, CourseDetails, Courses, Generate, Home, ForgotPassword, ResetPassword, SignUp, Login, VerifyEmail, Onboarding } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
-import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './static/index';
+import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './pages/static/index';
 const Layout = () => {
   return (
     <div>

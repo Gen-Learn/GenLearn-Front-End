@@ -1,5 +1,5 @@
 import { ArrowLeft, Zap, Shield, Lock, Cookie } from 'lucide-react';
-import { Button } from '../components/ui/index';
+import { Button } from '../../components/ui/index';
 import { Link } from 'react-router-dom';
 export default function PrivacyPage() {
   return (

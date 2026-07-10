@@ -1,5 +1,5 @@
 import { Home, Search, BookOpen } from 'lucide-react';
-import { Button, Card } from '../components/ui/index';
+import { Button, Card } from '../../components/ui/index';
 import { Link } from 'react-router-dom';
 
 const suggestedPages = [
