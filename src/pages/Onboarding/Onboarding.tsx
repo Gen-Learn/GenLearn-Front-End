@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, CheckCircle, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import Button from "../../components/ui/Button";
 import { useAuth } from "../../contexts/AuthContext";
-import { useOnboardingQuestions } from "../../hooks/useOnboarding";
+import { useOnboardingQuestions } from "../../hooks/queries/useGetOnboarding";
 import onboardingService from "../../services/onboardingService";
 import { OnboardingFormData, OnboardingQuestion } from "../../types/onboardingModel";
 
@@ -47,38 +47,38 @@ function Onboarding() {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
   const { questions, isLoading, error } = useOnboardingQuestions();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<OnboardingFormData>>(EMPTY_FORM_DATA);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [expandedOptions, setExpandedOptions] = useState<Record<number, boolean>>({});
+  const [ currentStep, setCurrentStep ] = useState(0);
+  const [ formData, setFormData ] = useState<Partial<OnboardingFormData>>(EMPTY_FORM_DATA);
+  const [ isSubmitting, setIsSubmitting ] = useState(false);
+  const [ submitError, setSubmitError ] = useState<string | null>(null);
+  const [ expandedOptions, setExpandedOptions ] = useState<Record<number, boolean>>({});
 
   // Redirect if user is not in pending onboarding status
   useEffect(() => {
     if (user && user.onboardingStatus !== "pending") {
-      console.log("User onboarding status is not pending, redirecting to home.",user);
+      console.log("User onboarding status is not pending, redirecting to home.", user);
       navigate("/");
     }
-  }, [user?.onboardingStatus, navigate, user]);
-    console.log("User onboarding status:", user?.onboardingStatus);
+  }, [ user?.onboardingStatus, navigate, user ]);
+  console.log("User onboarding status:", user?.onboardingStatus);
   // Only show questions whose showIf condition (if any) matches the
   // current answers, then order them so userType -> matched conditional
   // field question -> everything else, regardless of the raw API order.
   const visibleQuestions: OnboardingQuestion[] = useMemo(() => {
     const filtered = questions.filter((q) => {
       if (!q.showIf) return true;
-      const dependentValue = formData[q.showIf.questionId as keyof OnboardingFormData];
+      const dependentValue = formData[ q.showIf.questionId as keyof OnboardingFormData ];
       return dependentValue === q.showIf.value;
     });
 
-    return [...filtered].sort((a, b) => {
-      const rankA = QUESTION_ORDER_RANK[a.id] ?? 2;
-      const rankB = QUESTION_ORDER_RANK[b.id] ?? 2;
+    return [ ...filtered ].sort((a, b) => {
+      const rankA = QUESTION_ORDER_RANK[ a.id ] ?? 2;
+      const rankB = QUESTION_ORDER_RANK[ b.id ] ?? 2;
       if (rankA !== rankB) return rankA - rankB;
       // Same rank: preserve the order the backend originally returned them in.
       return questions.indexOf(a) - questions.indexOf(b);
     });
-  }, [questions, formData]);
+  }, [ questions, formData ]);
 
   // Keep currentStep in bounds if the visible list shrinks
   // (e.g. user changed userType, removing a previously-visible question).
@@ -87,9 +87,9 @@ function Onboarding() {
     if (currentStep > visibleQuestions.length - 1) {
       setCurrentStep(visibleQuestions.length - 1);
     }
-  }, [visibleQuestions, currentStep]);
+  }, [ visibleQuestions, currentStep ]);
 
-  const currentQuestion = visibleQuestions[currentStep];
+  const currentQuestion = visibleQuestions[ currentStep ];
   const progress = visibleQuestions.length
     ? ((currentStep + 1) / visibleQuestions.length) * 100
     : 0;
@@ -101,7 +101,7 @@ function Onboarding() {
     setFormData((prev) => {
       const next: Partial<OnboardingFormData> = {
         ...prev,
-        [questionId]: value,
+        [ questionId ]: value,
       };
 
       // If the userType answer changes, clear any previously selected
@@ -109,7 +109,7 @@ function Onboarding() {
       // submitted alongside a mismatched userType.
       if (questionId === "userType") {
         USER_TYPE_DEPENDENT_FIELDS.forEach((field) => {
-          (next as Record<string, string | string[]>)[field] = "";
+          (next as Record<string, string | string[]>)[ field ] = "";
         });
       }
 
@@ -120,14 +120,14 @@ function Onboarding() {
   const handleMultiSelect = (value: string) => {
     if (!currentQuestion) return;
     const questionId = currentQuestion.id as keyof OnboardingFormData;
-    const currentValues = (formData[questionId] as string[]) || [];
+    const currentValues = (formData[ questionId ] as string[]) || [];
     const isSelected = currentValues.includes(value);
 
     setFormData((prev) => ({
       ...prev,
-      [questionId]: isSelected
+      [ questionId ]: isSelected
         ? currentValues.filter((v) => v !== value)
-        : [...currentValues, value],
+        : [ ...currentValues, value ],
     }));
   };
 
@@ -180,9 +180,9 @@ function Onboarding() {
       // never leaks into the payload.
       const visibleIds = new Set(visibleQuestions.map((q) => q.id));
       const payload: Record<string, unknown> = { skipped: false };
-      Object.entries(formData).forEach(([key, value]) => {
+      Object.entries(formData).forEach(([ key, value ]) => {
         if (visibleIds.has(key)) {
-          payload[key] = value;
+          payload[ key ] = value;
         }
       });
 
@@ -307,7 +307,7 @@ function Onboarding() {
                       type="radio"
                       name={currentQuestion.id}
                       value={option}
-                      checked={formData[currentQuestion.id as keyof OnboardingFormData] === option}
+                      checked={formData[ currentQuestion.id as keyof OnboardingFormData ] === option}
                       onChange={() => handleSingleSelect(option)}
                       className="w-5 h-5 text-primary-600 cursor-pointer"
                     />
@@ -324,28 +324,28 @@ function Onboarding() {
                         onClick={() =>
                           setExpandedOptions((prev) => ({
                             ...prev,
-                            [currentStep]: !prev[currentStep],
+                            [ currentStep ]: !prev[ currentStep ],
                           }))
                         }
                         className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 hover:border-primary-300 transition-all"
                       >
                         <span className="font-medium text-gray-700">
-                          {((formData[currentQuestion.id as keyof OnboardingFormData] as string[]) ||
+                          {((formData[ currentQuestion.id as keyof OnboardingFormData ] as string[]) ||
                             []).length > 0
                             ? `${(
-                                (formData[
-                                  currentQuestion.id as keyof OnboardingFormData
-                                ] as string[]) || []
-                              ).length} selected`
+                              (formData[
+                                currentQuestion.id as keyof OnboardingFormData
+                              ] as string[]) || []
+                            ).length} selected`
                             : "Select options"}
                         </span>
-                        {expandedOptions[currentStep] ? (
+                        {expandedOptions[ currentStep ] ? (
                           <ChevronUp className="w-5 h-5 text-gray-400" />
                         ) : (
                           <ChevronDown className="w-5 h-5 text-gray-400" />
                         )}
                       </button>
-                      {expandedOptions[currentStep] && (
+                      {expandedOptions[ currentStep ] && (
                         <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
                           {currentQuestion.options.map((option) => (
                             <label

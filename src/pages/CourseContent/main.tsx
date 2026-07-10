@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Badge } from "@/components/ui";
-import { useGetSingleCource } from "../../hooks/useGetSingleCource";
-import { useGetLecture } from "../../hooks/useGetLecture";
+import { useGetSingleCource } from "../../hooks/queries/useGetSingleCource";
+import { useGetLecture } from "../../hooks/queries/useGetLecture";
 import { Lecture } from "@/types/coursesModel";
 import { formatDuration } from "./utils/formatDuration";
 import { CourseSidebar, ContentPlayerArea, LectureTabs } from "./components";
@@ -20,16 +20,16 @@ type SelectedItem =
 
 export default function CourseContent() {
   const { courseId, lectureId } = useParams<{ courseId: string; lectureId: string }>();
-  const { course, loading, error } = useGetSingleCource(courseId ?? "");
-  const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
-  const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
-  const [quizId, setQuizId] = useState<string | null>(null);
-  const [showQuiz, setShowQuiz] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabKey>("transcript");
-  const [notesByLecture, setNotesByLecture] = useState<Record<string, string>>({});
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: course, isLoading, error } = useGetSingleCource(courseId ?? "");
+  const [ selectedLecture, setSelectedLecture ] = useState<Lecture | null>(null);
+  const [ selectedItem, setSelectedItem ] = useState<SelectedItem>(null);
+  const [ expandedSections, setExpandedSections ] = useState<string[]>([]);
+  const [ quizId, setQuizId ] = useState<string | null>(null);
+  const [ showQuiz, setShowQuiz ] = useState(false);
+  const [ activeTab, setActiveTab ] = useState<TabKey>("transcript");
+  const [ notesByLecture, setNotesByLecture ] = useState<Record<string, string>>({});
+  const [ currentTime, setCurrentTime ] = useState(0);
+  const [ isSidebarOpen, setIsSidebarOpen ] = useState(false);
   // Fetch full lecture detail (including transcript scripts) for whichever
   // lecture is currently selected. The course object doesn't carry scripts.
   const { lecture: lectureDetails } = useGetLecture(selectedLecture?.id ?? "") as {
@@ -38,7 +38,7 @@ export default function CourseContent() {
   // Tracks video playback position so the transcript can highlight the
   // active segment and support click-to-seek.
   const videoPlayerRef = useRef<any>(null);
-  
+
 
 
   const navigate = useNavigate();
@@ -66,35 +66,35 @@ export default function CourseContent() {
 
     // Fallback: no valid lectureId in the URL, select the first lecture
     if (!selectedLecture) {
-      const firstLecture = course.sections?.[0]?.lectures?.[0] ?? null;
+      const firstLecture = course.sections?.[ 0 ]?.lectures?.[ 0 ] ?? null;
       setSelectedLecture(firstLecture);
       if (firstLecture) {
         setSelectedItem({ type: "lecture", id: firstLecture.id });
       }
     }
-  }, [course, lectureId]);
+  }, [ course, lectureId ]);
 
   useEffect(() => {
     setShowQuiz(Boolean(quizId));
-  }, [quizId]);
+  }, [ quizId ]);
 
   // Reset playback position tracking whenever the selected lecture changes,
   // so a stale timestamp from the previous lecture doesn't briefly
   // highlight the wrong transcript segment in the new one.
   useEffect(() => {
     setCurrentTime(0);
-  }, [selectedLecture?.id]);
+  }, [ selectedLecture?.id ]);
 
   const currentSection = useMemo(() => {
     if (!course || !selectedLecture) return null;
     return course.sections.find((section) =>
       section.lectures.some((lecture) => lecture.id === selectedLecture.id)
     ) ?? null;
-  }, [course, selectedLecture]);
+  }, [ course, selectedLecture ]);
 
   const handleToggleSection = (sectionId: string) => {
     setExpandedSections((prev) =>
-      prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId]
+      prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [ ...prev, sectionId ]
     );
   };
 
@@ -135,17 +135,17 @@ export default function CourseContent() {
 
   const handleNotesChange = (value: string) => {
     if (!selectedLecture) return;
-    setNotesByLecture((prev) => ({ ...prev, [selectedLecture.id]: value }));
+    setNotesByLecture((prev) => ({ ...prev, [ selectedLecture.id ]: value }));
   };
 
   const handleSaveNotes = () => {
     if (!selectedLecture) return;
-    setNotesByLecture((prev) => ({ ...prev, [selectedLecture.id]: prev[selectedLecture.id] ?? "" }));
+    setNotesByLecture((prev) => ({ ...prev, [ selectedLecture.id ]: prev[ selectedLecture.id ] ?? "" }));
   };
 
-  const currentNotes = selectedLecture ? notesByLecture[selectedLecture.id] ?? "" : "";
+  const currentNotes = selectedLecture ? notesByLecture[ selectedLecture.id ] ?? "" : "";
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAFC]">
         <FullPageLoader />
@@ -158,7 +158,7 @@ export default function CourseContent() {
       <div className="min-h-screen bg-[#FAFAFC] flex items-center justify-center p-6">
         <EmptyState
           title="Unable to load course"
-          description={error ?? "There was a problem loading this course."}
+          description={error instanceof Error ? error.message : "There was a problem loading this course."}
           icon={BookOpen}
         />
       </div>
@@ -186,9 +186,8 @@ export default function CourseContent() {
         />
       )}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] transform transition-transform duration-300 lg:static lg:z-auto lg:w-auto lg:max-w-none lg:transform-none lg:flex-shrink-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] transform transition-transform duration-300 lg:static lg:z-auto lg:w-auto lg:max-w-none lg:transform-none lg:flex-shrink-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="h-full flex flex-col bg-white">
           <div className="lg:hidden flex items-center justify-end p-3 border-b border-gray-100">
@@ -218,13 +217,13 @@ export default function CourseContent() {
           videoPlayerRef={videoPlayerRef}
           onTimeUpdate={setCurrentTime}
           onVideoEnded={() => {
-            if (selectedLecture?.quizzes?.[0]?.id) {
-              setQuizId(selectedLecture.quizzes[0].id);
+            if (selectedLecture?.quizzes?.[ 0 ]?.id) {
+              setQuizId(selectedLecture.quizzes[ 0 ].id);
               setSelectedItem({ type: "lectureQuiz", id: selectedLecture.id });
             }
           }}
           onCloseQuiz={handleCloseQuiz}
-          loading={loading}
+          loading={isLoading}
           error={error}
         />
 
@@ -249,13 +248,13 @@ export default function CourseContent() {
                     {selectedLecture?.completed ? "Completed" : "In Progress"}
                   </Badge>
                 </div>
-                {!selectedLecture?.completed && !showQuiz && selectedLecture?.quizzes?.[0]?.id && (
+                {!selectedLecture?.completed && !showQuiz && selectedLecture?.quizzes?.[ 0 ]?.id && (
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => {
-                      if (selectedLecture?.quizzes?.[0]?.id) {
-                        setQuizId(selectedLecture.quizzes[0].id);
+                      if (selectedLecture?.quizzes?.[ 0 ]?.id) {
+                        setQuizId(selectedLecture.quizzes[ 0 ].id);
                         setSelectedItem({ type: "lectureQuiz", id: selectedLecture.id });
                       }
                     }}

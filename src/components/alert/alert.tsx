@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useGetSingleCource } from "@/hooks/useGetSingleCource"
+import { useGetSingleCource } from "@/hooks/queries/useGetSingleCource"
 type Notification = {
   id: string;
   title: string;
@@ -18,12 +18,12 @@ type Props = {
 };
 
 const iconMap: Record<
-  NonNullable<Notification["type"]>,
+  NonNullable<Notification[ "type" ]>,
   { icon: string; bgClass: string; textClass: string }
 > = {
-  social:  { icon: "👤", bgClass: "bg-[#CECBF6]", textClass: "text-[#3C3489]" },
+  social: { icon: "👤", bgClass: "bg-[#CECBF6]", textClass: "text-[#3C3489]" },
   warning: { icon: "⚠️", bgClass: "bg-[#FAC775]", textClass: "text-[#633806]" },
-  success: { icon: "✓",  bgClass: "bg-[#9FE1CB]", textClass: "text-[#085041]" },
+  success: { icon: "✓", bgClass: "bg-[#9FE1CB]", textClass: "text-[#085041]" },
   message: { icon: "💬", bgClass: "bg-[#F5C4B3]", textClass: "text-[#712B13]" },
 };
 
@@ -52,7 +52,7 @@ const BellIcon = () => (
 );
 
 export default function NotificationPanel({ notifications, onMarkAllRead, onViewAll, courseID }: Props) {
-  const [items, setItems] = useState<Notification[]>(notifications);
+  const [ items, setItems ] = useState<Notification[]>(notifications);
   const { course } = useGetSingleCource(courseID || '');
   const unreadCount = items.filter((n) => !n.read).length;
 
@@ -105,10 +105,10 @@ export default function NotificationPanel({ notifications, onMarkAllRead, onView
           </div>
         ) : (
           items.map((notification) => {
-            const { icon, bgClass, textClass } = iconMap[notification.type ?? "social"];
+            const { icon, bgClass, textClass } = iconMap[ notification.type ?? "social" ];
             return (
               <Link
-             to={`/course/${courseID}/section/${course?.sections[0].id}/lecture/${course?.sections[0].lectures[0].id}`}
+                to={`/course/${courseID}/section/${course?.sections[ 0 ].id}/lecture/${course?.sections[ 0 ].lectures[ 0 ].id}`}
                 key={notification.id}
                 role="button"
                 tabIndex={0}

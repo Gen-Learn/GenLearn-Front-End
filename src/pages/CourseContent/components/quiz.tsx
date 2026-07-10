@@ -1,34 +1,45 @@
 import { useEffect } from "react";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
-import { useGetAttemps } from "../../../hooks/useGetAttemps";
-import { useQuiz } from "../../../hooks/useGetQuiz";
-import { useSubmitQuiz } from "../../../hooks/useSubmitQuiz";
+import { useGetQuiz } from "@/hooks/queries/useGetQuiz";
+import { useSubmitQuiz } from "../../../hooks/mutations/useSubmitQuiz";
 import { QuizLoadingSkeleton } from '@/components/loading';
 import { NoQuestionsYet } from '@/components/empty-states';
-
+import { useQuizAttempts } from "@/hooks/queries/useQuizAttempts"
+import { useQuizSession } from "@/hooks/session/useQuizSession"
 type QuizSectionProps = {
   quizId: string | null;
   onBackToVideo?: () => void;
 };
 
 export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps) {
-  const { attempts, loading: attemptsLoading, error: attemptsError, loadAttempts } = useGetAttemps(quizId);
-  const { error: submitHookError, loading: isSubmitting, submit } = useSubmitQuiz(quizId);
   const {
-    quiz, 
-    loading, 
+    data: attempts = [],
+    isLoading: attemptsLoading,
+    error: attemptsError,
+  } = useQuizAttempts(quizId ?? "");
+  const {
+    data: quiz,
+    isLoading,
     error,
+  } = useGetQuiz(quizId || '');
+  const {
+    mutateAsync: submit,
+    isPending: isSubmitting,
+    error: submitHookError,
+  } = useSubmitQuiz(quizId ?? "");
+
+  const {
     selectedAnswers,
     currentQuestionIndex,
     view,
     reviewAnswerIndex,
     answeredCount,
     currentQuestion,
-    isLastQuestion,
-    allQuestionsAnswered,
     latestAttempt,
     currentReviewAnswer,
+    isLastQuestion,
     isLastReviewAnswer,
+    allQuestionsAnswered,
     handleStartQuiz,
     handleReviewLatestAttempt,
     handleSelectAnswer,
@@ -39,14 +50,14 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
     goToNextReviewAnswer,
     showPrompt,
     showReview,
-  } = useQuiz(quizId || "", attempts);
+  } = useQuizSession(quiz, attempts);
 
   useEffect(() => {
     if (!quizId) return;
     if (!attemptsLoading) {
       showPrompt(attempts.length > 0);
     }
-  }, [attempts.length, attemptsLoading, quizId, showPrompt]);
+  }, [ attempts.length, attemptsLoading, quizId, showPrompt ]);
 
   const submitError = submitHookError ? submitHookError.message : null;
 
@@ -62,16 +73,18 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
     }
 
     try {
-      await submit({
+      const result = await submit({
         answers: quiz.questions.map((question) => ({
           questionId: question.id,
-          selectedOptionId: selectedAnswers[question.id],
+          selectedOptionId: selectedAnswers[ question.id ],
         })),
       });
-      await loadAttempts();
+
+      console.log("Submit result:", result);
+
       showReview();
-    } catch {
-      // submission errors are exposed via the hook state
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -86,7 +99,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
   if (!quizId) {
     return <NoQuestionsYet />;
   }
-
+  console.log("Current view:", view);
   return (
     // max-h + overflow-y-auto: the quiz can be taller than the video-sized
     // container it's swapped into, this lets it scroll internally instead
@@ -113,25 +126,25 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
         )}
       </div>
 
-      {loading && (
+      {isLoading && (
         <div className="flex min-h-[220px] sm:min-h-[280px] items-center justify-center rounded-xl bg-white/70">
           <QuizLoadingSkeleton />
         </div>
       )}
 
-      {!loading && error && (
+      {!isLoading && error && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          {error}
+          {error instanceof Error ? error.message : "We could not find the Quiz you requested."}
         </div>
       )}
 
-      {!loading && !error && quiz && attemptsLoading && view === "quiz" && (
+      {!isLoading && !error && quiz && attemptsLoading && view === "quiz" && (
         <div className="rounded-xl border border-gray-200 bg-white/80 p-4 text-sm text-gray-500">
           Checking your previous attempts...
         </div>
       )}
 
-      {!loading && !error && quiz && view === "prompt" && latestAttempt && (
+      {!isLoading && !error && quiz && view === "prompt" && latestAttempt && (
         <div className="rounded-2xl border border-purple-200 bg-white p-4 sm:p-5 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-purple-600">
             Previous attempt found
@@ -160,7 +173,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
         </div>
       )}
 
-      {!loading && !error && quiz && view === "quiz" && (
+      {!isLoading && !error && quiz && view === "quiz" && (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3 rounded-xl border border-purple-100 bg-white/80 px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">
             <span>{quiz.questions.length} questions</span>
@@ -180,21 +193,19 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
 
               <div className="space-y-2">
                 {currentQuestion.options.map((option) => {
-                  const isSelected = selectedAnswers[currentQuestion.id] === option.id;
+                  const isSelected = selectedAnswers[ currentQuestion.id ] === option.id;
                   return (
                     <button
                       key={option.id}
                       onClick={() => handleSelectAnswerWithReset(currentQuestion.id, option.id)}
-                      className={`flex w-full items-start gap-2 rounded-xl border px-3 py-3 text-left text-sm transition ${
-                        isSelected
-                          ? "border-purple-500 bg-purple-50 text-purple-800"
-                          : "border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/70"
-                      }`}
+                      className={`flex w-full items-start gap-2 rounded-xl border px-3 py-3 text-left text-sm transition ${isSelected
+                        ? "border-purple-500 bg-purple-50 text-purple-800"
+                        : "border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/70"
+                        }`}
                     >
                       <span
-                        className={`mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full border border-current ${
-                          isSelected ? "bg-current" : ""
-                        }`}
+                        className={`mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full border border-current ${isSelected ? "bg-current" : ""
+                          }`}
                       />
                       <span className="break-words">{option.optionText}</span>
                     </button>
@@ -246,7 +257,7 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
         </>
       )}
 
-      {!loading && !error && quiz && view === "review" && latestAttempt && currentReviewAnswer && (
+      {!isLoading && !error && quiz && view === "review" && latestAttempt && currentReviewAnswer && (
         <div className="rounded-2xl border border-emerald-200 bg-white p-4 sm:p-5 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -272,9 +283,9 @@ export default function QuizSection({ quizId, onBackToVideo }: QuizSectionProps)
             <p className="mt-2 text-sm text-gray-600 break-words">
               Your answer: {currentReviewAnswer.selectedOptionText || "Not answered"}
             </p>
-            <p className="mt-2 text-sm text-gray-600 break-words">
+            {currentReviewAnswer.isCorrect === false && (<p className="mt-2 text-sm text-gray-600 break-words">
               Correct answer: {currentReviewAnswer.correctOption?.optionText || "Not available"}
-            </p>
+            </p>)}
             {currentReviewAnswer.isCorrect === false && currentReviewAnswer.explanation && (
               <p className="mt-3 text-sm text-purple-700 break-words">{currentReviewAnswer.explanation}</p>
             )}

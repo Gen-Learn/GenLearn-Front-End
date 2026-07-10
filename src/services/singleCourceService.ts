@@ -1,8 +1,16 @@
 import axiosInstance from "./axios";
+import Course from "../types/coursesModel";
 
-const domain = import.meta.env.VITE_API_BASE_URL;
+interface CourseResponse {
+  data: {
+    course: Course;
+  };
+}
 
-export const getSingleCource = async (id: string) => {
-  const response = await axiosInstance.get(`${domain}/api/v1/courses/${id}`);
-  return response.data;
+export const getSingleCource = async (id: string): Promise<Course> => {
+  const response = await axiosInstance.get<CourseResponse>(
+    `/api/v1/courses/${id}`
+  );
+
+  return response.data.data.course;
 };

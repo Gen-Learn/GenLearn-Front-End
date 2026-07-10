@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 /**
  * Hook to redirect user to onboarding if their status is pending
@@ -17,5 +17,5 @@ export const useOnboardingRedirect = () => {
     ) {
       navigate("/onboarding", { replace: true });
     }
-  }, [user?.onboardingStatus, isAuthenticated, navigate]);
+  }, [ user?.onboardingStatus, isAuthenticated, navigate ]);
 };

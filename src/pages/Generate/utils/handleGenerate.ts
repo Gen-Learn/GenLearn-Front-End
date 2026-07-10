@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { submitGenerateJob } from '@/services/generateService';
 import { useNotification } from '@/contexts/NotificationContext';
-import { useGenerationSocket, type SocketStatus } from '@/hooks/useGenerationSocket';
+import { useGenerationSocket, type SocketStatus } from '@/hooks/mutations/useGenerationSocket';
 
 // Local phase before a jobId exists — the socket hook takes over
 // (and drives `processingStage`) as soon as a jobId is assigned.
@@ -11,13 +11,13 @@ type UploadPhase = 'idle' | 'uploading' | 'error';
 export type ProcessingStage = UploadPhase | SocketStatus;
 
 const handleGenerate = () => {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [courseId, setCourseid] = useState<string | null>(null);
-  const [courseName, setCourseName] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [ isDragOver, setIsDragOver ] = useState(false);
+  const [ courseId, setCourseid ] = useState<string | null>(null);
+  const [ courseName, setCourseName ] = useState<string | null>(null);
+  const [ file, setFile ] = useState<File | null>(null);
+  const [ uploadPhase, setUploadPhase ] = useState<UploadPhase>('idle');
+  const [ jobId, setJobId ] = useState<string | null>(null);
+  const [ error, setError ] = useState<string | null>(null);
 
   const { addNotification, setCourseID } = useNotification();
 
@@ -58,7 +58,7 @@ const handleGenerate = () => {
     setUploadPhase('uploading');
 
     try {
-      const data = await submitGenerateJob([selectedFile]);
+      const data = await submitGenerateJob([ selectedFile ]);
       const responseData = data?.data ?? data;
       const id = responseData?.jobId;
 
@@ -84,17 +84,17 @@ const handleGenerate = () => {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    const droppedFile = e.dataTransfer.files[0];
+    const droppedFile = e.dataTransfer.files[ 0 ];
     if (droppedFile && droppedFile.type === 'application/pdf') {
       handleGenerateCourse(droppedFile);
     }
-  }, [handleGenerateCourse]);
+  }, [ handleGenerateCourse ]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
+    const selectedFile = e.target.files?.[ 0 ];
     if (selectedFile) handleGenerateCourse(selectedFile);
     e.target.value = '';
-  }, [handleGenerateCourse]);
+  }, [ handleGenerateCourse ]);
 
   const resetUpload = () => {
     setFile(null);

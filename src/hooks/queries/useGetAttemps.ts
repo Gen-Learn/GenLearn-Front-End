@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { getQuizAttempts } from "../services/quizService";
-import type { QuizAttempt } from "../types/quizModel";
+import { getQuizAttempts } from "../../services/quizService";
+import type { QuizAttempt } from "../../types/quizModel";
 
 export const useGetAttemps = (quizId: string | null) => {
-  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ attempts, setAttempts ] = useState<QuizAttempt[]>([]);
+  const [ loading, setLoading ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
 
   const loadAttempts = useCallback(async () => {
     if (!quizId) {
@@ -26,11 +26,11 @@ export const useGetAttemps = (quizId: string | null) => {
     } finally {
       setLoading(false);
     }
-  }, [quizId]);
+  }, [ quizId ]);
 
   useEffect(() => {
     void loadAttempts();
-  }, [loadAttempts]);
+  }, [ loadAttempts ]);
 
   return { attempts, loading, error, loadAttempts };
 };

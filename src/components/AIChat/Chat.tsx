@@ -14,7 +14,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from '../ui';
 import { sendChatbotResponse } from '../../services/chatbotService';
-import { useParams } from 'react-router-dom';
 interface Message {
   id: string;
   role: 'user' | 'assistant';

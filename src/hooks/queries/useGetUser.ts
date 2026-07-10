@@ -1,6 +1,6 @@
-import { getCurrentUser } from "../services/userService";
+import { getCurrentUser } from "../../services/userService";
 import { useState, useEffect } from "react";
-import { User } from "../types/userModel";
+import { User } from "../../types/userModel";
 
 // Standalone hook for components that want a fresh user fetch without
 // pulling in the whole AuthContext. Note: AuthContext.tsx already does this
@@ -10,9 +10,9 @@ import { User } from "../types/userModel";
 // when you specifically need an independent, re-fetchable copy (e.g. a
 // settings page that wants to re-pull the latest profile on its own).
 export const useGetUser = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [ user, setUser ] = useState<User | null>(null);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;

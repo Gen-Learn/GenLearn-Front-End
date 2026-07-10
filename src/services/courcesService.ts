@@ -1,9 +1,18 @@
+// services/courcesService.ts
+
 import axiosInstance from "./axios";
+import Course from "../types/coursesModel";
 
-const domain = import.meta.env.VITE_API_BASE_URL;
+interface CoursesResponse {
+  data: {
+    courses: Course[];
+  };
+}
 
-export const getCourses = async () => {
-  const response = await axiosInstance.get(`${domain}/api/v1/courses`);
+export const getCourses = async (): Promise<Course[]> => {
+  const response = await axiosInstance.get<CoursesResponse>(
+    "/api/v1/courses"
+  );
 
-  return response;
+  return response.data.data.courses;
 };

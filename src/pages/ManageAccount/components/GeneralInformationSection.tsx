@@ -5,20 +5,20 @@ import SectionCard from './SectionCard';
 import { FormField, TextAreaField } from './FormField';
 import SaveButton from './SaveButton';
 import { User } from "../../../types/userModel";
-import { useUpdateUser } from '../../../hooks/useUpdateUser';
+import { useUpdateUser } from '../../../hooks/mutations/useUpdateUser';
 
 const GeneralInformationSection = ({ user }: { user: User }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleUpdate, loading, error } = useUpdateUser();
 
-  const [avatar, setAvatar] = useState(
+  const [ avatar, setAvatar ] = useState(
     'https://api.dicebear.com/7.x/adventurer/svg?seed=Mohamed&backgroundColor=b6e3f4'
   );
-  const [name, setName] = useState(user?.name || "");
-  const [biography, setBiography] = useState(user?.biography || "");
+  const [ name, setName ] = useState(user?.name || "");
+  const [ biography, setBiography ] = useState(user?.biography || "");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[ 0 ];
     if (file) setAvatar(URL.createObjectURL(file));
     // Note: this only updates the local preview. If you want the new avatar
     // actually saved, you'll need to upload `file` separately (e.g. as FormData)

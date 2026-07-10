@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import onboardingService from "../services/onboardingService";
-import { OnboardingQuestion } from "../types/onboardingModel";
+import onboardingService from "../../services/onboardingService";
+import { OnboardingQuestion } from "../../types/onboardingModel";
 
 interface UseOnboardingQuestionsReturn {
   questions: OnboardingQuestion[];
@@ -9,9 +9,9 @@ interface UseOnboardingQuestionsReturn {
 }
 
 export const useOnboardingQuestions = (): UseOnboardingQuestionsReturn => {
-  const [questions, setQuestions] = useState<OnboardingQuestion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [ questions, setQuestions ] = useState<OnboardingQuestion[]>([]);
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ error, setError ] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {

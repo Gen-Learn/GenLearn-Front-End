@@ -4,13 +4,13 @@ import SecuritySection from './components/SecuritySection'
 import DeleteAccountSection from './components/DeleteAccountSection'
 import { Link } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext'
-import {useGetUser} from "../../hooks/useGetUser"
+import { useGetUser } from "../../hooks/queries/useGetUser"
 import { FullPageLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { BookOpen } from 'lucide-react';
 export default function ManageAccount() {
 
-  const {user,loading} = useGetUser();
+  const { user, loading } = useGetUser();
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FAFAFC]">

@@ -10,14 +10,13 @@ import {
 import { Button } from '@/components/ui/index';
 import { CourseListItem, CourseCard } from "./components/index";
 import { Header } from '@/layout/index';
-import { useGetAllCourses } from "@/hooks/useGetAllCources";
-import { useGetSingleCource } from '@/hooks/useGetSingleCource';
+import { useGetAllCourses } from "@/hooks/queries/useGetAllCources";
+import { useGetSingleCource } from '@/hooks/queries/useGetSingleCource';
 import Course from '@/types/coursesModel';
-import img from '@/assets/images/Cardimg.png';
 import { CourseGridSkeleton } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { Link } from 'react-router-dom';
-import {useGetCoursesImages} from "@/hooks/useGetCoursesImages"
+import { useGetCoursesImages } from "@/hooks/queries/useGetCoursesImages"
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
@@ -46,7 +45,7 @@ function CourseCardWithDetails({
   courseImage: string;
   viewMode: ViewMode;
 }) {
-  const { course: singleCourse } = useGetSingleCource(course.id);
+  const { data: singleCourse } = useGetSingleCource(course.id);
 
   // Use reduce to count total lectures across all sections
   const lecturesCount = useMemo(() => {
@@ -55,12 +54,12 @@ function CourseCardWithDetails({
       (total, section) => total + (section.lectures?.length ?? 0),
       0
     );
-  }, [singleCourse]);
+  }, [ singleCourse ]);
   const displayCourse: DisplayCourse = {
     id: course.id,
     title: course.name,
     description: course.description,
-    thumbnail: courseImage ,
+    thumbnail: courseImage,
     courseDurationInMinutes: course.courseDurationInMinutes,
     sections_count: course.numsOfSections,
     lectures_count: lecturesCount,
@@ -77,15 +76,19 @@ function CourseCardWithDetails({
 
 // ─── Main page ─────────────────────────────────────────────────────────────────
 export default function CoursesPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [sortBy, setSortBy] = useState<SortOption>('recent');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const { courses, loading, error } = useGetAllCourses();
-  const { courseImages,loadingImages } = useGetCoursesImages();
+  const [ searchQuery, setSearchQuery ] = useState('');
+  const [ viewMode, setViewMode ] = useState<ViewMode>('grid');
+  const [ sortBy, setSortBy ] = useState<SortOption>('recent');
+  const [ statusFilter, setStatusFilter ] = useState<StatusFilter>('all');
+  const [ showFilters, setShowFilters ] = useState(false);
+  const {
+    data: courses = [],
+    isLoading,
+    error,
+  } = useGetAllCourses();
+  const { courseImages, loadingImages } = useGetCoursesImages();
   const filteredCourses = useMemo(() => {
-    let coursesCopy = [...courses.filter(Boolean)];
+    let coursesCopy = [ ...courses.filter(Boolean) ];
 
     if (searchQuery) {
       coursesCopy = coursesCopy.filter(c =>
@@ -113,12 +116,12 @@ export default function CoursesPage() {
             not_started: 1,
             completed: 2,
           };
-          return statusOrder[a.status] - statusOrder[b.status];
+          return statusOrder[ a.status ] - statusOrder[ b.status ];
         });
     }
 
     return coursesCopy;
-  }, [courses, searchQuery, statusFilter, sortBy]);
+  }, [ courses, searchQuery, statusFilter, sortBy ]);
 
 
   const formatDuration = (minutes: number) => {
@@ -134,7 +137,7 @@ export default function CoursesPage() {
         <main className="max-w-7xl mx-auto px-6 py-8">
           <EmptyState
             title="Unable to load courses"
-            description={error}
+            description={error instanceof Error ? error.message : "Something went wrong."}
             icon={BookOpen}
           />
         </main>
@@ -145,20 +148,20 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       <Header />
-      
+
       <main className="max-w-7xl mx-auto px-6 py-8">
-        
+
         <div className="mb-8">
           <div className="flex  gap-4 mb-2 justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">My Courses</h1>
             <Link
-            to="/"
-            data-nav="home"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 "
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
+              to="/"
+              data-nav="home"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 "
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
           </div>
           <p className="text-gray-600">Continue learning from your generated courses</p>
         </div>
@@ -207,15 +210,14 @@ export default function CoursesPage() {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700">Status:</span>
                 <div className="flex gap-2">
-                  {(['all', 'not_started', 'in_progress', 'completed'] as const).map((status) => (
+                  {([ 'all', 'not_started', 'in_progress', 'completed' ] as const).map((status) => (
                     <button
                       key={status}
                       onClick={() => setStatusFilter(status)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        statusFilter === status
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statusFilter === status
                           ? 'bg-primary-100 text-primary-700'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                        }`}
                     >
                       {status === 'all'
                         ? 'All'
@@ -246,9 +248,9 @@ export default function CoursesPage() {
           {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
         </p>
 
-        {loading || loadingImages? (
-            <CourseGridSkeleton />
-        ):filteredCourses.length === 0 ? (
+        {isLoading || loadingImages ? (
+          <CourseGridSkeleton />
+        ) : filteredCourses.length === 0 ? (
           searchQuery || statusFilter !== 'all' ? (
             <EmptyState
               title="No results found"
@@ -266,7 +268,7 @@ export default function CoursesPage() {
             />
           )
         ) : (
-          
+
           // ↓ viewMode passed down; CourseCardWithDetails renders the right variant
           <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredCourses.map((course) => (
@@ -275,7 +277,7 @@ export default function CoursesPage() {
                 course={course}
                 formatDuration={formatDuration}
                 viewMode={viewMode}
-                courseImage={courseImages[course.id]}
+                courseImage={courseImages[ course.id ]}
               />
             ))}
           </div>

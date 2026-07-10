@@ -1,25 +1,25 @@
 import img from "../../assets/images/signup.png";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router";
 import Button from "../../components/ui/Button.jsx";
 import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowLeft, Zap, CheckCircle } from 'lucide-react';
-import { useOnboardingRedirect } from "../../hooks/useOnboardingRedirect";
+import { useOnboardingRedirect } from "../../hooks/session/useOnboardingRedirect";
 
 function SignUp() {
-  const { register, isLoading, error, clearError,setError } = useAuth();
+  const { register, isLoading, error, clearError, setError } = useAuth();
   const navigate = useNavigate();
   useOnboardingRedirect();
-  const [form, setForm] = useState({
+  const [ form, setForm ] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [ confirmPassword, setConfirmPassword ] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
+  const [ googleLoading, setGoogleLoading ] = useState(false);
+  const [ success, setSuccess ] = useState(false);
 
   const passwordStrength = () => {
     if (form.password.length < 6) return { strength: 'weak', color: 'bg-red-500', width: 'w-1/3' };
@@ -29,37 +29,37 @@ function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log("Sending to backend:", form); 
+
+    console.log("Sending to backend:", form);
     clearError();
     try {
       if (form.password !== confirmPassword) {
-          setError('Passwords do not match');
-          return;
-        }
+        setError('Passwords do not match');
+        return;
+      }
 
-        if (form.password.length < 6) {
-          setError('Password must be at least 6 characters');
-          return;
-        }
+      if (form.password.length < 6) {
+        setError('Password must be at least 6 characters');
+        return;
+      }
       await register(form);
       navigate("/");
-    } catch(err) {
+    } catch (err) {
 
-        if (error?.includes('already registered')) {
-          setError('An account with this email already exists');
-          }
+      if (error?.includes('already registered')) {
+        setError('An account with this email already exists');
+      }
 
-        setSuccess(false);
+      setSuccess(false);
 
-    }finally{
+    } finally {
       setSuccess(true);
     }
-};
-  useEffect(()=>{
+  };
+  useEffect(() => {
     clearError();
-  },[])
- if (success) {
+  }, [])
+  if (success) {
     return (
       <div className="min-h-screen bg-[#FAFAFC] flex items-center justify-center p-8">
         <div className="w-full max-w-md text-center">
@@ -105,7 +105,7 @@ function SignUp() {
                 <User className="w-12 h-12 text-white" />
               </div>
             </div>
-            {[...Array(6)].map((_, i) => (
+            {[ ...Array(6) ].map((_, i) => (
               <div
                 key={i}
                 className="absolute w-4 h-4 rounded-full bg-white/40 animate-float"
@@ -150,7 +150,7 @@ function SignUp() {
 
           {/* Google Sign Up */}
           <button
-            onClick={()=>{console.log("not working yet")}}
+            onClick={() => { console.log("not working yet") }}
             disabled={googleLoading}
             className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-2xl border-2 border-gray-200 bg-white hover:bg-gray-50 transition-colors mb-6 disabled:opacity-50"
           >
@@ -192,7 +192,7 @@ function SignUp() {
                   id="name"
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm({...form ,name:e.target.value})}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="John Doe"
                   required
                   className="w-full pl-12 pr-4 py-3 rounded-2xl border border-gray-200 focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20 transition-all"
@@ -211,7 +211,7 @@ function SignUp() {
                   id="email"
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm({...form ,email:e.target.value})}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="you@example.com"
                   required
                   className="w-full pl-12 pr-4 py-3 rounded-2xl border border-gray-200 focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20 transition-all"
@@ -230,7 +230,7 @@ function SignUp() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
-                  onChange={(e) => setForm({...form ,password:e.target.value})}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="Create a password"
                   required
                   className="w-full pl-12 pr-12 py-3 rounded-2xl border border-gray-200 focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20 transition-all"

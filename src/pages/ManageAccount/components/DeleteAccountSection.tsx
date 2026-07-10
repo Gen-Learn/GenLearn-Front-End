@@ -1,7 +1,7 @@
 import { IoWarningOutline } from 'react-icons/io5';
-import { useDeleteUser } from '@/hooks/useDeleteUser';
+import { useDeleteUser } from '@/hooks/mutations/useDeleteUser';
 const DeleteAccountSection = () => {
-    const {isDeleted,Error,HandleDeleteAccount}=useDeleteUser();
+  const { isDeleted, Error, HandleDeleteAccount } = useDeleteUser();
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">

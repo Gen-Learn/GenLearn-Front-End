@@ -1,4 +1,4 @@
-import { 
+import {
   Hero,
   TrustedBy,
   HowItWorks,
@@ -6,10 +6,11 @@ import {
   SampleCourses,
   Statistics,
   Testimonials,
-  FAQ } from "./components/index";
-  
+  FAQ
+} from "./components/index";
+
 import { useEffect } from "react";
-import { useOnboardingRedirect } from "../../hooks/useOnboardingRedirect";
+import { useOnboardingRedirect } from "../../hooks/session/useOnboardingRedirect";
 
 function Home() {
   useOnboardingRedirect();

@@ -1,16 +1,16 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen } from 'lucide-react';
-import { useGetSingleCource } from '../../hooks/useGetSingleCource';
-import { CourseHeroCard ,CourseContentAccordion} from './components/index';
+import { useGetSingleCource } from '../../hooks/queries/useGetSingleCource';
+import { CourseHeroCard, CourseContentAccordion } from './components/index';
 import { FullPageLoader } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
-import {Header } from '@/layout/index';
+import { Header } from '@/layout/index';
 import { CourseDetailsSkeleton } from '@/components/loading';
-import { useGetCoursesImages } from '@/hooks/useGetCoursesImages';
+import { useGetCoursesImages } from '@/hooks/queries/useGetCoursesImages';
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const { course, loading, error } = useGetSingleCource(id || '');
-  const { courseImages,loadingImages } = useGetCoursesImages();
+  const { data: course, isLoading, error } = useGetSingleCource(id || '');
+  const { courseImages, loadingImages } = useGetCoursesImages();
   console.log("CourseDetailsPage - course:", course);
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
@@ -26,20 +26,20 @@ export default function CourseDetailsPage() {
           Back to Courses
         </Link>
 
-        {(loading || loadingImages) && <CourseDetailsSkeleton />}
+        {(isLoading || loadingImages) && <CourseDetailsSkeleton />}
 
-        {!loading && (error || !course) && (
+        {!isLoading && (error || !course) && (
           <EmptyState
             title="Course not found"
-            description={error ?? 'We could not find the course you requested.'}
+            description={error instanceof Error ? error.message : "We could not find the course you requested."}
             icon={BookOpen}
           />
         )}
 
-        {!loading && !loadingImages && course && (
+        {!isLoading && !loadingImages && course && (
           <>
             <CourseHeroCard course={course} courseImages={courseImages} />
-            <CourseContentAccordion sections={course.sections || []} courseId={course.id}  />
+            <CourseContentAccordion sections={course.sections || []} courseId={course.id} />
           </>
         )}
       </main>
