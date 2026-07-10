@@ -1,7 +1,6 @@
 import { BookOpen, Play, Award, Film } from 'lucide-react';
 import { Button, Card, Badge, LinearProgress, CircularProgress } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-import img from '@/assets/images/Cardimg.png';
 import  Course from "@/types/coursesModel"
 
 interface CourseImageMap {
@@ -36,7 +35,7 @@ export default function CourseHeroCard({ course ,courseImages}: Props) {
     if(section.lectures) acc= acc + section.lectures.length;
     return acc;
   },0)
-  const totalQuizzes =   numsOfSections + totalLectures;
+  const totalQuizzes =   numsOfSections + totalLectures -1;
   return (
     <Card className="!p-0 overflow-hidden mb-8">
       <div className="flex flex-col lg:flex-row">

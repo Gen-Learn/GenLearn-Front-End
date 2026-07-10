@@ -1,5 +1,5 @@
 import img from "../../assets/images/login.png";
-import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft, Zap, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft, User, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import Button from "../../components/ui/Button.jsx";
 import authService from "../../services/authService";
 import { useOnboardingRedirect } from "../../hooks/session/useOnboardingRedirect";
+import image from "@/assets/images/logoOld.png";
 function Login() {
   const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -61,9 +62,7 @@ function Login() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-white relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Zap className="w-5 h-5" />
-          </div>
+          <img src={image} alt="GenLearn" className="w-10"/>
           <span className="text-xl font-bold">GenLearn</span>
         </Link>
 
@@ -78,7 +77,7 @@ function Login() {
             {/* Center icon */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl">
-                <Zap className="w-12 h-12 text-white" />
+                <User className="w-12 h-12 text-white" />
               </div>
             </div>
 
@@ -100,7 +99,7 @@ function Login() {
         {/* Quote */}
         <div className="relative z-10 text-white">
           <p className="text-xl font-medium mb-2">"Transform your learning journey"</p>
-          <p className="text-white/70">Join 50,000+ learners using AI-powered education</p>
+          <p className="text-white/70">Join thousands of learners transforming education with AI</p>
         </div>
       </div>
 

@@ -1,4 +1,3 @@
-import img from "../../assets/images/signup.png";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +5,7 @@ import { Link } from "react-router";
 import Button from "../../components/ui/Button.jsx";
 import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowLeft, Zap, CheckCircle } from 'lucide-react';
 import { useOnboardingRedirect } from "../../hooks/session/useOnboardingRedirect";
-
+import image from "@/assets/images/logoOld.png";
 function SignUp() {
   const { register, isLoading, error, clearError, setError } = useAuth();
   const navigate = useNavigate();
@@ -88,9 +87,7 @@ function SignUp() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-white relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Zap className="w-5 h-5" />
-          </div>
+          <img src={image} alt="GenLearn" className="w-10" />
           <span className="text-xl font-bold">GenLearn</span>
         </Link>
 

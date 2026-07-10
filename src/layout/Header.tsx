@@ -1,110 +1,122 @@
-import { Link } from 'react-router-dom';
-import { Bell, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/index';
-import Alert from '@/components/alert/alert';
-import { useEffect, useState } from 'react';
-import { useNotification } from '@/contexts/NotificationContext';
-import { useAuth } from '@/contexts/AuthContext';
-import image from '@/assets/images/logoOld.png';
+import { Link, useLocation } from "react-router-dom";
+import { Bell, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui";
+import Alert from "@/components/alert/alert";
+import { useEffect, useState } from "react";
+import { useNotification } from "@/contexts/NotificationContext";
+import { useAuth } from "@/contexts/AuthContext";
+import image from "@/assets/images/logoOld.png";
+
 export default function Header() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
-    const [notificationsOpen, setNotificationsOpen] = useState(false);
-    const { notifications, unreadCount, markAllRead, courseID } = useNotification();
-    const { logout } = useAuth();
-    const toggleNotifications = () => {
-    setNotificationsOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        setAvatarMenuOpen(false); // close the other dropdown
+  const location = useLocation();
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  const { notifications, unreadCount, markAllRead, courseID } = useNotification();
+  const { logout } = useAuth();
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setAvatarMenuOpen(false);
+    setNotificationsOpen(false);
+  }, [location.pathname]);
+
+  const toggleNotifications = () => {
+    setNotificationsOpen((p) => {
+      const n = !p;
+      if (n) {
+        setAvatarMenuOpen(false);
         markAllRead();
       }
-      return next;
+      return n;
     });
   };
-    const toggleAvatarMenu = () => {
-    setAvatarMenuOpen((prev) => {
-      const next = !prev;
-      if (next) setNotificationsOpen(false); // close the other dropdown
-      return next;
+
+  const toggleAvatarMenu = () => {
+    setAvatarMenuOpen((p) => {
+      const n = !p;
+      if (n) setNotificationsOpen(false);
+      return n;
     });
   };
-    const handleLogout = async () => {
+
+  const handleLogout = async () => {
     setAvatarMenuOpen(false);
     setMobileMenuOpen(false);
     await logout();
   };
 
-    useEffect(() => {
-      setNotificationsOpen(false);
-      setAvatarMenuOpen(false);
-      setMobileMenuOpen(false);
-    }, [location.pathname]);
-  
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" data-nav="courses" className="flex items-center gap-2">
-          <img src={image} alt="GenLearn Logo" className="w-15 h-15" />
-          <span className="text-xl font-bold text-gray-900">GenLearn</span>
+    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+        <Link to="/" className="flex items-center gap-2">
+          <img src={image} alt="GenLearn" className="w-8 sm:w-10" />
+          <span className="text-lg font-bold text-gray-900 sm:text-xl">GenLearn</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <Link to="/generate" data-nav="upload">
+
+        <div className="hidden md:flex items-center gap-2 lg:gap-3">
+          <Link to="/generate">
             <Button variant="ghost" size="sm">Upload PDF</Button>
           </Link>
+
           <div className="relative">
-            <button
-              type="button"
-              onClick={toggleNotifications}
-              className="flex justify-center items-center text-2xl gap-2 px-4 py-2 rounded-xl text-gray-600 hover:bg-[#f1e1f7] hover:text-[#8864b5] transition-colors duration-300"
-            >
-              <Bell className="w-5 h-5 text-gray-600" />
+            <button onClick={toggleNotifications} className="relative rounded-xl p-2 hover:bg-purple-50">
+              <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-5 min-w-[1.25rem] rounded-full bg-[#d946ef] text-white text-[0.65rem] font-semibold px-1">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-fuchsia-500 px-1 text-[10px] text-white">
                   {unreadCount}
                 </span>
               )}
             </button>
-
             {notificationsOpen && <Alert notifications={notifications} courseID={courseID} />}
           </div>
-          <div
-            onClick={toggleAvatarMenu}
-            className="relative flex justify-center items-center gap-2 px-4 py-2 rounded-xl text-gray-600  hover:text-[#8864b5] transition-colors duration-300 cursor-pointer"
-          >
+
+          <div className="relative">
             <button
-              data-nav="profile"
-              className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-semibold hover:scale-105 transition-transform"
-            >
+              onClick={toggleAvatarMenu}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 font-semibold text-white">
               JP
             </button>
+
             {avatarMenuOpen && (
-              <div className="absolute top-11 right-0 bg-white shadow-lg rounded-md py-2 w-48 z-50">
-                <Link
-                  to="/profile"
-                  onClick={() => setAvatarMenuOpen(false)}
-                  className="text-sm block px-4 py-2 hover:bg-gray-100"
-                >
-                  Profile
-                </Link>
-                <Link
-                  to="/manage-account"
-                  onClick={() => setAvatarMenuOpen(false)}
-                  className="text-sm block px-4 py-2 hover:bg-gray-100"
-                >
-                  Manage Account
-                </Link>
-                <div
-                  onClick={handleLogout}
-                  className="text-sm block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  Logout
-                </div>
+              <div className="absolute right-0 top-12 w-48 rounded-md bg-white py-2 shadow-lg">
+                <Link to="/profile" onClick={()=>setAvatarMenuOpen(false)} className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
+                <Link to="/manage-account" onClick={()=>setAvatarMenuOpen(false)} className="block px-4 py-2 hover:bg-gray-100">Manage Account</Link>
+                <button onClick={handleLogout} className="block w-full px-4 py-2 text-left hover:bg-gray-100">Logout</button>
               </div>
             )}
           </div>
         </div>
+
+        <div className="flex items-center gap-2 md:hidden">
+          <button onClick={toggleNotifications} className="relative rounded-lg p-2 hover:bg-gray-100">
+            <Bell className="h-5 w-5"/>
+            {unreadCount>0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-fuchsia-500 px-1 text-[10px] text-white">{unreadCount}</span>}
+          </button>
+          <button onClick={()=>setMobileMenuOpen(v=>!v)} className="rounded-lg p-2 hover:bg-gray-100">
+            {mobileMenuOpen ? <X/> : <Menu/>}
+          </button>
+        </div>
       </div>
+
+      {notificationsOpen && (
+        <div className="md:hidden relative">
+          <Alert notifications={notifications} courseID={courseID}/>
+        </div>
+      )}
+
+      {mobileMenuOpen && (
+        <div className="border-t bg-white md:hidden">
+          <div className="flex flex-col gap-2 p-4">
+            <Link to="/generate"><Button className="w-full">Upload PDF</Button></Link>
+            <Link to="/profile" className="rounded-lg px-3 py-2 hover:bg-gray-100">Profile</Link>
+            <Link to="/manage-account" className="rounded-lg px-3 py-2 hover:bg-gray-100">Manage Account</Link>
+            <button onClick={handleLogout} className="rounded-lg px-3 py-2 text-left hover:bg-gray-100">Logout</button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -1,6 +1,7 @@
 import { Zap } from 'lucide-react';
 import Icon from './components/AppIcon';
 import { Link } from 'react-router-dom';
+import image from '@/assets/images/logoOld.png';
 
 export default function Footer() {
   return (
@@ -10,16 +11,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
+              <img src={image} alt="GenLearn" className='w-10 '/>
               <span className="text-xl font-bold">GenLearn</span>
             </Link>
             <p className="text-gray-400 leading-relaxed mb-6 max-w-xs">
               Transforming scientific knowledge into interactive learning experiences with AI.
             </p>
             <div className="flex gap-3">
-              {['twitter', 'linkedin', 'github'].map((social) => (
+              {[ 'twitter', 'linkedin', 'github' ].map((social) => (
                 <a
                   key={social}
                   href={`#${social}`}
