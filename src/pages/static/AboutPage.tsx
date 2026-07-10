@@ -1,5 +1,5 @@
 import { ArrowLeft, Zap, BookOpen, Cpu, Users, Target, Heart, Lightbulb, Rocket } from 'lucide-react';
-import { Button, Card } from '../components/ui/index';
+import { Button, Card } from '../../components/ui/index';
 import { Link } from 'react-router-dom';
 import image from '@/assets/images/logoOld.png';
 const team = [

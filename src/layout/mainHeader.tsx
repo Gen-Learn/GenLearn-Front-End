@@ -287,7 +287,7 @@ export default function Header() {
                 </Link>
                 <Link to="/manage-account" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full">
-                    Setting
+                    Manage Account
                   </Button>
                 </Link>
                 <Button className="w-full" onClick={handleLogout}>
