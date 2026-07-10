@@ -18,22 +18,20 @@ import {
 } from 'lucide-react';
 import { Button, Card, Badge, CircularProgress, LinearProgress } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-import {useAuth} from "@/contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
+import { useAnalytics } from "@/hooks/queries/useGetAnalytics";
+import { InlineLoader } from '@/components/loading';
+
+// Static, non-analytics parts of the profile that don't have a backend
+// source yet (badges, XP/level, recent courses). These stay mocked until
+// their own endpoints exist.
 const userProfile = {
-  name: 'John Parker',
-  email: 'john.parker@example.com',
-  avatar: null,
   level: 8,
   xp: 2450,
   xpToNextLevel: 3000,
-  streak: 7,
-  maxStreak: 14,
-  totalHours: 48,
-  coursesCompleted: 3,
+  joinDate: 'November 2025',
   lecturesWatched: 124,
   quizzesPassed: 87,
-  avgQuizScore: 92,
-  joinDate: 'November 2025',
   badges: [
     { id: 1, name: 'First Steps', icon: Target, color: 'from-green-500 to-green-600', earned: true, date: 'Nov 15, 2025' },
     { id: 2, name: 'Week Warrior', icon: Flame, color: 'from-orange-500 to-red-500', earned: true, date: 'Nov 22, 2025' },
@@ -43,15 +41,6 @@ const userProfile = {
     { id: 6, name: 'Perfectionist', icon: Gem, color: 'from-cyan-500 to-cyan-600', earned: false, progress: 75 },
     { id: 7, name: 'Marathon Mind', icon: Medal, color: 'from-rose-500 to-rose-600', earned: false, progress: 40 },
     { id: 8, name: 'Guru', icon: Crown, color: 'from-primary-600 to-secondary-500', earned: false, progress: 25 },
-  ],
-  weeklyActivity: [
-    { day: 'Mon', minutes: 45 },
-    { day: 'Tue', minutes: 90 },
-    { day: 'Wed', minutes: 30 },
-    { day: 'Thu', minutes: 60 },
-    { day: 'Fri', minutes: 120 },
-    { day: 'Sat', minutes: 75 },
-    { day: 'Sun', minutes: 45 },
   ],
   recentCourses: [
     { id: 1, title: 'Quantum Physics Fundamentals', progress: 67, thumbnail: 'https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=400' },
@@ -68,9 +57,29 @@ const levelThresholds = [
 ];
 
 export default function profile() {
-  const xpProgress = (userProfile.xp / userProfile.xpToNextLevel) * 100;
-  const maxMinutes = Math.max(...userProfile.weeklyActivity.map(d => d.minutes));
   const { user } = useAuth();
+  const { data, isLoading, isError, error } = useAnalytics();
+
+  const analytics = data;
+  console.log("analytics", data)
+  const currentStreak = analytics?.currentLoginStreak ?? 0;
+  const bestStreak = analytics?.bestLoginStreak ?? 0;
+  const totalHours = analytics ? Math.round(analytics.totalMinOfLectureDone / 60) : 0;
+  const coursesCompleted = analytics?.courseDone ?? 0;
+  const quizAvg = analytics ? Math.round(analytics.quizAvg) : 0;
+
+  // Map the backend's ISO date entries into short weekday labels for the chart
+  const weeklyActivity = (analytics?.activity ?? []).map((entry) => ({
+    day: new Date(entry.day).toLocaleDateString('en-US', { weekday: 'short' }),
+    minutes: entry.totalDuration,
+  }));
+
+  const maxMinutes = weeklyActivity.length > 0
+    ? Math.max(1, ...weeklyActivity.map((d) => d.minutes))
+    : 1;
+
+  const xpProgress = (userProfile.xp / userProfile.xpToNextLevel) * 100;
+
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       {/* Top Bar */}
@@ -100,6 +109,12 @@ export default function profile() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
+        {isError && (
+          <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+            Couldn't load your analytics: {error?.message ?? 'Please try again later.'}
+          </div>
+        )}
+
         {/* Profile Header */}
         <Card className="mb-8">
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -120,7 +135,7 @@ export default function profile() {
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 <Badge variant="primary">Level {userProfile.level}</Badge>
                 <Badge variant="success" icon={<Flame className="w-3 h-3" />}>
-                  {userProfile.streak} Day Streak
+                  {isLoading ? '—' : currentStreak} Day Streak
                 </Badge>
                 <Badge variant="gray">{userProfile.joinDate}</Badge>
               </div>
@@ -145,17 +160,19 @@ export default function profile() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           {[
-            { icon: Flame, label: 'Current Streak', value: `${userProfile.streak} days`, color: 'from-orange-500 to-red-500' },
-            { icon: Trophy, label: 'Best Streak', value: `${userProfile.maxStreak} days`, color: 'from-amber-500 to-amber-600' },
-            { icon: Clock, label: 'Total Hours', value: userProfile.totalHours, color: 'from-primary-500 to-secondary-500' },
-            { icon: BookOpen, label: 'Courses Done', value: userProfile.coursesCompleted, color: 'from-green-500 to-green-600' },
-            { icon: Target, label: 'Quiz Avg', value: `${userProfile.avgQuizScore}%`, color: 'from-blue-500 to-blue-600' },
+            { icon: Flame, label: 'Current Streak', value: `${currentStreak} days`, color: 'from-orange-500 to-red-500' },
+            { icon: Trophy, label: 'Best Streak', value: `${bestStreak} days`, color: 'from-amber-500 to-amber-600' },
+            { icon: Clock, label: 'Total Hours', value: totalHours, color: 'from-primary-500 to-secondary-500' },
+            { icon: BookOpen, label: 'Courses Done', value: coursesCompleted, color: 'from-green-500 to-green-600' },
+            { icon: Target, label: 'Quiz Avg', value: `${quizAvg}%`, color: 'from-blue-500 to-blue-600' },
           ].map((stat, i) => (
             <Card key={i} className="!p-4 text-center">
               <div className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-2`}>
                 <stat.icon className="w-5 h-5 text-white" />
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+              <div className="text-2xl font-bold text-gray-900">
+                {isLoading ? <InlineLoader className="mx-auto" /> : stat.value}
+              </div>
               <p className="text-sm text-gray-500">{stat.label}</p>
             </Card>
           ))}
@@ -164,56 +181,6 @@ export default function profile() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Level Progression */}
-            <Card>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary-500" />
-                  Level Progression
-                </h2>
-                <Button variant="ghost" size="sm">
-                  View All <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="relative h-20">
-                {/* Level markers */}
-                <div className="absolute left-0 right-0 top-0 flex items-end justify-between">
-                  {levelThresholds.map((threshold) => {
-                    const isCurrentLevel = threshold.level === userProfile.level;
-                    const isPast = threshold.level < userProfile.level;
-                    const isNextLevel = threshold.level === userProfile.level + 1;
-                    const position = ((threshold.level - 1) / 9) * 100;
-
-                    return (
-                      <div
-                        key={threshold.level}
-                        className="flex flex-col items-center relative"
-                        style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
-                      >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                          isPast || isCurrentLevel
-                            ? 'bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-glow'
-                            : isNextLevel
-                            ? 'bg-white border-2 border-primary-300 text-primary-500'
-                            : 'bg-gray-100 text-gray-400'
-                        }`}>
-                          {threshold.level}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Progress Bar */}
-                <div className="absolute top-[42px] left-0 right-0 h-2 bg-gray-100 rounded-full">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
-                    style={{ width: `${xpProgress}%` }}
-                  />
-                </div>
-              </div>
-            </Card>
-
             {/* Weekly Activity */}
             <Card>
               <div className="flex items-center justify-between mb-6">
@@ -223,22 +190,32 @@ export default function profile() {
                 </h2>
                 <span className="text-sm text-gray-500">This week</span>
               </div>
-              <div className="flex items-end justify-between gap-3 h-32">
-                {userProfile.weeklyActivity.map((day) => (
-                  <div key={day.day} className="flex-1 flex flex-col items-center gap-2">
-                    <div
-                      className={`w-full rounded-t-lg transition-all ${
-                        day.minutes === maxMinutes
+
+              {isLoading ? (
+                <div className="flex items-center justify-center h-32">
+                  <InlineLoader />
+                </div>
+              ) : weeklyActivity.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-8">
+                  No activity recorded yet this week.
+                </p>
+              ) : (
+                <div className="flex items-end justify-between gap-3 h-32">
+                  {weeklyActivity.map((day, i) => (
+                    <div key={`${day.day}-${i}`} className="flex-1 flex flex-col items-center gap-2">
+                      <div
+                        className={`w-full rounded-t-lg transition-all ${day.minutes === maxMinutes
                           ? 'bg-gradient-to-t from-primary-500 to-secondary-500'
                           : 'bg-gradient-to-t from-primary-300 to-primary-200'
-                      }`}
-                      style={{ height: `${(day.minutes / maxMinutes) * 100}%` }}
-                    />
-                    <span className="text-xs text-gray-500 font-medium">{day.day}</span>
-                    <span className="text-xs text-gray-400">{day.minutes}m</span>
-                  </div>
-                ))}
-              </div>
+                          }`}
+                        style={{ height: `${(day.minutes / maxMinutes) * 100}%` }}
+                      />
+                      <span className="text-xs text-gray-500 font-medium">{day.day}</span>
+                      <span className="text-xs text-gray-400">{day.minutes}m</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
 
             {/* Recent Courses */}
@@ -297,18 +274,16 @@ export default function profile() {
                     return (
                       <div
                         key={badge.id}
-                        className={`p-3 rounded-xl transition-colors ${
-                          badge.earned
-                            ? 'bg-gradient-to-r from-gray-50 to-transparent hover:from-primary-50'
-                            : 'bg-gray-50 opacity-60'
-                        }`}
+                        className={`p-3 rounded-xl transition-colors ${badge.earned
+                          ? 'bg-gradient-to-r from-gray-50 to-transparent hover:from-primary-50'
+                          : 'bg-gray-50 opacity-60'
+                          }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                            badge.earned
-                              ? `bg-gradient-to-br ${badge.color} shadow-glow`
-                              : 'bg-gray-200'
-                          }`}>
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${badge.earned
+                            ? `bg-gradient-to-br ${badge.color} shadow-glow`
+                            : 'bg-gray-200'
+                            }`}>
                             <Icon className={`w-6 h-6 ${badge.earned ? 'text-white' : 'text-gray-400'}`} />
                           </div>
                           <div className="flex-1">
@@ -341,7 +316,7 @@ export default function profile() {
             </Card>
 
             {/* Learning Stats Summary */}
-            <Card className="bg-gradient-to-br from-primary-500 to-secondary-500 !text-white">
+            {/* <Card className="bg-gradient-to-br from-primary-500 to-secondary-500 !text-white">
               <h3 className="font-bold text-lg mb-4">Learning Journey</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -354,15 +329,16 @@ export default function profile() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/80">Average Score</span>
-                  <span className="font-bold">{userProfile.avgQuizScore}%</span>
+                  <span className="font-bold">{isLoading ? '—' : `${quizAvg}%`}</span>
                 </div>
                 <div className="h-px bg-white/20 my-2" />
                 <div className="flex justify-between">
                   <span className="text-white/80">Total Learning Time</span>
-                  <span className="font-bold">{userProfile.totalHours}h</span>
+                  <span className="font-bold">{isLoading ? '—' : `${totalHours}h`}</span>
                 </div>
               </div>
-            </Card>
+            </Card> */}
+
           </div>
         </div>
       </main>
