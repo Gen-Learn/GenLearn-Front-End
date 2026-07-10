@@ -81,7 +81,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="" className="flex items-center gap-2 group shrink-0">
-            <img src={image} alt="GenLearn Logo" className="w-8 sm:w-10" />
+            <img src={image} alt="GenLearn Logo" className="w-10 sm:w-12" />
             <span className="text-lg sm:text-xl font-bold text-gray-900">GenLearn</span>
           </Link>
 
@@ -161,7 +161,7 @@ export default function Header() {
                         onClick={() => setAvatarMenuOpen(false)}
                         className="text-sm block px-4 py-2 hover:bg-gray-100"
                       >
-                        Manage Account
+                        Setting
                       </Link>
                       <div
                         onClick={handleLogout}
@@ -287,7 +287,7 @@ export default function Header() {
                 </Link>
                 <Link to="/manage-account" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full">
-                    Manage Account
+                    Setting
                   </Button>
                 </Link>
                 <Button className="w-full" onClick={handleLogout}>

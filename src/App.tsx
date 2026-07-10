@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route,Outlet, useLocation,matchPath  } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation, matchPath } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
-import {MainHeader ,Footer} from "@/layout/index";
+import { MainHeader, Footer } from "@/layout/index";
 import AIChatbot from "./components/AIChat/Chat";
-import {Profile, CourseContent,CourseDetails, Courses ,Generate ,Home ,ForgotPassword ,ResetPassword ,SignUp ,Login, VerifyEmail, Onboarding } from "@/pages/index"
+import { Profile, CourseContent, CourseDetails, Courses, Generate, Home, ForgotPassword, ResetPassword, SignUp, Login, VerifyEmail, Onboarding } from "@/pages/index"
 import ManageAccount from "./pages/ManageAccount/ManageAccount";
 import { AboutPage, ContactPage, PrivacyPage, TermsPage, NotFoundPage } from './static/index';
 const Layout = () => {
@@ -16,9 +16,9 @@ const Layout = () => {
 };
 function AppContent() {
   const location = useLocation();
-  const match =matchPath(
-  "/course/:courseId/section/:sectionId/lecture/:lectureId",
-  location.pathname);
+  const match = matchPath(
+    "/course/:courseId/section/:sectionId/lecture/:lectureId",
+    location.pathname);
   const courseId = match?.params.courseId;
   const showChatbot = [
     "dashboard",
@@ -41,9 +41,9 @@ function AppContent() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/manage-account" element={<ManageAccount />} />
-          </Route>
 
+          </Route>
+          <Route path="/manage-account" element={<ManageAccount />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:courseId/section/:sectionId/lecture/:lectureId" element={<CourseContent />} />
@@ -62,7 +62,7 @@ function AppContent() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
-        {showChatbot && <AIChatbot courseId={courseId || ""}/>}
+        {showChatbot && <AIChatbot courseId={courseId || ""} />}
       </div>
     </>
   );

@@ -5,8 +5,8 @@ import { FormField } from './FormField';
 import SaveButton from './SaveButton';
 
 const SecuritySection = () => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [ password, setPassword ] = useState('');
+  const [ confirmPassword, setConfirmPassword ] = useState('');
 
   return (
     <SectionCard icon={<PiShieldCheckLight />} title="Security">

@@ -3,14 +3,13 @@ interface SaveButtonProps {
   label?: string;
   Data:{name:string, biography:string}
 }
-
+import { Button } from '@/components/ui/index';
 const SaveButton = ({Data, onClick, label = 'Save Changes' }: SaveButtonProps) => (
-  <button
+  <Button
     onClick={() => onClick?.(Data)}
-    className="border border-brand-purple text-brand-violet font-medium text-[13px] rounded-lg px-5 py-2.5 hover:bg-purple-50 active:scale-[0.98] transition-all"
   >
     {label}
-  </button>
+  </Button>
 );
 
 export default SaveButton;

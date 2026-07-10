@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { ArrowLeft, Zap, Mail, Phone, MapPin, Send, CheckCircle, Clock, MessageCircle } from 'lucide-react';
-import { Button, Card } from '../components/ui/index';
+import { Button, Card } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
-
+import image from '@/assets/images/logoOld.png';
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const [ formData, setFormData ] = useState({
     name: '',
     email: '',
     subject: '',
     message: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [ loading, setLoading ] = useState(false);
+  const [ submitted, setSubmitted ] = useState(false);
+  const [ errors, setErrors ] = useState<Record<string, string>>({});
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -58,9 +58,7 @@ export default function ContactPage() {
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+            <img src={image} alt="Genlearn" className='w-12' />
             <span className="text-xl font-bold text-gray-900">GenLearn</span>
           </Link>
           <Link to="/">
@@ -134,7 +132,7 @@ export default function ContactPage() {
             <div className="pt-4">
               <p className="text-sm text-gray-500 mb-3">Follow us</p>
               <div className="flex gap-3">
-                {['Twitter', 'LinkedIn', 'Facebook', 'Instagram'].map((social) => (
+                {[ 'Twitter', 'LinkedIn', 'Facebook', 'Instagram' ].map((social) => (
                   <a
                     key={social}
                     href="#"

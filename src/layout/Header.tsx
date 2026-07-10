@@ -62,7 +62,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <img src={image} alt="GenLearn" className="w-8 sm:w-10" />
+          <img src={image} alt="GenLearn" className="w-10 sm:w-12" />
           <span className="text-lg font-bold text-gray-900 sm:text-xl">
             GenLearn
           </span>
@@ -117,7 +117,7 @@ export default function Header() {
                   onClick={() => setAvatarMenuOpen(false)}
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
-                  Manage Account
+                  Setting
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -173,8 +173,8 @@ export default function Header() {
           <div
             onClick={() => setMobileMenuOpen(false)}
             className={`md:hidden fixed inset-0 z-[90] bg-black/40 transition-opacity duration-300 ${mobileMenuOpen
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
               }`}
           />
 
@@ -209,7 +209,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-lg px-3 py-2 hover:bg-gray-100"
               >
-                Manage Account
+                Setting
               </Link>
               <button
                 onClick={handleLogout}
