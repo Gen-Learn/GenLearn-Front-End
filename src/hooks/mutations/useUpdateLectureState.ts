@@ -24,12 +24,9 @@ export const useUpdateLectureState = (
             // queries so progress UI reflects the new state.
             queryClient.invalidateQueries({ queryKey: [ "lecture", lectureId ] });
 
-            // courseDone tells you whether this was the last lecture in the
-            // course — invalidate course-level queries too so completion
-            // badges / certificates update.
-            if (data.courseDone) {
-                queryClient.invalidateQueries({ queryKey: [ "course" ] });
-            }
+            // Always invalidate course-level queries so the course details
+            // page (progress bar, section completion) updates immediately.
+            queryClient.invalidateQueries({ queryKey: [ "course" ] });
 
             options?.onSuccess?.(...args);
         },

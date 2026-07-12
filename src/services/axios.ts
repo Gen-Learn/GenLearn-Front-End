@@ -11,7 +11,7 @@ const isRefreshRequest = (config?: AxiosRequestConfig) =>
 
 const clearAuthState = () => {
   // Don't redirect if we're on a public auth page (verify-email, forgot-password, reset-password)
-  const publicPages = ["/verify-email", "/forgot-password", "/reset-password", "/signup", "/login"];
+  const publicPages = ["/", "/verify-email", "/forgot-password", "/reset-password", "/signup", "/login", "/about", "/contact", "/privacy", "/terms"];
   const isPublicPage = publicPages.some((page) => window.location.pathname.startsWith(page));
 
   // Only redirect if we're NOT on a public page

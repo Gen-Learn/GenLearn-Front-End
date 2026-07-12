@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import authService from "../services/authService";
 import { getCurrentUser } from "../services/userService";
 import {
@@ -40,12 +41,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  // isLoading covers BOTH the initial session check on mount AND
-  // login/register/logout actions — all are "we don't know the final auth
-  // state yet" moments. Starts true because we don't know if there's a
-  // valid session cookie until the very first getCurrentUser() call resolves.
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Rehydrate session on app load by asking the SERVER who we are — this is
   // the only source of truth now. The accessToken cookie (httpOnly) is sent
@@ -133,12 +131,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await authService.logout();
     } catch {
-      // Even if the server call fails, clear local state — worst case the
-      // cookie outlives the session in the UI's eyes, but the user is
-      // logged out client-side either way.
     } finally {
       setUser(null);
       setIsLoading(false);
+      queryClient.clear();
     }
   };
 

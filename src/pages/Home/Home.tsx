@@ -11,6 +11,7 @@ import {
 
 import { useEffect } from "react";
 import { useOnboardingRedirect } from "../../hooks/session/useOnboardingRedirect";
+import { MainHeader, Footer } from "@/layout/index";
 
 function Home() {
   useOnboardingRedirect();
@@ -33,6 +34,7 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
+      <MainHeader />
       <Hero />
       <TrustedBy />
       <HowItWorks />
@@ -41,6 +43,7 @@ function Home() {
       <Statistics />
       <Testimonials />
       <FAQ />
+      <Footer />
     </div>
   );
 }

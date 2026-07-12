@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Bell, Flame } from 'lucide-react';
 import Button from '../components/ui/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import Alert from '@/components/alert/alert';
@@ -14,6 +14,7 @@ export default function Header() {
   const [ avatarMenuOpen, setAvatarMenuOpen ] = useState(false);
   const [ notificationsOpen, setNotificationsOpen ] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading, logout } = useAuth();
   const { notifications, unreadCount, markAllRead, courseID } = useNotification();
   const inHomePage = location.pathname === '/';
@@ -70,6 +71,7 @@ export default function Header() {
     setAvatarMenuOpen(false);
     setMobileMenuOpen(false);
     await logout();
+    navigate("/");
   };
 
   return (

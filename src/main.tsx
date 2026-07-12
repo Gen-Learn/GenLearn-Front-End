@@ -8,12 +8,12 @@ const rootElement = document.getElementById("root");
 const queryClient = new QueryClient();
 if (!rootElement) throw new Error("Root element not found");
 createRoot(rootElement).render(
-  <AuthProvider>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <NotificationProvider>
         <App />
       </NotificationProvider>
-    </QueryClientProvider>
-  </AuthProvider>,
+    </AuthProvider>
+  </QueryClientProvider>,
 );
 

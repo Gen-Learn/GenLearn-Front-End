@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import Alert from "@/components/alert/alert";
@@ -10,6 +10,7 @@ import image from "@/assets/images/logoOld.png";
 
 export default function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [ mobileMenuOpen, setMobileMenuOpen ] = useState(false);
   const [ avatarMenuOpen, setAvatarMenuOpen ] = useState(false);
@@ -56,6 +57,7 @@ export default function Header() {
     setAvatarMenuOpen(false);
     setMobileMenuOpen(false);
     await logout();
+    navigate("/");
   };
 
   return (
