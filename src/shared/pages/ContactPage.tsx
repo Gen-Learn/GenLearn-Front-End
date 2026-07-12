@@ -1,41 +1,88 @@
 import { useState } from 'react';
-import { ArrowLeft, Zap, Mail, Phone, MapPin, Send, CheckCircle, Clock, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, Clock, MessageCircle, Star, AlertCircle } from 'lucide-react';
 import { Button, Card } from '@/components/ui/index';
 import { Link } from 'react-router-dom';
 import image from '@/assets/images/logoOld.png';
+import { useCreateContact } from '@/hooks/mutations/useCreateContact';
+
+type ContactType = 'issue' | 'feedback';
+
+interface FormState {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  rating: number;
+}
+
+const initialFormState: FormState = {
+  name: '',
+  email: '',
+  subject: '',
+  message: '',
+  rating: 0,
+};
+
 export default function ContactPage() {
-  const [ formData, setFormData ] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [ loading, setLoading ] = useState(false);
-  const [ submitted, setSubmitted ] = useState(false);
+  const [ contactType, setContactType ] = useState<ContactType>('issue');
+  const [ formData, setFormData ] = useState<FormState>(initialFormState);
   const [ errors, setErrors ] = useState<Record<string, string>>({});
+
+  const { mutate: submitContact, isPending, isSuccess, isError, reset } = useCreateContact();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format';
-    if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
     if (!formData.message.trim()) newErrors.message = 'Message is required';
+
+    if (contactType === 'issue' && !formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+    if (contactType === 'feedback' && formData.rating === 0) {
+      newErrors.rating = 'Please select a rating';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTypeChange = (type: ContactType) => {
+    setContactType(type);
+    setErrors({});
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLoading(false);
-    setSubmitted(true);
+    if (contactType === 'issue') {
+      submitContact({
+        type: 'issue',
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+      });
+    } else {
+      submitContact({
+        type: 'feedback',
+        name: formData.name,
+        email: formData.email,
+        rating: formData.rating,
+        message: formData.message,
+      });
+    }
   };
 
-  if (submitted) {
+  const handleSendAnother = () => {
+    setFormData(initialFormState);
+    setErrors({});
+    reset();
+  };
+
+  if (isSuccess) {
     return (
       <div className="min-h-screen bg-[#FAFAFC] flex items-center justify-center p-8">
         <Card className="max-w-md w-full text-center">
@@ -44,7 +91,7 @@ export default function ContactPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h1>
           <p className="text-gray-600 mb-6">We'll get back to you within 24 hours.</p>
-          <Button variant="secondary" onClick={() => setSubmitted(false)}>
+          <Button variant="secondary" onClick={handleSendAnother}>
             Send Another Message
           </Button>
         </Card>
@@ -149,6 +196,31 @@ export default function ContactPage() {
           <div className="lg:col-span-2">
             <Card>
               <h2 className="text-xl font-bold text-gray-900 mb-6">Send us a message</h2>
+
+              {/* Type Toggle */}
+              <div className="flex gap-2 mb-6 bg-gray-100 rounded-xl p-1 w-fit">
+                <button
+                  type="button"
+                  onClick={() => handleTypeChange('issue')}
+                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${contactType === 'issue'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                  Report an Issue
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTypeChange('feedback')}
+                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${contactType === 'feedback'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                  Share Feedback
+                </button>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -175,32 +247,67 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                  <input
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="How can we help?"
-                    className={`w-full px-4 py-3 rounded-xl border ${errors.subject ? 'border-red-300' : 'border-gray-200'} focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20`}
-                  />
-                  {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
-                </div>
+                {contactType === 'issue' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                    <input
+                      type="text"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      placeholder="How can we help?"
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.subject ? 'border-red-300' : 'border-gray-200'} focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20`}
+                    />
+                    {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                    <div className="flex gap-1">
+                      {[ 1, 2, 3, 4, 5 ].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, rating: star })}
+                          className="p-1"
+                        >
+                          <Star
+                            className={`w-8 h-8 transition-colors ${star <= formData.rating
+                              ? 'text-amber-400 fill-current'
+                              : 'text-gray-300'
+                              }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    {errors.rating && <p className="text-sm text-red-500 mt-1">{errors.rating}</p>}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
                   <textarea
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell us more about your question or feedback..."
+                    placeholder={
+                      contactType === 'issue'
+                        ? 'Tell us more about the issue you ran into...'
+                        : 'Tell us what you think of GenLearn...'
+                    }
                     rows={6}
                     className={`w-full px-4 py-3 rounded-xl border ${errors.message ? 'border-red-300' : 'border-gray-200'} focus:border-primary-300 focus:ring-2 focus:ring-primary-500/20 resize-none`}
                   />
                   {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
                 </div>
 
-                <Button type="submit" size="lg" disabled={loading}>
-                  {loading ? (
+                {isError && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 px-4 py-3 rounded-xl">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    Something went wrong. Please try again.
+                  </div>
+                )}
+
+                <Button type="submit" size="lg" disabled={isPending}>
+                  {isPending ? (
                     'Sending...'
                   ) : (
                     <>
@@ -213,7 +320,7 @@ export default function ContactPage() {
             </Card>
           </div>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }

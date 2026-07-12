@@ -1,37 +1,45 @@
+// src/components/Testimonials.tsx
 import { Star, Quote } from 'lucide-react';
+import { useFeedbacks } from '@/hooks/queries/useGetFeedback';
 
-const testimonials = [
-  {
-    name: 'Dr. Sarah Chen',
-    role: 'Molecular Biologist',
-    avatar: 'https://images.pexels.com/photos/3764119/pexels-photo-3764119.jpeg?auto=compress&cs=tinysrgb&w=100',
-    content: 'GenLearn revolutionized how I understand complex research papers. The AI-generated courses break down difficult concepts into digestible video lectures.',
-    rating: 5,
-  },
-  {
-    name: 'Michael Roberts',
-    role: 'Medical Student',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-    content: 'As a med student, I need to absorb massive amounts of information fast. This platform has been a game-changer for my study efficiency.',
-    rating: 5,
-  },
-  {
-    name: 'Emily Thompson',
-    role: 'PhD Researcher',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100',
-    content: 'The quiz generation is incredibly accurate. It tests understanding, not just memorization. Perfect for research methodology courses.',
-    rating: 5,
-  },
-  {
-    name: 'Dr. James Watson',
-    role: 'Physics Professor',
-    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100',
-    content: 'I recommend GenLearn to all my students. The AI-generated summaries and flashcards are excellent supplementary materials.',
-    rating: 5,
-  },
-];
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .map((part) => part[ 0 ])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
 export default function Testimonials() {
+  const { data: feedbacks, isLoading, isError } = useFeedbacks();
+
+  // Only show real feedback with a rating and a message, capped at 4 cards
+  const visibleFeedbacks =
+    feedbacks
+      ?.filter((f) => f.type === 'feedback' && f.isVisible && f.message)
+      .slice(0, 4) ?? [];
+
+  if (isLoading) {
+    return (
+      <section className="py-24 bg-[#F5F7FB]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[ ...Array(4) ].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-3xl p-6 shadow-soft border border-gray-100 h-64 animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isError || visibleFeedbacks.length === 0) {
+    return null; // fail quietly rather than showing a broken section
+  }
+
   return (
     <section className="py-24 bg-[#F5F7FB]">
       <div className="max-w-7xl mx-auto px-6">
@@ -50,10 +58,10 @@ export default function Testimonials() {
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((testimonial, i) => (
+          {visibleFeedbacks.map((feedback) => (
             <div
-              key={i}
-              className="bg-white rounded-3xl p-6 shadow-soft hover:shadow-soft-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 relative"
+              key={feedback.id}
+              className="bg-white rounded-3xl p-6 shadow-soft hover:shadow-soft-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 relative flex flex-col"
             >
               {/* Quote Icon */}
               <div className="absolute -top-3 left-6 w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
@@ -62,26 +70,23 @@ export default function Testimonials() {
 
               {/* Rating */}
               <div className="flex gap-1 mb-4 pt-2">
-                {[...Array(testimonial.rating)].map((_, j) => (
+                {[ ...Array(feedback.rating) ].map((_, j) => (
                   <Star key={j} className="w-4 h-4 text-amber-400 fill-current" />
                 ))}
               </div>
 
               {/* Content */}
               <p className="text-gray-600 leading-relaxed mb-6 flex-grow">
-                "{testimonial.content}"
+                "{feedback.message}"
               </p>
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                <img
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-semibold">
+                  {getInitials(feedback.name)}
+                </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  <p className="font-semibold text-gray-900">{feedback.name}</p>
                 </div>
               </div>
             </div>
