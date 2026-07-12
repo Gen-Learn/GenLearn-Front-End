@@ -5,24 +5,24 @@ import AIChatbot from "./components/AIChat/Chat";
 import { Skeleton } from "@/components/loading";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-const Home = lazy(() => import("@/pages/Home/Home"));
-const Courses = lazy(() => import("@/pages/Courses/CoursesPage"));
-const CourseDetails = lazy(() => import("@/pages/CourseDetails/CourseDetailsPage"));
-const CourseContent = lazy(() => import("@/pages/CourseContent/main"));
-const Profile = lazy(() => import("@/pages/profile/profile"));
-const Generate = lazy(() => import("@/pages/Generate/Generate"));
-const ManageAccount = lazy(() => import("./pages/ManageAccount/ManageAccount"));
-const ForgotPassword = lazy(() => import("@/pages/ForgotPassword/ForgotPassword"));
-const ResetPassword = lazy(() => import("@/pages/ResetPassword/ResetPassword"));
-const SignUp = lazy(() => import("@/pages/SignUp/SignUp"));
-const Login = lazy(() => import("@/pages/LogIn/LogIn"));
-const VerifyEmail = lazy(() => import("@/pages/VerifyEmail/VerifyEmail"));
-const Onboarding = lazy(() => import("@/pages/Onboarding/Onboarding"));
-const AboutPage = lazy(() => import("./pages/static/AboutPage"));
-const ContactPage = lazy(() => import("./pages/static/ContactPage"));
-const PrivacyPage = lazy(() => import("./pages/static/PrivacyPage"));
-const TermsPage = lazy(() => import("./pages/static/TermsPage"));
-const NotFoundPage = lazy(() => import("./pages/static/NotFoundPage"));
+const Home = lazy(() => import("@/features/home/Home"));
+const Courses = lazy(() => import("@/features/course/CoursesPage"));
+const CourseDetails = lazy(() => import("@/features/course/CourseDetailsPage"));
+const CourseContent = lazy(() => import("@/features/course/main"));
+const Profile = lazy(() => import("@/features/user/profile"));
+const Generate = lazy(() => import("@/features/generate/Generate"));
+const ManageAccount = lazy(() => import("@/features/user/ManageAccount"));
+const ForgotPassword = lazy(() => import("@/features/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/features/auth/ResetPassword"));
+const SignUp = lazy(() => import("@/features/auth/SignUp"));
+const Login = lazy(() => import("@/features/auth/LogIn"));
+const VerifyEmail = lazy(() => import("@/features/auth/VerifyEmail"));
+const Onboarding = lazy(() => import("@/features/onboarding/Onboarding"));
+const AboutPage = lazy(() => import("@/shared/pages/AboutPage"));
+const ContactPage = lazy(() => import("@/shared/pages/ContactPage"));
+const PrivacyPage = lazy(() => import("@/shared/pages/PrivacyPage"));
+const TermsPage = lazy(() => import("@/shared/pages/TermsPage"));
+const NotFoundPage = lazy(() => import("@/shared/pages/NotFoundPage"));
 
 const Layout = () => {
   return (
