@@ -12,8 +12,9 @@ import {
 import { useEffect } from "react";
 import { useOnboardingRedirect } from "@/hooks/session/useOnboardingRedirect";
 import { MainHeader, Footer } from "@/layout/index";
-
+import { useAuth } from "../../contexts/AuthContext";
 function Home() {
+  const { isAuthenticated } = useAuth();
   useOnboardingRedirect();
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -39,7 +40,7 @@ function Home() {
       <TrustedBy />
       <HowItWorks />
       <Features />
-      <SampleCourses />
+      {isAuthenticated && <SampleCourses />}
       <Statistics />
       <Testimonials />
       <FAQ />
