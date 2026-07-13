@@ -21,7 +21,6 @@
 - [Routing](#routing)
 - [Architecture](#architecture)
 - [API Reference](#api-reference)
-- [Deployment](#deployment)
 - [Contributing](#contributing)
 
 ---
@@ -38,9 +37,7 @@ Upload PDF → Backend AI Processing → Real-Time Progress via Socket → Cours
 
 ### Live Demo
 
-- **Frontend:** [https://genlearn.vercel.app](https://genlearn.vercel.app)
-- **Backend:** Azure-hosted API
-
+- **Frontend:** [https://gen-learn-front-end.vercel.app/](https://gen-learn-front-end.vercel.app/)
 ---
 
 ## Features
@@ -107,35 +104,6 @@ Upload PDF → Backend AI Processing → Real-Time Progress via Socket → Cours
 - **npm** >= 9.0.0 (or yarn/pnpm)
 - **Git**
 
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Gen-Learn/GenLearn-Front-End.git
-cd GenLearn-Front-End
-
-# Install dependencies
-npm install
-```
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_API_BASE_URL=https://genlearn-backend-egehcshjhabscsgu.francecentral-01.azurewebsites.net
-```
-
-### Development
-
-```bash
-npm run dev        # Start dev server on http://localhost:3001
-npm run build      # Production build to dist/
-npm run preview    # Preview production build
-npm run lint       # Run ESLint
-```
-
----
 
 ## Project Structure
 
