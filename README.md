@@ -646,3 +646,5 @@ All API calls are proxied through the Axios instance at `src/services/axios.ts`.
 > **Document Version:** 1.0  
 > **Last Updated:** July 2026  
 > **Project:** GenLearn Front-End
+ 
+ 
