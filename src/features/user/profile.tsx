@@ -1,5 +1,4 @@
 import {
-  Zap,
   Flame,
   Trophy,
   Target,
@@ -7,7 +6,6 @@ import {
   BookOpen,
   Award,
   Star,
-  TrendingUp,
   Calendar,
   ChevronRight,
   Medal,
@@ -22,6 +20,8 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/hooks/queries/useGetAnalytics";
 import { InlineLoader } from '@/components/loading';
 import image from "@/assets/images/logoOld.png";
+import { useRecentCourses } from '@/hooks/queries/useGetRecentCourses';
+import { useGetCoursesImages } from '@/hooks/queries/useGetCoursesImages';
 // Static, non-analytics parts of the profile that don't have a backend
 // source yet (badges, XP/level, recent courses). These stay mocked until
 // their own endpoints exist.
@@ -42,11 +42,6 @@ const userProfile = {
     { id: 7, name: 'Marathon Mind', icon: Medal, color: 'from-rose-500 to-rose-600', earned: false, progress: 40 },
     { id: 8, name: 'Guru', icon: Crown, color: 'from-primary-600 to-secondary-500', earned: false, progress: 25 },
   ],
-  recentCourses: [
-    { id: 1, title: 'Quantum Physics Fundamentals', progress: 67, thumbnail: 'https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=400' },
-    { id: 2, title: 'Molecular Biology Essentials', progress: 89, thumbnail: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-    { id: 3, title: 'Machine Learning Basics', progress: 100, thumbnail: 'https://images.pexels.com/photos/8438980/pexels-photo-8438980.jpeg?auto=compress&cs=tinysrgb&w=400' },
-  ],
 };
 
 const levelThresholds = [
@@ -59,7 +54,8 @@ const levelThresholds = [
 export default function profile() {
   const { user } = useAuth();
   const { data, isLoading, isError, error } = useAnalytics();
-
+  const { data: courses, isLoading: loadingRecent, isError: errorRecent } = useRecentCourses({ page: 1, limit: 4 });
+  const { courseImages, loadingImages } = useGetCoursesImages();
   const analytics = data;
   console.log("analytics", data)
   const currentStreak = analytics?.currentLoginStreak ?? 0;
@@ -189,7 +185,7 @@ export default function profile() {
                 <span className="text-sm text-gray-500">This week</span>
               </div>
 
-              {isLoading ? (
+              {isLoading || loadingImages ? (
                 <div className="flex items-center justify-center h-32">
                   <InlineLoader />
                 </div>
@@ -223,29 +219,30 @@ export default function profile() {
                   <BookOpen className="w-5 h-5 text-primary-500" />
                   Recent Courses
                 </h2>
-                <Button variant="ghost" size="sm">
-                  View All <ChevronRight className="w-4 h-4" />
-                </Button>
+                <Link to="/courses" data-nav="settings">
+                  <Button variant="ghost" size="sm">
+                    View All <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
               <div className="space-y-3">
-                {userProfile.recentCourses.map((course) => (
-                  <div key={course.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="w-16 h-12 rounded-lg object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">{course.title}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <LinearProgress value={course.progress} className="flex-1 !mb-0" />
-                        <span className="text-sm font-medium text-gray-600">{course.progress}%</span>
+                {courses?.map((course) => (
+                  <Link to={`/course-details/${course.id}`}>
+                    <div key={course.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                      <img
+                        src={courseImages[ course.id ]}
+                        alt={course.name}
+                        className="w-16 h-12 rounded-lg object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 truncate">{course.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <LinearProgress value={course.percentage} className="flex-1 !mb-0" />
+                          <span className="text-sm font-medium text-gray-600">{course.percentage}%</span>
+                        </div>
                       </div>
                     </div>
-                    {course.progress === 100 && (
-                      <Badge variant="success">Complete</Badge>
-                    )}
-                  </div>
+                  </Link>
                 ))}
               </div>
             </Card>

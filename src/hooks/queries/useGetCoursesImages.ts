@@ -1,23 +1,27 @@
+// hooks/queries/useGetCoursesImages.ts
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useGetAllCourses } from "./useGetAllCources";
+import { useGetAllCourses } from "./useGetAllCources"; // fixed typo: Cources -> Courses
 import axiosInstance from "@/services/axios";
+import Course from "@/types/coursesModel";
 
 interface CourseImageMap {
-  [courseId: string]: string;
+  [ courseId: string ]: string;
 }
 
 export const useGetCoursesImages = () => {
   const { data: courses = [], isLoading: loadingCourses } = useGetAllCourses();
+  const previousUrlsRef = useRef<string[]>([]);
 
   const query = useQuery({
-    queryKey: ["course-images", courses.map((c) => c.id)],
+    queryKey: [ "course-images", courses.map((c: Course) => c.id) ],
     enabled: !loadingCourses && courses.length > 0,
 
     queryFn: async (): Promise<CourseImageMap> => {
       const results = await Promise.allSettled(
         courses
-          .filter((course) => course.imageUrl)
-          .map(async (course) => {
+          .filter((course: Course) => course.imageUrl)
+          .map(async (course: Course) => {
             const response = await axiosInstance.get(course.imageUrl!, {
               responseType: "blob",
             });
@@ -26,14 +30,14 @@ export const useGetCoursesImages = () => {
               id: course.id,
               objectUrl: URL.createObjectURL(response.data),
             };
-          })
+          }),
       );
 
       const map: CourseImageMap = {};
 
-      results.forEach((result) => {
+      results.forEach((result: any) => {
         if (result.status === "fulfilled") {
-          map[result.value.id] = result.value.objectUrl;
+          map[ result.value.id ] = result.value.objectUrl;
         }
       });
 
