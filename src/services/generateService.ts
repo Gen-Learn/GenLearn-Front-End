@@ -1,6 +1,6 @@
 import axiosInstance from "./axios";
 
-import {GenerateJobResponse} from "../types/generation";
+import { GenerateJobResponse } from "../types/generation";
 
 export const submitGenerateJob = async (
   files: File[]
@@ -10,9 +10,9 @@ export const submitGenerateJob = async (
     formData.append("file", file); // field name backend expects
   });
 
-  const { data } = await axiosInstance.post("/api/v1/generate", formData, {
+  const { data } = await axiosInstance.post("/api/v1/generate/test", formData, {
     headers: {
-      "Content-Type": undefined, 
+      "Content-Type": undefined,
     },
   });
   return data as GenerateJobResponse;
@@ -20,7 +20,7 @@ export const submitGenerateJob = async (
 
 
 export const fetchGenerateJobStatus = async (jobId: string) => {
-  const { data } = await axiosInstance.get(`/api/v1/generate/${jobId}`, );
+  const { data } = await axiosInstance.get(`/api/v1/generate/${jobId}`,);
   return data as GenerateJobResponse;
 };
 
