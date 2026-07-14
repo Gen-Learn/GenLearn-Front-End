@@ -10,6 +10,7 @@ interface GetCoursesParams {
 
 interface CoursesResponse {
   data: {
+    total: number;
     courses: Course[];
   };
 }

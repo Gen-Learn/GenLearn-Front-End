@@ -41,13 +41,12 @@ export default function Header() {
   }, [ mobileMenuOpen ]);
 
   const navItems = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Courses', href: '#courses' },
-    { label: 'About', href: '/about' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Features', href: '#features', secure: false },
+    { label: 'How It Works', href: '#how-it-works', secure: false },
+    { label: 'Courses', href: '#courses', secure: true },
+    { label: 'About', href: '/about', secure: false },
+    { label: 'Contact', href: '/contact', secure: false },
   ];
-
   const toggleNotifications = () => {
     setNotificationsOpen((prev) => {
       const next = !prev;
@@ -89,27 +88,29 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-            {navItems.map((item) =>
-              item.href.charAt(0) === '#' ? (
-                inHomePage ? (
-                  <a
+            {navItems
+              .filter(item => !item.secure || isAuthenticated)
+              .map((item) =>
+                item.href.startsWith('#') ? (
+                  inHomePage ? (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+                    >
+                      {item.label}
+                    </a>
+                  ) : null
+                ) : (
+                  <Link
                     key={item.label}
-                    href={item.href}
+                    to={item.href}
                     className="text-gray-600 hover:text-primary-600 font-medium transition-colors"
                   >
                     {item.label}
-                  </a>
-                ) : null
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="text-gray-600 hover:text-primary-600 font-medium transition-colors"
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+                  </Link>
+                )
+              )}
           </nav>
 
           {/* Desktop right side: auth-aware */}
@@ -255,29 +256,31 @@ export default function Header() {
         </div>
 
         <nav className="flex flex-col p-6 gap-4 overflow-y-auto h-[calc(100%-4.5rem)]">
-          {navItems.map((item) =>
-            item.href.charAt(0) === '#' ? (
-              inHomePage ? (
-                <a
+          {navItems
+            .filter(item => !item.secure || isAuthenticated)
+            .map((item) =>
+              item.href.startsWith('#') ? (
+                inHomePage ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-gray-600 hover:text-primary-600 font-medium transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ) : null
+              ) : (
+                <Link
                   key={item.label}
-                  href={item.href}
+                  to={item.href}
                   className="text-gray-600 hover:text-primary-600 font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
-                </a>
-              ) : null
-            ) : (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="text-gray-600 hover:text-primary-600 font-medium transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            )
-          )}
+                </Link>
+              )
+            )}
 
           <div className="flex flex-col gap-3 pt-4 border-t border-gray-100 mt-auto">
             {isLoading ? null : isAuthenticated ? (

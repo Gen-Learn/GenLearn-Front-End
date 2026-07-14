@@ -4,28 +4,74 @@ import { Link } from 'react-router-dom';
 import image from '@/assets/images/logoOld.png';
 const team = [
   {
-    name: 'Dr. Sarah Chen',
-    role: 'CEO & Co-Founder',
-    bio: 'Former AI researcher at MIT with 15 years in EdTech.',
-    image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300',
+    name: 'Omar Ahmed Ibrahim',
+    role: 'AI Engineer & Team Leader',
+    bio: 'Leading the AI team and developing intelligent learning solutions.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Omar%20Ahmed%20Ibrahim',
   },
   {
-    name: 'Marcus Johnson',
-    role: 'CTO & Co-Founder',
-    bio: 'Ex-Google engineer specializing in ML and content generation.',
-    image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300',
+    name: 'Al-Zahraa Hassan Mohamed',
+    role: 'Mobile App Developer',
+    bio: 'Building seamless and responsive mobile applications.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Al-Zahraa%20Hassan%20Mohamed',
   },
   {
-    name: 'Dr. Emily Rodriguez',
-    role: 'Head of Education',
-    bio: 'PhD in Learning Sciences from Stanford University.',
-    image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300',
+    name: 'Ziyad Mohamed Fouda',
+    role: 'AI Engineer',
+    bio: 'Developing AI models and intelligent content generation systems.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Ziyad%20Mohamed%20Fouda',
   },
   {
-    name: 'Alex Kim',
-    role: 'Head of Product',
-    bio: 'Product leader who shipped products to 50M+ users.',
-    image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=300',
+    name: 'Mahmoud Hamdino Ibrahim',
+    role: 'Mobile App Developer',
+    bio: 'Creating modern and user-friendly mobile experiences.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Mahmoud%20Hamdino%20Ibrahim',
+  },
+  {
+    name: 'Menna Ahmed Mohamed Ali',
+    role: 'AI Engineer',
+    bio: 'Working on AI-powered educational technologies.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Menna%20Ahmed%20Mohamed%20Ali',
+  },
+  {
+    name: 'Mohamed Yasser Elshahaby',
+    role: 'Backend Developer',
+    bio: 'Building reliable backend architecture and services.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Mohamed%20Yasser%20Elshahaby',
+  },
+  {
+    name: 'Khaled Nashat Attallah',
+    role: 'Backend Developer',
+    bio: 'Designing scalable backend services and APIs.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Khaled%20Nashat%20Attallah',
+  },
+  {
+    name: 'Abdallah Nabil Elsaid Agila',
+    role: 'Frontend Developer',
+    bio: 'Building modern, responsive, and interactive user interfaces.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Abdallah%20Nabil%20Elsaid%20Agila',
+  },
+  {
+    name: 'Mohamed Gamal Mansour',
+    role: 'Backend Developer',
+    bio: 'Developing secure and high-performance backend systems.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Mohamed%20Gamal%20Mansour',
+  },
+  {
+    name: 'Mohamed Mahmoud Metwally',
+    role: 'UI/UX Designer',
+    bio: 'Designing intuitive and engaging user experiences.',
+    image:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Mohamed%20Mahmoud%20Metwally',
   },
 ];
 
