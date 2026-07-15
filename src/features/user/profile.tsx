@@ -64,11 +64,32 @@ export default function profile() {
   const coursesCompleted = analytics?.courseDone ?? 0;
   const quizAvg = analytics ? Math.round(analytics.quizAvg) : 0;
 
-  // Map the backend's ISO date entries into short weekday labels for the chart
-  const weeklyActivity = (analytics?.activity ?? []).map((entry) => ({
-    day: new Date(entry.day).toLocaleDateString('en-US', { weekday: 'short' }),
-    minutes: entry.totalDuration,
-  }));
+  // Build a full Mon–Sun week and merge the API data into it so all 7
+  // bars are always present (days without activity show 0 minutes).
+  const DAY_LABELS = [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ] as const;
+
+  // Index API entries by their date string ("YYYY-MM-DD") for fast lookup
+  const activityByDate = new Map<string, number>();
+  for (const entry of analytics?.activity ?? []) {
+    // Normalise to YYYY-MM-DD in local time so the key matches our generated dates
+    const d = new Date(entry.day);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    activityByDate.set(key, entry.totalDuration);
+  }
+
+  // Determine the Monday of the current week
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon … 6=Sat
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // shift back to Monday
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
+
+  const weeklyActivity = DAY_LABELS.map((label, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return { day: label, minutes: activityByDate.get(key) ?? 0 };
+  });
 
   const maxMinutes = weeklyActivity.length > 0
     ? Math.max(1, ...weeklyActivity.map((d) => d.minutes))
@@ -196,16 +217,22 @@ export default function profile() {
               ) : (
                 <div className="flex items-end justify-between gap-3 h-32">
                   {weeklyActivity.map((day, i) => (
-                    <div key={`${day.day}-${i}`} className="flex-1 flex flex-col items-center gap-2">
-                      <div
-                        className={`w-full rounded-t-lg transition-all ${day.minutes === maxMinutes
-                          ? 'bg-gradient-to-t from-primary-500 to-secondary-500'
-                          : 'bg-gradient-to-t from-primary-300 to-primary-200'
-                          }`}
-                        style={{ height: `${(day.minutes / maxMinutes) * 100}%` }}
-                      />
-                      <span className="text-xs text-gray-500 font-medium">{day.day}</span>
-                      <span className="text-xs text-gray-400">{day.minutes}m</span>
+                    <div key={`${day.day}-${i}`} className="flex-1 flex flex-col items-center h-full">
+                      {/* Bar area — flex-1 so it fills remaining height after labels,
+                          giving the percentage-based bar a real pixel height to resolve against. */}
+                      <div className="flex-1 w-full flex items-end justify-center">
+                        <div
+                          className={` w-6 rounded-t-lg transition-all ${day.minutes === maxMinutes
+                            ? 'bg-gradient-to-t from-primary-500 to-secondary-500'
+                            : 'bg-gradient-to-t from-primary-300 to-primary-200'
+                            }`}
+                          style={{ height: `${(day.minutes / maxMinutes) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-center mt-1">
+                        <span className="text-xs text-gray-500 font-medium block">{day.day}</span>
+                        <span className="text-xs text-gray-400 block">{day.minutes}m</span>
+                      </div>
                     </div>
                   ))}
                 </div>

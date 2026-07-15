@@ -48,6 +48,12 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Never retry POST requests to the generate endpoint — re-sending
+      // them would create duplicate jobs / courses on the server.
+      if (originalRequest.method?.toUpperCase() === "POST" && originalRequest.url?.includes("/api/v1/generate/")) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         // Queue this request until the in-flight refresh finishes, then
         // just retry it — the new accessToken cookie is already in place.

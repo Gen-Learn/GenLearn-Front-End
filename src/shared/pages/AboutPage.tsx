@@ -107,55 +107,6 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 lg:py-32">
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-secondary-500/5" />
-        <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl lg:text-6xl font-extrabold text-gray-900 mb-6">
-              Transforming How the World{' '}
-              <span className="text-gradient">Learns</span>
-            </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              We're on a mission to make quality education accessible to everyone by turning any document into an interactive learning experience in minutes.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-600 font-medium text-sm mb-6">
-                <Rocket className="w-4 h-4" />
-                Our Mission
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Democratizing Education Through AI
-              </h2>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                Traditional education hasn't kept pace with how people actually learn. We believe everyone deserves access to personalized, engaging learning experiences regardless of their location, budget, or background.
-              </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                GenLearn transforms static PDFs into dynamic video courses with AI-generated lectures, interactive quizzes, and personalized learning paths. What once took months of course creation now takes minutes.
-              </p>
-            </div>
-            <div className="relative">
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-primary-500 to-secondary-500 p-1">
-                <div className="w-full h-full rounded-3xl bg-white flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="text-6xl font-extrabold text-gradient mb-2">50M+</div>
-                    <p className="text-gray-600">Pages transformed into courses</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Why GenLearn Section */}
       <section className="py-16 bg-gray-50">

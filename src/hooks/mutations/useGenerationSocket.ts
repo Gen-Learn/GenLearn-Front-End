@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  connectToGenerationSocket,
+  joinJob,
   disconnectSocket,
   JobEventPayload,
 } from '@/services/socket';
@@ -35,6 +35,7 @@ const JOB_STATUS_TO_STAGE: Record<string, SocketStatus> = {
 
 interface UseGenerationSocketArgs {
   jobId: string | null;
+  connectionAttempt?: number;
   onJoined?: (payload: JobEventPayload) => void;
   onCompleted?: (payload: JobEventPayload) => void;
   onFailed?: (payload: JobEventPayload) => void;
@@ -43,6 +44,7 @@ interface UseGenerationSocketArgs {
 
 export function useGenerationSocket({
   jobId,
+  connectionAttempt = 0,
   onJoined,
   onCompleted,
   onFailed,
@@ -65,9 +67,17 @@ export function useGenerationSocket({
 
     setStatus('connecting');
 
-    const socket = connectToGenerationSocket(jobId, {
+    // The socket may already be connected (via an earlier connectSocket() call).
+    // joinJob() handles both cases — immediate join if connected, deferred if not.
+    const socket = joinJob(jobId, {
       onJoined: (payload) => {
-        setStatus('connected');
+        // Use the backend-reported status if it maps to a real processing
+        // stage — this handles the case where the job has already progressed
+        // past "connected" by the time the socket joins (e.g. early socket
+        // connection while the upload was still in-flight).
+        const joinedStatus = payload?.status?.toLowerCase() ?? '';
+        const stage = JOB_STATUS_TO_STAGE[joinedStatus];
+        setStatus(stage ?? 'connected');
         callbacksRef.current.onJoined?.(payload);
       },
       jobStatusUpdated: (payload) => {
@@ -94,7 +104,18 @@ export function useGenerationSocket({
       return;
     }
 
-    const handleConnect = () => setStatus('connected');
+    const handleConnect = () => {
+      // Don't reset to a transport state if we've already advanced to a
+      // real processing stage — a reconnect shouldn't blow away progress.
+      setStatus((prev) => {
+        if (prev === 'extracting' || prev === 'structuring' ||
+            prev === 'creating'  || prev === 'finalizing' ||
+            prev === 'completed') {
+          return prev;
+        }
+        return 'connected';
+      });
+    };
     const handleDisconnect = () => setStatus('reconnecting');
     const handleError = () => setStatus('error');
 
@@ -109,7 +130,7 @@ export function useGenerationSocket({
       disconnectSocket();
       setStatus('idle');
     };
-  }, [jobId]);
+  }, [jobId, connectionAttempt]);
 
   return { status };
 }

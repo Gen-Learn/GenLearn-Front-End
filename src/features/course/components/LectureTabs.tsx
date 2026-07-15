@@ -28,6 +28,9 @@ type Props = {
   onChangeTab: (tab: TabKey) => void;
   currentTime?: number;
   onSeek?: (time: number) => void;
+  notes: string ;
+  onNotesChange: (value: string) => void ;
+  onSaveNotes : (value: string) => void
 };
 
 const tabItems: Array<{ id: TabKey; label: string; icon: typeof FileText }> = [
@@ -216,6 +219,7 @@ export default function LectureTabs({
   onChangeTab,
   currentTime = 0,
   onSeek,
+  notes
 }: Props) {
   const [ isTranscriptExpanded, setIsTranscriptExpanded ] = useState(false);
   const scripts = selectedLecture?.scripts ?? [];

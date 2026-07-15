@@ -7,6 +7,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import Alert from '@/components/alert/alert';
 import { useLocation } from 'react-router-dom';
 import image from '@/assets/images/logoOld.png';
+import { useAnalytics } from '@/hooks/queries/useGetAnalytics';
 
 export default function Header() {
   const [ scrolled, setScrolled ] = useState(false);
@@ -17,6 +18,8 @@ export default function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, logout } = useAuth();
   const { notifications, unreadCount, markAllRead, courseID } = useNotification();
+  const { data: analytics } = useAnalytics({ enabled: isAuthenticated });
+  const currentStreak = analytics?.currentLoginStreak ?? 0;
   const inHomePage = location.pathname === '/';
 
   useEffect(() => {
@@ -121,7 +124,7 @@ export default function Header() {
             ) : isAuthenticated ? (
               <ul className="flex justify-between items-center gap-1">
                 <li className="flex justify-center text-base items-center gap-2 px-4 py-2 rounded-xl text-[#8864b5]">
-                  <span>0</span>
+                  <span>{currentStreak}</span>
                   <Flame className="w-5 h-5" />
                 </li>
                 <li className="relative">
@@ -195,7 +198,7 @@ export default function Header() {
             {!isLoading && isAuthenticated && (
               <>
                 <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-[#8864b5] text-sm">
-                  <span>0</span>
+                  <span>{currentStreak}</span>
                   <Flame className="w-5 h-5" />
                 </div>
                 <div className="relative">

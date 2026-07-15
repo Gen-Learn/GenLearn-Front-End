@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { submitGenerateJob } from '@/services/generateService';
+import { connectSocket } from '@/services/socket';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useGenerationSocket, type SocketStatus } from '@/hooks/mutations/useGenerationSocket';
 
@@ -19,6 +20,13 @@ const handleGenerate = () => {
   const [ jobId, setJobId ] = useState<string | null>(null);
   const [ error, setError ] = useState<string | null>(null);
 
+  // Monotonically increasing key that forces the socket hook to re-join
+  // the same job when the user clicks "Retry" after a socket-level failure.
+  const [ connectionAttempt, setConnectionAttempt ] = useState(0);
+
+  // Guard against concurrent generation attempts.
+  const generatingRef = useRef(false);
+
   const { addNotification, setCourseID } = useNotification();
 
   const getErrorMessage = (err: unknown) => {
@@ -31,6 +39,7 @@ const handleGenerate = () => {
   // connectionStatus/jobStatus states to keep in sync.
   const { status: socketStatus } = useGenerationSocket({
     jobId,
+    connectionAttempt,
     onCompleted: (payload) => {
       setCourseName(payload?.courseName || null);
       setCourseID(payload?.courseId || null);
@@ -52,10 +61,14 @@ const handleGenerate = () => {
 
   // **********************************************************************Handle job generation
   const handleGenerateCourse = useCallback(async (selectedFile: File) => {
+    if (generatingRef.current) return;
+    generatingRef.current = true;
+
     setFile(selectedFile);
     setError(null);
-    setJobId(null);
     setUploadPhase('uploading');
+
+    connectSocket();
 
     try {
       const data = await submitGenerateJob([ selectedFile ]);
@@ -68,6 +81,8 @@ const handleGenerate = () => {
     } catch (err) {
       setError(getErrorMessage(err));
       setUploadPhase('error');
+    } finally {
+      generatingRef.current = false;
     }
   }, []);
 
@@ -101,9 +116,23 @@ const handleGenerate = () => {
     setUploadPhase('idle');
     setJobId(null);
     setError(null);
+    setConnectionAttempt(0);
   };
 
   const retryUpload = () => {
+    setError(null);
+
+    if (jobId) {
+      // The job was already created on the server — don't re-upload.
+      // Just reconnect the socket to the existing job by bumping the
+      // connection attempt counter, which forces the socket hook to
+      // tear down and re-join.
+      setUploadPhase('uploading');
+      setConnectionAttempt((n) => n + 1);
+      return;
+    }
+
+    // No jobId yet — the upload itself failed. Re-upload the file.
     if (file) handleGenerateCourse(file);
   };
 
