@@ -7,18 +7,24 @@ import { createPortal } from "react-dom";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
 import image from "@/assets/images/logoOld.png";
-
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const [ mobileMenuOpen, setMobileMenuOpen ] = useState(false);
   const [ avatarMenuOpen, setAvatarMenuOpen ] = useState(false);
   const [ notificationsOpen, setNotificationsOpen ] = useState(false);
 
   const { notifications, unreadCount, markAllRead, courseID } =
     useNotification();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const initials = (user?.name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[ 0 ])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || '?';
+
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -102,7 +108,7 @@ export default function Header() {
               onClick={toggleAvatarMenu}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 font-semibold text-white"
             >
-              JP
+              {initials}
             </button>
 
             {avatarMenuOpen && (

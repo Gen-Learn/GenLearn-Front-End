@@ -16,10 +16,17 @@ export default function Header() {
   const [ notificationsOpen, setNotificationsOpen ] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { notifications, unreadCount, markAllRead, courseID } = useNotification();
   const { data: analytics } = useAnalytics({ enabled: isAuthenticated });
   const currentStreak = analytics?.currentLoginStreak ?? 0;
+  const initials = (user?.name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[ 0 ])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || '?';
   const inHomePage = location.pathname === '/';
 
   useEffect(() => {
@@ -123,9 +130,12 @@ export default function Header() {
               <div className="w-24 h-9" />
             ) : isAuthenticated ? (
               <ul className="flex justify-between items-center gap-1">
-                <li className="flex justify-center text-base items-center gap-2 px-4 py-2 rounded-xl text-[#8864b5]">
+                <li className="group relative flex justify-center text-base items-center gap-2 px-4 py-2 rounded-xl text-[#8864b5] hover:bg-[#f1e1f7] transition-colors duration-300 cursor-default">
                   <span>{currentStreak}</span>
                   <Flame className="w-5 h-5" />
+                  <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+                    {currentStreak} day streak
+                  </span>
                 </li>
                 <li className="relative">
                   <button
@@ -151,7 +161,7 @@ export default function Header() {
                     data-nav="profile"
                     className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-semibold hover:scale-105 transition-transform"
                   >
-                    JP
+                    {initials}
                   </button>
                   {avatarMenuOpen && (
                     <div className="absolute top-11 right-0 bg-white shadow-lg rounded-md py-2 w-48 z-50">
@@ -197,9 +207,12 @@ export default function Header() {
           <div className="flex lg:hidden items-center gap-1">
             {!isLoading && isAuthenticated && (
               <>
-                <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-[#8864b5] text-sm">
+                <div className="group relative flex items-center gap-1 px-2 py-1.5 rounded-xl text-[#8864b5] text-sm hover:bg-[#f1e1f7] transition-colors duration-300 cursor-default">
                   <span>{currentStreak}</span>
                   <Flame className="w-5 h-5" />
+                  <span className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+                    {currentStreak} day streak
+                  </span>
                 </div>
                 <div className="relative">
                   <button

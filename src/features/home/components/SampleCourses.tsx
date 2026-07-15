@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import { Link } from 'react-router-dom';
 import { useRecentCourses } from '@/hooks/queries/useGetRecentCourses';
 import { useGetCoursesImages } from '@/hooks/queries/useGetCoursesImages';
-import { CourseCardSkeleton, Skeleton } from '@/components/loading/index'; 
+import { CourseCardSkeleton, Skeleton } from '@/components/loading/index';
 
 export default function SampleCourses() {
   const { data: courses, isLoading, isError } = useRecentCourses({ page: 1, limit: 4 });
@@ -34,7 +34,7 @@ export default function SampleCourses() {
     );
   }
 
-  if (isError || !courses || courses.length === 0) {
+  if (isError || !courses || courses.courses.length === 0) {
     return null;
   }
 
@@ -61,7 +61,7 @@ export default function SampleCourses() {
 
         {/* Courses Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {courses.map((course) => {
+          {courses.courses.map((course) => {
             const imageSrc = courseImages[ course.id ];
 
             return (

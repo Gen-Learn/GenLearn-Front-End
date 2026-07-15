@@ -253,7 +253,7 @@ export default function profile() {
                 </Link>
               </div>
               <div className="space-y-3">
-                {courses?.map((course) => (
+                {courses?.courses?.map((course) => (
                   <Link to={`/course-details/${course.id}`}>
                     <div key={course.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
                       <img

@@ -1,4 +1,3 @@
-// services/courcesService.ts
 import axiosInstance from "./axios";
 import Course from "../types/coursesModel";
 
@@ -15,13 +14,21 @@ interface CoursesResponse {
   };
 }
 
+export interface GetCoursesResult {
+  courses: Course[];
+  total: number;
+}
+
 export const getCourses = async (
   params: GetCoursesParams = {},
-): Promise<Course[]> => {
+): Promise<GetCoursesResult> => {
   const response = await axiosInstance.get<CoursesResponse>(
     "/api/v1/courses",
     { params },
   );
 
-  return response.data.data.courses;
+  return {
+    courses: response.data.data.courses,
+    total: response.data.data.total,
+  };
 };

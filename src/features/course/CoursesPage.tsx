@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   Filter,
@@ -6,6 +6,8 @@ import {
   List,
   BookOpen,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/index';
 import { CourseListItem, CourseCard } from "./components/index";
@@ -17,9 +19,12 @@ import { CourseGridSkeleton } from '@/components/loading';
 import { EmptyState } from '@/components/empty-states';
 import { Link } from 'react-router-dom';
 import { useGetCoursesImages } from "@/hooks/queries/useGetCoursesImages"
+
 type ViewMode = 'grid' | 'list';
 type SortOption = 'recent' | 'title' | 'progress' | 'duration';
 type StatusFilter = 'all' | 'not_started' | 'in_progress' | 'completed';
+
+const PAGE_SIZE = 9;
 
 type DisplayCourse = {
   id: string;
@@ -47,7 +52,6 @@ function CourseCardWithDetails({
 }) {
   const { data: singleCourse } = useGetSingleCource(course.id);
 
-  // Use reduce to count total lectures across all sections
   const lecturesCount = useMemo(() => {
     if (!singleCourse?.sections) return 0;
     return singleCourse.sections.reduce(
@@ -55,6 +59,7 @@ function CourseCardWithDetails({
       0
     );
   }, [ singleCourse ]);
+
   const displayCourse: DisplayCourse = {
     id: course.id,
     title: course.name,
@@ -81,12 +86,27 @@ export default function CoursesPage() {
   const [ sortBy, setSortBy ] = useState<SortOption>('recent');
   const [ statusFilter, setStatusFilter ] = useState<StatusFilter>('all');
   const [ showFilters, setShowFilters ] = useState(false);
+  const [ page, setPage ] = useState(1);
+
   const {
-    data: courses = [],
+    data,
     isLoading,
+    isPlaceholderData,
     error,
-  } = useGetAllCourses();
-  const { courseImages, loadingImages } = useGetCoursesImages();
+  } = useGetAllCourses({ page, limit: PAGE_SIZE });
+
+  const courses = data?.courses ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const { courseImages, loadingImages } = useGetCoursesImages(courses);
+
+  // Reset to page 1 whenever search/filter changes so the user can't get
+  // stranded on a page that no longer has matching results.
+  useEffect(() => {
+    setPage(1);
+  }, [ searchQuery, statusFilter ]);
+
   const filteredCourses = useMemo(() => {
     let coursesCopy = [ ...courses.filter(Boolean) ];
 
@@ -123,7 +143,6 @@ export default function CoursesPage() {
     return coursesCopy;
   }, [ courses, searchQuery, statusFilter, sortBy ]);
 
-
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -152,12 +171,12 @@ export default function CoursesPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
 
         <div className="mb-8">
-          <div className="flex  gap-4 mb-2 justify-between items-center">
+          <div className="flex gap-4 mb-2 justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">My Courses</h1>
             <Link
               to="/"
               data-nav="home"
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 "
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
@@ -215,8 +234,8 @@ export default function CoursesPage() {
                       key={status}
                       onClick={() => setStatusFilter(status)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statusFilter === status
-                          ? 'bg-primary-100 text-primary-700'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-primary-100 text-primary-700'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                     >
                       {status === 'all'
@@ -245,7 +264,7 @@ export default function CoursesPage() {
         </div>
 
         <p className="text-sm text-gray-500 mb-4">
-          {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found
+          {total} course{total !== 1 ? 's' : ''} found
         </p>
 
         {isLoading || loadingImages ? (
@@ -268,19 +287,54 @@ export default function CoursesPage() {
             />
           )
         ) : (
+          <>
+            <div
+              className={`transition-opacity ${isPlaceholderData ? 'opacity-60' : 'opacity-100'} ${viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}`}
+            >
+              {filteredCourses.map((course) => (
+                <CourseCardWithDetails
+                  key={course.id}
+                  course={course}
+                  formatDuration={formatDuration}
+                  viewMode={viewMode}
+                  courseImage={courseImages[ course.id ]}
+                />
+              ))}
+            </div>
 
-          // ↓ viewMode passed down; CourseCardWithDetails renders the right variant
-          <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-            {filteredCourses.map((course) => (
-              <CourseCardWithDetails
-                key={course.id}
-                course={course}
-                formatDuration={formatDuration}
-                viewMode={viewMode}
-                courseImage={courseImages[ course.id ]}
-              />
-            ))}
-          </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-9 h-9 rounded-lg text-sm font-medium ${p === page
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                      }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
