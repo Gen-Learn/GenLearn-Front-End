@@ -1,8 +1,8 @@
 import { getSingleCource } from "../../services/singleCourceService";
 import { useQuery } from "@tanstack/react-query";
-
+import Course from "@/types/coursesModel"
 export const useGetSingleCource = (id: string) => {
-  return useQuery({
+  return useQuery<Course>({
     queryKey: [ "course", id ],
     queryFn: () => getSingleCource(id),
 

@@ -1,6 +1,6 @@
 // hooks/queries/useGetCoursesImages.ts
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { useQueries } from "@tanstack/react-query";
 import axiosInstance from "@/services/axios";
 import Course from "@/types/coursesModel";
 
@@ -8,8 +8,35 @@ interface CourseImageMap {
   [ courseId: string ]: string;
 }
 
+// Revoke blob URLs only when React Query actually evicts them from cache
+// (gcTime expiry), not when any particular component unmounts. This must
+// be registered once globally, not per-hook-instance, or you'll end up
+// with duplicate subscriptions and revoke-on-first-unmount bugs again.
+let blobRevokeSubscribed = false;
+
+function ensureBlobRevocationSubscription(
+  queryClient: ReturnType<typeof useQueryClient>
+) {
+  if (blobRevokeSubscribed) return;
+  blobRevokeSubscribed = true;
+
+  queryClient.getQueryCache().subscribe((event) => {
+    if (event.type !== "removed") return;
+    if (event.query.queryKey[ 0 ] !== "course-image") return;
+
+    const url = event.query.state.data;
+    if (typeof url === "string" && url.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
+  });
+}
+
 export const useGetCoursesImages = (courses: Course[] = []) => {
-  const createdUrlsRef = useRef<Set<string>>(new Set());
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    ensureBlobRevocationSubscription(queryClient);
+  }, [ queryClient ]);
 
   const coursesWithImages = courses.filter((c) => c.imageUrl);
 
@@ -22,9 +49,7 @@ export const useGetCoursesImages = (courses: Course[] = []) => {
         const response = await axiosInstance.get(course.imageUrl!, {
           responseType: "blob",
         });
-        const url = URL.createObjectURL(response.data);
-        createdUrlsRef.current.add(url);
-        return url;
+        return URL.createObjectURL(response.data);
       },
       staleTime: 1000 * 60 * 10,
       gcTime: 1000 * 60 * 30,
@@ -40,16 +65,6 @@ export const useGetCoursesImages = (courses: Course[] = []) => {
     if (result.data) courseImages[ course.id ] = result.data;
     if (result.isLoading) loadingImages = true;
   });
-
-  // Revoke every blob URL this hook instance created, once the courses
-  // page unmounts entirely (not on every page change — cache still needs
-  // the URLs alive while the user pages back and forth).
-  useEffect(() => {
-    return () => {
-      createdUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      createdUrlsRef.current.clear();
-    };
-  }, []);
 
   return {
     courseImages,

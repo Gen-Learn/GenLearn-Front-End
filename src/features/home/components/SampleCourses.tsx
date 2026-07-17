@@ -8,7 +8,7 @@ import { CourseCardSkeleton, Skeleton } from '@/components/loading/index';
 
 export default function SampleCourses() {
   const { data: courses, isLoading, isError } = useRecentCourses({ page: 1, limit: 4 });
-  const { courseImages, loadingImages } = useGetCoursesImages();
+  const { courseImages, loadingImages } = useGetCoursesImages(courses?.courses ?? []);
 
   if (isLoading || loadingImages) {
     return (

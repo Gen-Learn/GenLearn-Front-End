@@ -7,11 +7,14 @@ import { EmptyState } from '@/components/empty-states';
 import { Header } from '@/layout/index';
 import { CourseDetailsSkeleton } from '@/components/loading';
 import { useGetCoursesImages } from '@/hooks/queries/useGetCoursesImages';
+import { useGetAllCourses } from '@/hooks/queries/useGetAllCources';
 export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { data: course, isLoading, error } = useGetSingleCource(id || '');
-  const { courseImages, loadingImages } = useGetCoursesImages();
-  console.log("CourseDetailsPage - course:", course);
+  const { data: coursesData } = useGetAllCourses({ page: 1, limit: 100 });
+  const imageUrl = coursesData?.courses?.find((c) => c.id === id)?.imageUrl;
+  const courseForImages = course && imageUrl ? { ...course, imageUrl } : course;
+  const { courseImages, loadingImages } = useGetCoursesImages(courseForImages ? [ courseForImages ] : []);
   return (
     <div className="min-h-screen bg-[#FAFAFC]">
       <Header />

@@ -37,12 +37,19 @@ export default function CourseHeroCard({ course, courseImages }: Props) {
     return acc;
   }, 0)
   const totalQuizzes = numsOfSections + totalLectures - 1;
+  console.log("imageUrl:", courseImages[ course.id ], "id:", course?.id, "type:", typeof course?.id);
   return (
     <Card className="!p-0 overflow-hidden mb-8">
       <div className="flex flex-col lg:flex-row">
         <div className="lg:w-96 flex-shrink-0">
           <div className="relative aspect-video lg:aspect-auto lg:h-full">
-            <img src={courseImages[ course.id ]} alt={courseName} className="w-full h-full object-cover" />
+            {courseImages[ course.id ] ? (
+              <img src={courseImages[ course.id ]} alt={courseName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                <BookOpen className="w-12 h-12" />
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
         </div>
